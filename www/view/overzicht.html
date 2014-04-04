@@ -2,20 +2,9 @@
    <ion-content class="has-header">
       
       <div class="med-list scroll has-header has-footer">
-         <ion-list>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-            <ion-item> a </ion-item>
-         </ion-list>
+         <ion-item ng-repeat="med in meds" type="item-text-wrap" href="#/med/{{med.id}}">
+           {{med.name}}
+         </ion-item>
       </div>
 
    </ion-content>

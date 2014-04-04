@@ -1,9 +1,15 @@
-angular.module('project.router', [])
-   .config(function($stateProvider, $urlRouterProvider) {
+angular.module(
+   'project.router', 
+   [
+      'project.controller.settings',
+      'project.controller.overview'
+   ]
+).config(function($stateProvider, $urlRouterProvider) {
    
       $stateProvider
          .state('overzicht', {
             url: '/',
+            controller: 'OverviewCtrl',
             templateUrl: 'view/overzicht.html'
          })
          .state('nieuw', {

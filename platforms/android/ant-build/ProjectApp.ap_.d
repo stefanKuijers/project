@@ -107,14 +107,10 @@ C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\ww
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\www\device.js \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www\statusbar.js \
-C:\dev\project\platforms\android\assets\www\view\friend-detail.html \
 C:\dev\project\platforms\android\assets\www\view\history.html \
 C:\dev\project\platforms\android\assets\www\view\new-med-scan.html \
 C:\dev\project\platforms\android\assets\www\view\new-med-type.html \
 C:\dev\project\platforms\android\assets\www\view\new-med.html \
 C:\dev\project\platforms\android\assets\www\view\overzicht.html \
-C:\dev\project\platforms\android\assets\www\view\tab-account.html \
-C:\dev\project\platforms\android\assets\www\view\tab-dash.html \
-C:\dev\project\platforms\android\assets\www\view\tab-friends.html \
-C:\dev\project\platforms\android\assets\www\view\tabs.html \
+C:\dev\project\platforms\android\assets\www\view\settings.html \
 C:\dev\project\platforms\android\ant-build\AndroidManifest.xml \
