@@ -1,0 +1,24 @@
+.bar-header {
+   height:50px;
+}
+.bar .title {
+   line-height: 50px;
+}
+.bar .button.button-icon .icon:before, .bar .button.button-icon:before, .bar .button.button-icon.icon-left:before, .bar .button.button-icon.icon-right:before {
+   line-height: 40px;
+}
+.bar .button {
+   line-height: 40px;
+}
+
+.bar-footer {
+   height: 70px;
+}
+
+
+@media screen and (orientation:portrait) {
+
+}
+@media screen and (orientation:landscape) {
+
+}
