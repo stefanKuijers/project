@@ -12,6 +12,10 @@ angular.module(
             controller: 'OverviewCtrl',
             templateUrl: 'view/overzicht.html'
          })
+         .state('med-info', {
+            url: '/medicijn-detail/:id',
+            templateUrl: 'view/medicijn-detail.html'
+         })
          .state('nieuw', {
             url: '/nieuw',
             templateUrl: 'view/new-med.html'
