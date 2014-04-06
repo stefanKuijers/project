@@ -1,0 +1,35 @@
+<ion-view title="Overzicht">
+   <ion-content class="has-header">
+    
+      <div class="icon">
+         {{med.form}}
+      </div>
+
+      <div class="med_info">
+         <h1 class="med_name">{{med.trade_name}}</h1>
+         <div class="dosis">
+            <div class="dose">
+               <div class="amount">{{med.dose.amount}}</div>
+               <div class="unit">{{med.dose.unit}}</div>
+            </div>
+            <p class="description">{{med.description}}</p>
+            <div class="dosis">
+            <h2>Inamemomenten</h2>
+               <div class="item" ng-repeat="dose in med.dosis">
+                  <div class="time">
+                     {{dose.time}}
+                  </div>
+                  <div class="dose_amount">{{dose.amount}} <span>x</span></div>
+                  <div class="dose">
+                     <div class="amount">{{med.dose.amount}}</div>
+                     <div class="unit">{{med.dose.unit}}</div>
+                  </div>
+            
+               </div>
+            </div>
+
+         </div>
+      </div>
+
+   </ion-content>
+</ion-view>
