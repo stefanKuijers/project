@@ -2,7 +2,8 @@ angular.module(
    'project.router', 
    [
       'project.controller.settings',
-      'project.controller.overview'
+      'project.controller.overview',
+      'project.controller.med_info'
    ]
 ).config(function($stateProvider, $urlRouterProvider) {
    
@@ -14,6 +15,7 @@ angular.module(
          })
          .state('med-info', {
             url: '/medicijn-detail/:id',
+            controller: 'MedInfoCtrl',
             templateUrl: 'view/medicijn-detail.html'
          })
          .state('nieuw', {

@@ -21,8 +21,38 @@
 }
 
 /* view specific */
+/**/
 .row.med-add-options {
    margin-top: 40px;
+}
+
+/* overzicht */
+.med-list .time,
+.med-list .icon,
+.med-list .med_info,
+.med-list .dose_amount,
+.med-list .dose,
+.med-list .amount,
+.med-list .unit {
+   float: left;
+}
+
+.med-list .time,
+.med-list .icon {
+   width: 80px;
+}
+
+.med-list .med_name {
+   padding-bottom: 4px;
+}
+
+.med-list .dosis {
+   clear: left;
+}
+
+.med-list .dose_amount,
+.med-list .dose .amount {
+   padding-right: 5px;
 }
 
 @media screen and (orientation:portrait) {
