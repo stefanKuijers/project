@@ -12,6 +12,10 @@
    line-height: 40px;
 }
 
+.has-header {
+   top: 50px;
+}
+
 .bar-footer {
    height: 70px;
 }

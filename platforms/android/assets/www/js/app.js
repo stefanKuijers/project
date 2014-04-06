@@ -2,7 +2,6 @@ angular.module(
    'project', 
    [
       'ionic',
-      'project.controller.settings',
       'project.router'
    ]
 ).run( 

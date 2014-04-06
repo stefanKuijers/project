@@ -34,7 +34,11 @@ C:\dev\project\platforms\android\assets\www\js\friend-detail.html \
 C:\dev\project\platforms\android\assets\www\js\router.js \
 C:\dev\project\platforms\android\assets\www\js\service \
 C:\dev\project\platforms\android\assets\www\js\services.js \
+C:\dev\project\platforms\android\assets\www\js\controller\overview.js \
 C:\dev\project\platforms\android\assets\www\js\controller\settings.js \
+C:\dev\project\platforms\android\assets\www\js\service\user \
+C:\dev\project\platforms\android\assets\www\js\service\user\medicins.js \
+C:\dev\project\platforms\android\assets\www\js\service\user\settings.js \
 C:\dev\project\platforms\android\assets\www\lib\fast-click.min.js \
 C:\dev\project\platforms\android\assets\www\lib\ionic \
 C:\dev\project\platforms\android\assets\www\lib\live-templates.js \
@@ -108,6 +112,7 @@ C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\ww
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www\statusbar.js \
 C:\dev\project\platforms\android\assets\www\view\history.html \
+C:\dev\project\platforms\android\assets\www\view\medicijn-detail.html \
 C:\dev\project\platforms\android\assets\www\view\new-med-scan.html \
 C:\dev\project\platforms\android\assets\www\view\new-med-type.html \
 C:\dev\project\platforms\android\assets\www\view\new-med.html \
