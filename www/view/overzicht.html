@@ -2,17 +2,19 @@
    <ion-content class="has-header">
       
       <div class="med-list scroll has-header has-footer">
-         <a class="item" ng-repeat="med in meds | orderBy:'trade_name':false | orderBy:'dosis[primary_dose_index].time':false" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
-            <div class="time">
+         <a class="item" ng-repeat="med in meds" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
+            <div class="time-container" ng-class="{'time-header': med.time_header==true}">
+               <span ng-if="med.time_header" class="time">
                {{med.dosis[med.primary_dose_index].time}}
+               </span>
             </div>
-            <div class="icon">
-               {{med.form}}
+            <div class="med-icon med-icon-{{med.form}} placeholder-img">
+            {{med.form}}
             </div>
-            <div class="med_info">
-               <div class="med_name"><h2>{{med.trade_name}}</h2></div>
+            <div class="med-info">
+               <div class="med-name"><h2>{{med.trade_name}}</h2></div>
                <div class="dosis">
-                  <div class="dose_amount">{{med.dosis[med.primary_dose_index].amount}} <span>x</span></div>
+                  <div class="dose-amount">{{med.dosis[med.primary_dose_index].amount}} <span>x</span></div>
                   <div class="dose">
                      <div class="amount">{{med.dose.amount}}</div>
                      <div class="unit">{{med.dose.unit}}</div>
@@ -25,8 +27,18 @@
    </ion-content>
 
    <ion-footer-bar class="bar-stable">
-      <div class="col"><a class="button button-clear button-block" href="#/nieuw">Nieuw Medicijn</a></div>
-      <div class="col"><a class="button button-clear button-block" href="#/geschiedenis">Geschiedenis</a></div>         
+      <div class="col">
+         <a class="button button-clear button-block" href="#/nieuw">
+            <div class="placeholder-img nav-icon nav-icon-new"></div>
+            <span class="button-label">Nieuw Medicijn</span>
+         </a>
+      </div>
+      <div class="col">
+         <a class="button button-clear button-block" href="#/geschiedenis">  
+            <div class="placeholder-img nav-icon nav-icon-history"></div>
+            <span class="button-label">Geschiedenis</span>
+         </a>
+      </div>         
    </ion-footer-bar>
    
 </ion-view>

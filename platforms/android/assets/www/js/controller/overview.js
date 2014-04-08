@@ -3,5 +3,6 @@ angular.module('project.controller.overview', ['project.service.user.medicins'])
       Medicins.parse();
 
       $scope.meds = Medicins.get();
+      console.log($scope.meds);
    })
 ;

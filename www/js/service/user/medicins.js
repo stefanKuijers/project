@@ -4,7 +4,7 @@
    Data will be fetched from local storage
 */
 angular.module('project.service.user.medicins', [])
-   .factory('Medicins', function() {
+   .factory('Medicins', function($filter) {
       var meds = [
          { id: 0, dosis: [{time: "08:00", amount: 2}, {time: "12:00", amount: 1}, {time: "18:00", amount: 2}], trade_name: 'Ultacit', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "Hydrotalciet", form: "tablet_1", dose:{amount:200, unit:"mg"}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines.", breast_feading: "Geen effect op borst voeding"} },
          { id: 1, dosis: [{time: "08:00", amount: 1}], trade_name: 'Paracetamol Trekpleister', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: false, active_ingredient: "Paracetamol", form: "tablet_2", dose:{amount:100, unit:"mg"}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines.", breast_feading: "Geen effect op borst voeding"} },
@@ -78,7 +78,17 @@ angular.module('project.service.user.medicins', [])
                };
 
                parsed_meds = meds.concat(double_meds);
-               // $filter('orderBy')(parsed_meds, 'name', false);
+
+               parsed_meds = $filter('orderBy')(parsed_meds, 'trade_name', false);
+               parsed_meds = $filter('orderBy')(parsed_meds, 'dosis[primary_dose_index].time', false);
+
+               var prevTime;
+               var parsed_meds_length = parsed_meds.length;
+               for(i = 0; i < parsed_meds_length; i++) {
+                  parsed_meds[i].time_header = parsed_meds[i].dosis[parsed_meds[i].primary_dose_index].time !== prevTime;
+                  console.log(prevTime, parsed_meds[i].dosis[parsed_meds[i].primary_dose_index].time, parsed_meds[i].time_header);
+                  prevTime = parsed_meds[i].dosis[parsed_meds[i].primary_dose_index].time;
+               }
             }
          },
 

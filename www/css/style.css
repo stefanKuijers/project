@@ -17,11 +17,21 @@
 }
 
 .has-footer {
-   bottom: 70px;
+   bottom: 188px;
 }
 
 .bar-footer {
-   height: 70px;
+   height: 190px;
+}
+
+.item h2 {
+   font-size: 22px;
+   font-weight: bold;
+}
+
+/* global */
+.padding-view {
+   padding: 10px;
 }
 
 /* view specific */
@@ -31,32 +41,105 @@
 }
 
 /* overzicht */
-.med-list .time,
-.med-list .icon,
-.med-list .med_info,
-.med-list .dose_amount,
-.med-list .dose,
-.med-list .amount,
-.med-list .unit {
+.med-list .time-container,
+.med-list .med-icon,
+.med-list .med-info,
+/*.med-list*/ .dose-amount,
+/*.med-list*/ .dose,
+/*.med-list*/ .amount,
+/*.med-list*/ .unit {
    float: left;
 }
 
-.med-list .time,
-.med-list .icon {
-   width: 80px;
+.med-list .time-container,
+.med-list .med-icon {
+   width: 60px;
+   height: 60px;
 }
 
-.med-list .med_name {
+.med-list .med-icon {
+   margin-left: 70px;
+   text-align: center;
+}
+.med-list .time-container{
+   border-right: 1px solid #ddd;
+   position:absolute;
+   height:100px;
+   top:0;
+   padding-top: 14px;
+}
+
+.med-list .time-container.time-header {
+   font-weight: bold;
+}
+
+.med-list .med-name {
    padding-bottom: 4px;
 }
 
-.med-list .dosis {
+/*.med-list*/ .dosis {
    clear: left;
 }
 
-.med-list .dose_amount,
-.med-list .dose .amount {
+/*.med-list*/ .dose-amount,
+/*.med-list*/ .dose .amount {
    padding-right: 5px;
+}
+
+.med-list .med-info {
+   margin-left: 10px;
+}
+
+.bar-footer .button {
+   width:100%;
+   padding-bottom:50%;
+}
+.nav-icon {
+   width: 120px;
+   height:120px;
+   margin: 0 auto;
+}
+
+/* med-detail */
+.med-detail .med-icon {
+   width: 40%;
+   padding-bottom: 40%;
+   margin:auto;
+}
+
+.med-detail .med-name,
+.med-detail .dose-detail,
+.med-detail .time,
+.med-detail .dose-amount {
+   float:left;
+}
+
+.med-detail .time {
+   margin-right: 10px;
+}
+
+.med-detail .med-name {
+   width:70%;
+}
+
+.med-detail .dose-detail {
+   width: 20%;
+}
+
+.med-detail .description {
+   clear: left;
+}
+
+
+
+/* wireframe styles */
+.placeholder-img {
+   background-size: 100%;
+   color:rgba(100,100,100,0.3);
+   background-repeat: no-repeat;
+   text-align: center;
+   background-image: url('../img/placeholder.png');
+   background-position: 50%;
 }
 
 @media screen and (orientation:portrait) {
