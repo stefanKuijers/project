@@ -6,26 +6,58 @@
       </div>
 
       <div class="med-info">
+         <!-- primary info -->
          <h1 class="med-name">{{med.trade_name}}</h1>
          <div class="dose-detail">
             <div class="amount">{{med.dose.amount}}</div>
             <div class="unit">{{med.dose.unit}}</div>
          </div>
          <p class="description">{{med.description}}</p>
-         <div class="dosis">
-            <h2>Inamemomenten</h2>
-               <div class="item" ng-repeat="dose in med.dosis">
-                  <div class="time">
-                     {{dose.time}}
-                  </div>
-                  <div class="dose-amount">{{dose.amount}} <span>x</span></div>
-                  <div class="dose">
-                     <div class="amount">{{med.dose.amount}}</div>
-                     <div class="unit">{{med.dose.unit}}</div>
-                  </div>
-            
+
+         <!-- secondary info -->
+
+         <div class="list secondary-info">
+
+            <div class="item item-divider">
+               Inamemomenten
+            </div>
+
+            <div class="item dosis" ng-repeat="dose in med.dosis">
+               <div class="time">
+                  {{dose.time}}
+               </div>
+               <div class="dose-amount">{{dose.amount}} <span>x</span></div>
+               <div class="dose">
+                  <div class="amount">{{med.dose.amount}}</div>
+                  <div class="unit">{{med.dose.unit}}</div>
                </div>
             </div>
+
+            <div class="item item-divider">
+               Bijwerkingen
+            </div>
+
+            <div class="item side-effects">
+               {{med.information.bijwerkingen}}         
+            </div>
+
+            <div class="item item-divider">
+               Houdbaarheid
+            </div>
+
+            <div class="item side-effects">
+               {{med.information.houdbaarheid}}         
+            </div>
+
+            <div class="item item-divider">
+               Situaties
+            </div>
+
+            <div class="item" ng-repeat="condition in med.conditions">
+               <strong>{{condition.title}}</strong>
+               <p>{{condition.description}}</p>
+            </div>
+
          </div>
       </div>
 
