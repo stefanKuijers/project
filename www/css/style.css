@@ -16,6 +16,10 @@
    top: 50px;
 }
 
+.has-footer {
+   bottom: 70px;
+}
+
 .bar-footer {
    height: 70px;
 }

@@ -2,7 +2,7 @@
    <ion-content class="has-header">
       
       <div class="med-list scroll has-header has-footer">
-         <a class="item" ng-repeat="med in meds" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
+         <a class="item" ng-repeat="med in meds track by med.track_id" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
             <div class="time">
                {{med.dosis[0].time}}
             </div>

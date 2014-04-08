@@ -2,9 +2,9 @@
    <ion-content class="has-header">
       
       <div class="med-list scroll has-header has-footer">
-         <a class="item" ng-repeat="med in meds" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
+         <a class="item" ng-repeat="med in meds | orderBy:'trade_name':false | orderBy:'dosis[primary_dose_index].time':false" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
             <div class="time">
-               {{med.dosis[0].time}}
+               {{med.dosis[med.primary_dose_index].time}}
             </div>
             <div class="icon">
                {{med.form}}
@@ -12,7 +12,7 @@
             <div class="med_info">
                <div class="med_name"><h2>{{med.trade_name}}</h2></div>
                <div class="dosis">
-                  <div class="dose_amount">{{med.dosis[0].amount}} <span>x</span></div>
+                  <div class="dose_amount">{{med.dosis[med.primary_dose_index].amount}} <span>x</span></div>
                   <div class="dose">
                      <div class="amount">{{med.dose.amount}}</div>
                      <div class="unit">{{med.dose.unit}}</div>
