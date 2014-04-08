@@ -15,40 +15,18 @@ angular.module('project.service.user.medicins', [])
          { id: 6, dosis: [{time: "16:30", amount: 2}], trade_name: 'Davitamon', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "paracetamol", form: "powder", dose:{amount:20, unit:"gr"}, interaction: {description: "Dit medicijn kent bepaalde wisselwerkingen met andere medicijnen", status: {code:0, name:"Niet Schadelijk"}, combination_med_id: 4}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines.", breast_feading: "Geen effect op borst voeding"} }
       ];
       var meds_length = meds.length - 1;
-      var i,ii;
       var double_meds = [];
       var dosis_length;
       var parsed = false;
       var parsed_meds = [];
+      var i,ii,parsed_meds_length;
 
 
       var Medicine = function(med) {
          return this.parse(med);
       };
 
-      Medicine.prototype.validate_attribute = function(attribute, value) {
-         return value === 'undefined' ? this.get_default_value(value) : value;
-      };
-
-      Medicine.prototype.get_default_value = function(attribute) {
-         switch(attribute) {
-            case 'form': 
-               return "tablet";
-
-            case 'prescribed': 
-            case 'interaction': 
-            case 'condition': 
-               return false;
-
-            default: return 'null';
-         };
-      };
-
       Medicine.prototype.parse = function(med) {
-         for (var attr in med) {
-            med[attr] = this.validate_attribute(attr, med[attr]);
-         }
-
          med.note = "";
          med.primary_dose_index = 0;
 
@@ -60,11 +38,9 @@ angular.module('project.service.user.medicins', [])
 
                double_med.primary_dose_index = ii;
                double_meds.push(double_med);
-
-               //console.log(double_med);
             };
          }
-         //console.log(this);
+
          return med;
       }
 
@@ -78,22 +54,28 @@ angular.module('project.service.user.medicins', [])
                };
 
                parsed_meds = meds.concat(double_meds);
-
                parsed_meds = $filter('orderBy')(parsed_meds, 'trade_name', false);
                parsed_meds = $filter('orderBy')(parsed_meds, 'dosis[primary_dose_index].time', false);
 
                var prevTime;
-               var parsed_meds_length = parsed_meds.length;
+               parsed_meds_length = parsed_meds.length;
                for(i = 0; i < parsed_meds_length; i++) {
                   parsed_meds[i].time_header = parsed_meds[i].dosis[parsed_meds[i].primary_dose_index].time !== prevTime;
-                  console.log(prevTime, parsed_meds[i].dosis[parsed_meds[i].primary_dose_index].time, parsed_meds[i].time_header);
+                  
                   prevTime = parsed_meds[i].dosis[parsed_meds[i].primary_dose_index].time;
                }
             }
          },
 
          get: function(id) {
-            return id !== undefined ? parsed_meds[id] : parsed_meds;
+            return id !== undefined ? this.get_by_id(id) : parsed_meds;
+         },
+
+         get_by_id: function(id) {
+            for (i = 0; i < parsed_meds_length; i++) {
+               if (parsed_meds[i].id == id)
+                  return parsed_meds[i];
+            }
          }
       }
       
