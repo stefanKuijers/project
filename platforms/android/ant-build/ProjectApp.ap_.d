@@ -88,6 +88,7 @@ C:\dev\project\platforms\android\assets\www\js\services.js \
 C:\dev\project\platforms\android\assets\www\js\controller\med_detail.js \
 C:\dev\project\platforms\android\assets\www\js\controller\overview.js \
 C:\dev\project\platforms\android\assets\www\js\controller\settings.js \
+C:\dev\project\platforms\android\assets\www\js\service\phonestorage.js \
 C:\dev\project\platforms\android\assets\www\js\service\user \
 C:\dev\project\platforms\android\assets\www\js\service\user\medicins.js \
 C:\dev\project\platforms\android\assets\www\js\service\user\settings.js \

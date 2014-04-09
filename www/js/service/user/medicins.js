@@ -3,8 +3,9 @@
 
    Data will be fetched from local storage
 */
-angular.module('project.service.user.medicins', [])
-   .factory('Medicins', function($filter) {
+angular.module('project.service.user.medicins', ['project.service.phonestorage'])
+   .factory('Medicins', function($filter, Phonestorage) {
+      var storageLog = Phonestorage.log;
       var meds = [
          { id: 0, dosis: [{time: "08:00", amount: 2}, {time: "12:00", amount: 1}, {time: "18:00", amount: 2}], trade_name: 'Ultacit', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "Hydrotalciet", form: "tablet_1", dose:{amount:200, unit:"mg"}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} },
          { id: 1, dosis: [{time: "08:00", amount: 1}], trade_name: 'Paracetamol Trekpleister', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: false, active_ingredient: "Paracetamol", form: "tablet_2", dose:{amount:100, unit:"mg"}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} },
@@ -73,7 +74,9 @@ angular.module('project.service.user.medicins', [])
                if (parsed_meds[i].id == id)
                   return parsed_meds[i];
             }
-         }
+         },
+
+         Phonestorage: Phonestorage
       }
       
 

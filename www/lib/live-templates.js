@@ -30,6 +30,7 @@
 var urlMatchRegex = /[a-zA-Z0-9\-\.\/]*[a-zA-Z0-9\-\.]+\.(html|jade)(\/\S*)?/g;
 // location of the router. In this case (example Ionic/Angular project) it was located in js/app.js 
 var routerURL = "js/router.js";
+var excludes = ['cordova.js'];
 
 (function () {
 
@@ -38,7 +39,7 @@ var routerURL = "js/router.js";
       pendingRequests = {},
       currentLinkElements = {},
       oldLinkElements = {},
-      interval = 300,
+      interval = 50,
       loaded = false,
       active = { "html": 1, "css": 1, "js": 1 };
 
@@ -71,7 +72,7 @@ var routerURL = "js/router.js";
            var url = uris[i];
            Live.getHead(url, function (url, info) {
              resources[url] = info;
-           });
+           });             
          }
 
          // add rule for morphing between old and new css files
@@ -96,6 +97,7 @@ var routerURL = "js/router.js";
       for (var i = 0; i < scripts.length; i++) {
         var script = scripts[i], src = script.getAttribute("src");
 
+        if (excludes.indexOf(src) !== -1) continue;
         // Start added code to load any templates defined in the router
         if (src === routerURL) {
           // get router js file with ajax request
