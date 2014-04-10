@@ -13,7 +13,7 @@ angular.module('project.service.phonestorage', [])
             settings: {
                sound_level:           { type: "int", value: "75"},
                sound:                 { type: "int", value: "2"},
-               viration_notification: { type: "bool", value: "true"},
+               vibration_notification: { type: "bool", value: "true"},
                shake_to_take:         { type: "bool", value: "false"},
                visual_notification:   { type: "bool", value: "true"},
                contrast_level:        { type: "int", value: "25"},
@@ -26,7 +26,7 @@ angular.module('project.service.phonestorage', [])
             STORAGE_INITIALIZED:  "STORAGE_INITIALIZED",
             TABLE_DOES_NOT_EXIST: "TABLE_DOES_NOT_EXIST",
             SETTINGS_RETRIEVED:   "SETTINGS_RETRIEVED",
-            SETTING_STORED: "SETTING_STORED"
+            SETTING_STORED:       "SETTING_STORED"
          },
 
          init: function(event_scope) {
@@ -36,8 +36,11 @@ angular.module('project.service.phonestorage', [])
             this.table_exists(this.settings.MED_TABLE_NAME);
 
             var scope = this;
+
+            // comment this line
             this.event_aggregater.$on(this.events.TABLE_DOES_NOT_EXIST , function(e, result) {
                scope.setup_storage();
+            // and this line to force rebuild database on device
             });
          },
 

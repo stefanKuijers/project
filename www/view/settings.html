@@ -24,7 +24,7 @@
       <div class="item item-toggle">
          Vibreer
          <label class="toggle toggle-assertive">
-            <input type="checkbox" checked="checked">
+            <input type="checkbox" ng-checked="vibration_notification" ng-click="toggle_setting('vibration_notification')">
             <div class="track">
                <div class="handle"></div>
             </div>
@@ -33,7 +33,7 @@
       <div class="item item-toggle">
          Schud om medicijn te nemen
          <label class="toggle toggle-assertive">
-            <input type="checkbox">
+            <input type="checkbox" ng-checked="shake_to_take" ng-click="toggle_setting('shake_to_take')">
             <div class="track">
                <div class="handle"></div>
             </div>
@@ -42,7 +42,7 @@
       <div class="item item-toggle">
          Visueele Feedback
          <label class="toggle toggle-assertive">
-            <input type="checkbox">
+            <input type="checkbox" ng-checked="visual_notification" ng-click="toggle_setting('visual_notification')">
             <div class="track">
                <div class="handle"></div>
             </div>
@@ -58,7 +58,7 @@
          Invoer
       </div>
       <div class="item item-toggle">
-         Vibratie bij invoer {{vibration_input}}
+         Vibratie bij invoer
          <label class="toggle toggle-assertive">
             <input type="checkbox" ng-checked="vibration_input" ng-click="toggle_setting('vibration_input')">
             <div class="track">
@@ -67,7 +67,7 @@
          </label>
       </div>
       <div class="item item-toggle">
-         Geluid bij invoer {{sound_input}}
+         Geluid bij invoer
          <label class="toggle toggle-assertive">
             <input type="checkbox" ng-checked="sound_input" ng-click="toggle_setting('sound_input')">
             <div class="track">
