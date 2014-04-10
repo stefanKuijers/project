@@ -75,7 +75,8 @@ angular.module('project.service.phonestorage', [])
          connection: {},
          settings: {
             DB_NAME: "Project_Database",
-            MED_TABLE_NAME: "Medicin"
+            MED_TABLE_NAME: "Medicin",
+            SETTINGS_TABLE_NAME: "Setting"
          },
 
          init: function(event_scope) {
@@ -130,7 +131,15 @@ angular.module('project.service.phonestorage', [])
 
          setup_storage: function() {
             console.log("table does not exists so lets set up storage");
-            var scope = this;
+
+            this.setup_med_table(this);
+            this.setup_settings_table(this);
+            this.setup_history_table(this);
+            this.setup_reminder_table(this);
+            this.setup_user_condition_table(this);
+         },
+
+         setup_med_table: function(scope) {
             this.connection.transaction(
                function(tx) {
                   tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.MED_TABLE_NAME);
@@ -143,7 +152,35 @@ angular.module('project.service.phonestorage', [])
                   console.log("med table created")
                }
             );
+         },
+
+         setup_settings_table: function(scope) {
+            this.connection.transaction(
+               function(tx) {
+                  tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.SETTINGS_TABLE_NAME);
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS ' + scope.settings.SETTINGS_TABLE_NAME + ' (id unique, data)');
+                  tx.executeSql('INSERT INTO ' + scope.settings.SETTINGS_TABLE_NAME + ' (id, data) VALUES (1, "First row")');
+                  tx.executeSql('INSERT INTO ' + scope.settings.SETTINGS_TABLE_NAME + ' (id, data) VALUES (2, "Second row")');
+               }, 
+               this.query_failed, 
+               function() {
+                  console.log("setting table created")
+               }
+            );
+         },
+
+         setup_history_table: function(scope) {
+            // setup table and inject default data
+         },
+
+         setup_reminder_table: function(scope) {
+            // setup table and inject default data
+         },
+
+         setup_user_condition_table: function(scope) {
+            // setup table and inject default data
          }
+
          
       }
    })
