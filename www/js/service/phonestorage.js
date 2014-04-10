@@ -107,6 +107,7 @@ angular.module('project.service.phonestorage', [])
             STORAGE_INITIALIZED:  "STORAGE_INITIALIZED",
             TABLE_DOES_NOT_EXIST: "TABLE_DOES_NOT_EXIST",
             SETTINGS_RETRIEVED:   "SETTINGS_RETRIEVED",
+            MEDS_RETRIEVED:       "MEDS_RETRIEVED",
             SETTING_STORED:       "SETTING_STORED"
          },
 
@@ -129,7 +130,14 @@ angular.module('project.service.phonestorage', [])
             PUBLIC FUNCTIONS
          */
          /* GET */
-         get_medicins: function() {},
+         get_medicins: function(caller_scope) {
+            var scope = this;
+            this.connection.transaction(
+               function(tx) {
+                  scope.query("SELECT * FROM " + scope.settings.MED_TABLE_NAME, tx, scope.events.MEDS_RETRIEVED, caller_scope);
+               }
+            );
+         },
          get_settings: function(caller_scope) {
             var scope = this;
             this.connection.transaction(
@@ -314,7 +322,6 @@ angular.module('project.service.phonestorage', [])
                      ' SELECT 10, 2, 10 UNION ALL ' +
                      ' SELECT 11, 5, 11;'
                   );
-        
 
                   // Create the med table
                   tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.MED_TABLE_NAME);
@@ -337,20 +344,14 @@ angular.module('project.service.phonestorage', [])
                      ')'
                   );
 
-                  //console.log(scope.default_values.meds);
                   var med; 
                   var query_pre_fix = 'INSERT INTO ' + scope.settings.MED_TABLE_NAME + ' (id, prescribed, description, trade_name, note, dosis_amount, when_to_use, when_not_to_use, how_to_use, Icon_id, Unit_id, Active_Ingredient_id) VALUES ';
                   for (med_i in scope.default_values.meds) {
                      med = scope.default_values.meds[med_i];
                      tx.executeSql(query_pre_fix + '('+ med.id +', "' + med.prescribed + '", "' + med.description + '", "' + med.trade_name + '", "' + med.note + '", ' + med.dosis_amount + ', "' + med.when_to_use + '", "' + med.when_not_to_use + '", "' + med.how_to_use + '", ' + med.Icon_id + ', ' + med.Unit_id + ', "' + med.active_ingredient + '")');
                   }
-
-                  
                }, 
-               this.query_failed, 
-               function() {
-                  console.log("med table created");
-               }
+               this.query_failed
             );
          },
 
