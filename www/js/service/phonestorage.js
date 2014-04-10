@@ -1,75 +1,5 @@
 angular.module('project.service.phonestorage', [])
    .service('Phonestorage', function($ionicPlatform) {
-      // var connection, event_aggregater;
-      // var log = "Log Start <:|:> ";
-
-      // var DB_NAME = "Project_Database";
-      // var MED_TABLE_NAME = "Medicins";
-
-      
-
-      // function initialize_database() {
-      //    write_log("initialize_database");
-      //    connection = window.openDatabase("Database", "1.0", DB_NAME, 200000);
-         
-      //    function queryDB(tx) {
-      //       write_log("query the db for table ' + MED_TABLE_NAME + '");
-      //       tx.executeSql('SELECT * FROM ' + MED_TABLE_NAME + '', [], querySuccess, errorCB);
-      //    }
-
-      //    function querySuccess(tx, results) {
-      //       write_log("query was success");
-      //       var result_rows = [];
-      //       for (var i=0; i < results.rows.length; i++) {
-      //          write_log("Row = " + i + " ID = " + results.rows.item(i).id + " Data =  " + results.rows.item(i).data);
-      //          result_rows.push(results.rows.item(i));
-      //       }
-      //       event_aggregater.$emit("MED_DATA_RETRIEVED", result_rows);
-      //    }
-
-      //    function errorCB(tx, err) {
-      //       if (err.code !== 5) {
-      //          write_log("Error processing SQL: " + err.code);
-      //       }
-
-      //       write_log("No table found in database. Let's create one");
-      //       // err.code === 5 this means the table does noet excist in the database
-      //       connection.transaction(populateDB, error_CB, successCB);
-      //    }
-
-      //    write_log("start query transaction");
-      //    connection.transaction(queryDB, errorCB);
-
-      //    // Populate the database 
-      //    //
-      //    function populateDB(tx) {
-      //       write_log("populateDB");
-      //       tx.executeSql('DROP TABLE IF EXISTS ' + MED_TABLE_NAME);
-      //       tx.executeSql('CREATE TABLE IF NOT EXISTS ' + MED_TABLE_NAME + ' (id unique, data)');
-      //       tx.executeSql('INSERT INTO ' + MED_TABLE_NAME + ' (id, data) VALUES (1, "First row")');
-      //       tx.executeSql('INSERT INTO ' + MED_TABLE_NAME + ' (id, data) VALUES (2, "Second row")');
-      //    }
-
-      //    // Transaction error callback
-      //    //
-      //    function error_CB(tx, err) {
-      //       write_log("Error while creating table in database:" + err);
-      //    }
-         
-      //    // Transaction success callback
-      //    //
-      //    function successCB() {
-      //       write_log("Table created in database");
-      //       // table created in database. Now execute a select query.
-      //       connection.transaction(queryDB, errorCB);
-      //    }
-      // }
-
-      // function write_log(message) {
-      //    var log_message = String(message);
-      //    log += log_message + " <:|:> ";
-      // }
-
       return {
          event_aggregater: {},
          connection: {},
@@ -78,23 +8,62 @@ angular.module('project.service.phonestorage', [])
             MED_TABLE_NAME: "Medicin",
             SETTINGS_TABLE_NAME: "Setting"
          },
+         default_values: {
+            settings: {
+               sound_level: "75",
+               sound: "2",
+               viration_notification: "true",
+               shake_to_take: "false",
+               visual_notification:"true",
+               contrast_level: "25",
+               vibration_input: "false",
+               sound_input: "true"
+            }
+         },
 
          init: function(event_scope) {
             this.event_aggregater = event_scope;
+            this.connection = this.connect();
+
+            this.table_exists(this.settings.MED_TABLE_NAME);
 
             var scope = this;
-            $ionicPlatform.ready(function() {
-               console.log("device ready for phonestorage");
-               scope.connection = scope.connect();
-
-               scope.table_exists(scope.settings.MED_TABLE_NAME);
-               scope.event_aggregater.$on("table_does_not_exist", function(e, result) {
-                  scope.setup_storage();
-               });
-
+            this.event_aggregater.$on("table_does_not_exist", function(e, result) {
+               scope.setup_storage();
             });
          },
 
+         /**
+            PUBLIC FUNCTIONS
+         */
+         /* GET */
+         get_medicins: function() {},
+         get_settings: function() {
+            var scope = this;
+            this.connection.transaction(
+               function(tx) {
+                  scope.query("SELECT * FROM " + scope.settings.SETTINGS_TABLE_NAME, tx, "SETTINGS_RETRIEVED");
+               }
+            );
+         },
+
+         get_reminders: function() {},
+         get_history: function() {},
+         get_conditions: function() {},
+
+         /* ADD */
+         add_medicin: function(data) {},
+
+         /* UPDATE */
+         update_medicin: function(attribute, value) {},
+         update_setting: function(attribute, value) {
+
+         },
+
+
+         /**
+            PRIVATE FUNCTIONS
+         */
          connect: function() {
             return window.openDatabase("Database", "1.0", this.settings.DB_NAME, 200000);
          },
@@ -103,7 +72,8 @@ angular.module('project.service.phonestorage', [])
             var scope = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query("SELECT 1 FROM " + scope.settings.MED_TABLE_NAME, tx);
+                  // checks only or the med table does not exists. If it doesnt we assume none of the oters exist or are corrupted
+                  scope.query("SELECT 1 FROM " + scope.settings.MED_TABLE_NAME, tx, "STORAGE_READY");
                }
             );
          },
@@ -113,9 +83,10 @@ angular.module('project.service.phonestorage', [])
             tx.executeSql(
                query, 
                [], 
-               function(result) { // a query succeeded
-                  console.log("a query succeeded");
-                  scope.event_aggregater.$emit(success_event ,result);
+               function(transaction, result) { // a query succeeded
+                  // console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
+                  if (success_event)
+                     scope.event_aggregater.$emit(success_event, result);
                }, 
                function(tx, err) { // a query failed
                   if (err.code === 5) 
@@ -149,7 +120,7 @@ angular.module('project.service.phonestorage', [])
                }, 
                this.query_failed, 
                function() {
-                  console.log("med table created")
+                  console.log("med table created");
                }
             );
          },
@@ -158,13 +129,18 @@ angular.module('project.service.phonestorage', [])
             this.connection.transaction(
                function(tx) {
                   tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.SETTINGS_TABLE_NAME);
-                  tx.executeSql('CREATE TABLE IF NOT EXISTS ' + scope.settings.SETTINGS_TABLE_NAME + ' (id unique, data)');
-                  tx.executeSql('INSERT INTO ' + scope.settings.SETTINGS_TABLE_NAME + ' (id, data) VALUES (1, "First row")');
-                  tx.executeSql('INSERT INTO ' + scope.settings.SETTINGS_TABLE_NAME + ' (id, data) VALUES (2, "Second row")');
+
+                  // how to auto increment the id?
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS ' + scope.settings.SETTINGS_TABLE_NAME + ' (id INT IDENTITY(1,1) PRIMARY KEY, key VARCHAR(50), value VARCHAR(50))');
+                  
+                  var query_pre_fix = 'INSERT INTO ' + scope.settings.SETTINGS_TABLE_NAME + ' (key, value) VALUES ';
+                  for (var key in scope.default_values.settings) {
+                     tx.executeSql(query_pre_fix + '("' + key + '", "' + scope.default_values.settings[key] + '")');
+                  }
                }, 
                this.query_failed, 
                function() {
-                  console.log("setting table created")
+                  console.log("setting table created");
                }
             );
          },
@@ -179,6 +155,8 @@ angular.module('project.service.phonestorage', [])
 
          setup_user_condition_table: function(scope) {
             // setup table and inject default data
+
+            scope.event_aggregater.$emit("STORAGE_READY", "got initialized");
          }
 
          

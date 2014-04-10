@@ -1,13 +1,25 @@
-angular.module('project.controller.overview', ['project.service.user.medicins'])
-   .controller('OverviewCtrl', function($scope, Medicins) {
-      Medicins.Phonestorage.init($scope);
+angular.module('project.controller.overview', ['project.service.user.medicins', 'project.service.phonestorage'])
+   .controller('OverviewCtrl', function($ionicPlatform, $scope, Medicins, Phonestorage) {
+      $ionicPlatform.ready(function() {
+         Phonestorage.init($scope);
+      });
 
-      Medicins.parse();
-      var i = 0;
-      $scope.meds = Medicins.get();
+      $scope.$on("STORAGE_READY", function() {
+         Phonestorage.get_settings($scope);
+         $scope.$on("SETTINGS_RETRIEVED", function(e, result) {
+            console.log("settings from database", result);
+         });
+      });
+
       
-      $scope.$on("MED_DATA_RETRIEVED", function(e, result) {
-         console.log("Med data was retrieved", result);
-      });      
+
+
+      // Medicins.parse();
+      // var i = 0;
+      // $scope.meds = Medicins.get();
+      
+      // $scope.$on("MED_DATA_RETRIEVED", function(e, result) {
+      //    console.log("Med data was retrieved", result);
+      // });      
    })
 ;
