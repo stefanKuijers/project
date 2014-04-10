@@ -5,6 +5,7 @@
 */
 angular.module('project.service.user.settings', [])
    .factory('Settings', function() {
+
      return [
        { id: 0, name: 'setting 1', value: 'value 1' },
        { id: 1, name: 'setting 2', value: 'value 2' },

@@ -2,6 +2,7 @@ angular.module(
    'project.router', 
    [
       'project.controller.settings',
+      'project.controller.nav_control',
       'project.controller.overview',
       'project.controller.med_info'
    ]

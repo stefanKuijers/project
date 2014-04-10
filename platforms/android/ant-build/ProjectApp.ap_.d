@@ -86,6 +86,7 @@ C:\dev\project\platforms\android\assets\www\js\router.js \
 C:\dev\project\platforms\android\assets\www\js\service \
 C:\dev\project\platforms\android\assets\www\js\services.js \
 C:\dev\project\platforms\android\assets\www\js\controller\med_detail.js \
+C:\dev\project\platforms\android\assets\www\js\controller\nav_control.js \
 C:\dev\project\platforms\android\assets\www\js\controller\overview.js \
 C:\dev\project\platforms\android\assets\www\js\controller\settings.js \
 C:\dev\project\platforms\android\assets\www\js\service\phonestorage.js \

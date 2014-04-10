@@ -31,6 +31,7 @@ var urlMatchRegex = /[a-zA-Z0-9\-\.\/]*[a-zA-Z0-9\-\.]+\.(html|jade)(\/\S*)?/g;
 // location of the router. In this case (example Ionic/Angular project) it was located in js/app.js 
 var routerURL = "js/router.js";
 var excludes = ['cordova.js'];
+var includes = ['view/settings.html'];
 
 (function () {
 
@@ -140,6 +141,9 @@ var excludes = ['cordova.js'];
           if (src.match("notify")) 
             alert("Live.js is loaded.");
         }
+
+        for (var j = 0; j < includes.length; j++)
+          uris.push(includes[j]);
       }
       if (!active.js) uris = [];
       if (active.html) uris.push(document.location.href);

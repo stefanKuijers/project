@@ -1,9 +1,47 @@
-angular.module('project.controller.settings', ['project.service.user.settings'])
-   .controller('NavCtrl', function($scope, $ionicSideMenuDelegate, Settings) {
-      // Here I can load the settings
+angular.module('project.controller.settings', ['project.service.phonestorage'])
+   .controller('Settings', function($scope, $ionicSideMenuDelegate, Phonestorage) {
+      
+      if (Phonestorage.initialized) 
+         get_settings();
+      else
+         $scope.$on(Phonestorage.events.STORAGE_READY, get_settings);
 
-      $scope.showSettings = function() {
-         $ionicSideMenuDelegate.toggleRight();
-      };
+      function get_settings() {
+         Phonestorage.get_settings($scope);
+         $scope.$on(Phonestorage.events.SETTINGS_RETRIEVED, function(e, result) {
+            // console.log(result.rows.item(0));
+            for (var i = 0; i < result.rows.length; i++){
+               // console.log("Setting = " + i + " key = " + result.rows.item(i).key + " value =  " + result.rows.item(i).value + " type =  " + result.rows.item(i).type);
+               $scope[result.rows.item(i).key] = type_cast(result.rows.item(i).type, result.rows.item(i).value);
+            }
+            // $scope.$apply();
+            console.log("data recieved and bindings applied", $scope);
+         });
+      }
+
+      function type_cast(type, value) {
+         switch(type) {
+            case "string":
+               return value;
+            break;
+
+            case "bool":
+               return value === "true" ? true : false;
+            break;
+
+            case "num": 
+            case "int":
+               return new Number(value);
+            break;
+
+            default: return value;
+         }
+      }
+
+      $scope.toggle_setting = function(setting_key) {
+         $scope[setting_key] = !$scope[setting_key];
+
+         Phonestorage.update_setting(setting_key, $scope[setting_key]);
+      }
    })
 ;

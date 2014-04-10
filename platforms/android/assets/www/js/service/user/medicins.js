@@ -76,9 +76,7 @@ angular.module('project.service.user.medicins', ['project.service.phonestorage']
             }
          },
 
-         get_log: function() {
-            return Phonestorage.get_log();
-         } 
+         Phonestorage: Phonestorage
       }
       
 

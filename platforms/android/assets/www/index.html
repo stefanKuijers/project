@@ -9,7 +9,7 @@
 
       <script src="lib/ionic/js/ionic.bundle.js"></script>
 
-      <script src="cordova.js"></script>
+      <script src="cordova.js"></script> 
 
       <script src="/bower_components/persistence/lib/persistence.js"></script>
       <script src="/bower_components/persistence/lib/persistence.store.sql.js"></script>
@@ -17,6 +17,7 @@
       <script src="/bower_components/persistence/lib/persistence.store.memory.js"></script>
 
       <script src="js/controller/settings.js"></script>
+      <script src="js/controller/nav_control.js"></script>
       <script src="js/controller/overview.js"></script>
       <script src="js/controller/med_detail.js"></script>
 
@@ -47,7 +48,7 @@
           </ion-nav-view>
         </ion-side-menu-content> 
    
-        <ion-side-menu side="right" ng-include="'view/settings.html'">
+        <ion-side-menu side="right" ng-include="'view/settings.html'" ng-controller="Settings">
         </ion-side-menu>
         
       </ion-side-menus>

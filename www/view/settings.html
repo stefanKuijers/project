@@ -58,18 +58,18 @@
          Invoer
       </div>
       <div class="item item-toggle">
-         Vibratie bij invoer
+         Vibratie bij invoer {{vibration_input}}
          <label class="toggle toggle-assertive">
-            <input type="checkbox" checked="checked">
+            <input type="checkbox" ng-checked="vibration_input" ng-click="toggle_setting('vibration_input')">
             <div class="track">
                <div class="handle"></div>
             </div>
          </label>
       </div>
       <div class="item item-toggle">
-         Geluid bij invoer
+         Geluid bij invoer {{sound_input}}
          <label class="toggle toggle-assertive">
-            <input type="checkbox">
+            <input type="checkbox" ng-checked="sound_input" ng-click="toggle_setting('sound_input')">
             <div class="track">
                <div class="handle"></div>
             </div>
