@@ -14,11 +14,10 @@ angular.module('project.controller.settings', ['project.service.phonestorage'])
                // console.log("Setting = " + i + " key = " + result.rows.item(i).key + " value =  " + result.rows.item(i).value + " type =  " + result.rows.item(i).type);
                $scope[result.rows.item(i).key] = type_cast(result.rows.item(i).type, result.rows.item(i).value);
             }
-            // $scope.$apply();
-            console.log("data recieved and bindings applied", $scope);
          });
       }
 
+      // some wacky hacky stuff
       function type_cast(type, value) {
          switch(type) {
             case "string":
