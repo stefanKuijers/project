@@ -44,10 +44,10 @@
 .med-list .time-container,
 .med-list .med-icon,
 .med-list .med-info,
-/*.med-list*/ .dose-amount,
-/*.med-list*/ .dose,
-/*.med-list*/ .amount,
-/*.med-list*/ .unit {
+.dose-amount,
+.dose,
+.amount,
+.unit {
    float: left;
 }
 
@@ -77,12 +77,12 @@
    padding-bottom: 4px;
 }
 
-/*.med-list*/ .dosis {
+.dosis {
    clear: left;
 }
 
-/*.med-list*/ .dose-amount,
-/*.med-list*/ .dose .amount {
+.dose-amount,
+.dose .amount {
    padding-right: 5px;
 }
 
@@ -128,6 +128,10 @@
 
 .med-detail .description {
    clear: left;
+}
+
+.secondary-info .item {
+   white-space: normal;
 }
 
 

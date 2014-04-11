@@ -9,8 +9,8 @@
          <!-- primary info -->
          <h1 class="med-name">{{med.trade_name}}</h1>
          <div class="dose-detail">
-            <div class="amount">{{med.dose.amount}}</div>
-            <div class="unit">{{med.dose.unit}}</div>
+            <div class="amount">{{med.dosis_amount}}</div>
+            <div class="unit">{{med.unit}}</div>
          </div>
          <p class="description">{{med.description}}</p>
 
@@ -22,14 +22,14 @@
                Inamemomenten
             </div>
 
-            <div class="item dosis" ng-repeat="dose in med.dosis">
+            <div class="item dosis" ng-repeat="dose in times">
                <div class="time">
                   {{dose.time}}
                </div>
                <div class="dose-amount">{{dose.amount}} <span>x</span></div>
                <div class="dose">
-                  <div class="amount">{{med.dose.amount}}</div>
-                  <div class="unit">{{med.dose.unit}}</div>
+                  <div class="amount">{{med.dosis_amount}}</div>
+                  <div class="unit">{{med.unit}}</div>
                </div>
             </div>
 

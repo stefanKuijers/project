@@ -33,30 +33,38 @@
                </div>
             </div>
 
-            <div class="item item-divider">
-               Bijwerkingen
+            <div class="item item-divider when-to-div">
+               Toepassing
             </div>
 
-            <div class="item side-effects">
-               {{med.information.bijwerkingen}}         
+            <div class="item when-to-item">
+               {{med.when_to_use}}         
             </div>
 
-            <div class="item item-divider">
-               Houdbaarheid
+            <div class="item item-divider when-not-div">
+               Waarschuwingen
             </div>
 
-            <div class="item side-effects">
-               {{med.information.houdbaarheid}}         
+            <div class="item when-not-item">
+               {{med.when_not_to_use}}         
             </div>
 
-            <div class="item item-divider">
-               Situaties
+            <div class="item item-divider how-div">
+               Hoe in te gebruiken
             </div>
 
-            <div class="item" ng-repeat="condition in med.conditions">
-               <strong>{{condition.title}}</strong>
-               <p>{{condition.description}}</p>
+            <div class="item how-item">
+               {{med.how_to_use}}         
             </div>
+
+            <div class="item item-divider note-div">
+               Notulen
+            </div>
+
+            <div class="item note-item">
+               {{med.note}}         
+            </div>
+
 
          </div>
       </div>

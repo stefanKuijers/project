@@ -103,12 +103,14 @@ angular.module('project.service.phonestorage', [])
             interaction_statusses:         ["Ongevaarlijk", "Enigzins gevaarlijk", "gevaarlijk", "extreem gevaarlijk"]
          },
          events: {
-            STORAGE_READY:        "STORAGE_READY",
-            STORAGE_INITIALIZED:  "STORAGE_INITIALIZED",
-            TABLE_DOES_NOT_EXIST: "TABLE_DOES_NOT_EXIST",
-            SETTINGS_RETRIEVED:   "SETTINGS_RETRIEVED",
-            MEDS_RETRIEVED:       "MEDS_RETRIEVED",
-            SETTING_STORED:       "SETTING_STORED"
+            STORAGE_READY:          "STORAGE_READY",
+            STORAGE_INITIALIZED:    "STORAGE_INITIALIZED",
+            TABLE_DOES_NOT_EXIST:   "TABLE_DOES_NOT_EXIST",
+            SETTINGS_RETRIEVED:     "SETTINGS_RETRIEVED",
+            MED_OVERVIEW_RETRIEVED: "MEDS_RETRIEVED",
+            MED_RETRIEVED:          "MED_RETRIEVED",
+            MED_TIMES_RETRIEVED:    "MED_TIMES_RETRIEVED",
+            SETTING_STORED:         "SETTING_STORED"
          },
 
          init: function(event_scope) {
@@ -130,11 +132,73 @@ angular.module('project.service.phonestorage', [])
             PUBLIC FUNCTIONS
          */
          /* GET */
-         get_medicins: function(caller_scope) {
+         get_med_overview: function(caller_scope) {
             var scope = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query("SELECT * FROM " + scope.settings.MED_TABLE_NAME, tx, scope.events.MEDS_RETRIEVED, caller_scope);
+                  scope.query(
+                     "SELECT " + 
+                        "Medicin.id, " +
+                        "Medicin.prescribed, " +
+                        "Medicin.trade_name, " +
+                        "Medicin.dosis_amount, " +
+                        "Unit.unit, " +
+                        "Icon.name as icon, " +
+                        "Dosis.time, " +
+                        "Dosis.amount " +
+                     "FROM Dosis " +
+                        "INNER JOIN Medicin on Dosis.Med_id = Medicin.id " +
+                        "INNER JOIN Unit on Medicin.Unit_id = Unit.id " +
+                        "INNER JOIN Icon on Medicin.Icon_id = Icon.id" +
+                     ";" , 
+                     tx, 
+                     scope.events.MED_OVERVIEW_RETRIEVED, 
+                     caller_scope
+                  );
+               }
+            );
+         }, 
+
+         get_medicin_and_times: function(caller_scope, med_id) {
+            var scope = this;
+            this.connection.transaction(
+               function(tx) {
+                  scope.query(
+                     "SELECT " + 
+                        "Medicin.id, " +
+                        "Medicin.prescribed, " +
+                        "Medicin.trade_name, " +
+                        "Medicin.note, " +
+                        "Medicin.dosis_amount, " +
+                        "Medicin.when_to_use, " +
+                        "Medicin.when_not_to_use, " +
+                        "Medicin.how_to_use, " +
+                        "Active_Ingredient.name as active_ingredient, " +
+                        "Unit.unit, " +
+                        "Icon.name as icon " +
+                     "FROM Medicin " +
+                        "INNER JOIN Active_Ingredient on Medicin.Active_Ingredient_id = Active_Ingredient.id " +
+                        "INNER JOIN Unit on Medicin.Unit_id = Unit.id " +
+                        "INNER JOIN Icon on Medicin.Icon_id = Icon.id " +
+                     "WHERE "+ 
+                        "Medicin.id=" + med_id + " " +
+                     ";" , 
+                     tx, 
+                     scope.events.MED_RETRIEVED, 
+                     caller_scope
+                  );
+                  scope.query(
+                     "SELECT " + 
+                        "time, " +
+                        "amount " +
+                     "FROM Dosis " +
+                     "WHERE "+ 
+                        "Dosis.Med_id=" + med_id + " " +
+                     ";" , 
+                     tx, 
+                     scope.events.MED_TIMES_RETRIEVED, 
+                     caller_scope
+                  );
                }
             );
          },
@@ -193,7 +257,7 @@ angular.module('project.service.phonestorage', [])
                query, 
                [], 
                function(transaction, result) { // a query succeeded
-                  console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
+                  // console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
                   
                   if (success_event === scope.events.STORAGE_INITIALIZED)
                      scope.initialized = true,
@@ -385,7 +449,7 @@ angular.module('project.service.phonestorage', [])
                }, 
                this.query_failed, 
                function() {
-                  console.log("setting table created");
+                  // console.log("setting table created");
                }
             );
          },
