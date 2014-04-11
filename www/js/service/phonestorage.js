@@ -108,6 +108,8 @@ angular.module('project.service.phonestorage', [])
             TABLE_DOES_NOT_EXIST:   "TABLE_DOES_NOT_EXIST",
             SETTINGS_RETRIEVED:     "SETTINGS_RETRIEVED",
             MED_OVERVIEW_RETRIEVED: "MEDS_RETRIEVED",
+            MED_RETRIEVED:          "MED_RETRIEVED",
+            MED_TIMES_RETRIEVED:    "MED_TIMES_RETRIEVED",
             SETTING_STORED:         "SETTING_STORED"
          },
 
@@ -156,40 +158,50 @@ angular.module('project.service.phonestorage', [])
                }
             );
          }, 
-         // get_medicin: function(caller_scope, med_id) {
-         //    var scope = this;
-         //    this.connection.transaction(
-         //       function(tx) {
 
-         //          scope.query(
-         //             "SELECT " + 
-         //                "Medicin.id, " +
-         //                "Medicin.prescribed, " +
-         //                "Medicin.trade_name, " +
-         //                "Medicin.note, " +
-         //                "Medicin.dosis_amount, " +
-         //                "Medicin.when_to_use, " +
-         //                "Medicin.when_not_to_use, " +
-         //                "Medicin.how_to_use, " +
-         //                "Active_Ingredient.name as active_ingredient, " +
-         //                "Unit.unit, " +
-         //                "Icon.name as icon " +
-         //                "Dosis.time " +
-         //                "Dosis.amount as primary_amount" +
-         //                "Dosis.time " +
-         //             "FROM Dosis " +
-         //                "INNER JOIN Medicin on Dosis.Med_id = Medicin.id " +
-         //                "INNER JOIN Active_Ingredient on Medicin.Active_Ingredient_id = Active_Ingredient.id " +
-         //                "INNER JOIN Unit on Medicin.Unit_id = Unit.id " +
-         //                "INNER JOIN Icon on Medicin.Icon_id = Icon.id" +
-         //             ";" , 
-         //             tx, 
-         //             scope.events.MEDS_RETRIEVED, 
-         //             caller_scope
-         //          );
-         //       }
-         //    );
-         // },
+         get_medicin_and_times: function(caller_scope, med_id) {
+            var scope = this;
+            this.connection.transaction(
+               function(tx) {
+                  scope.query(
+                     "SELECT " + 
+                        "Medicin.id, " +
+                        "Medicin.prescribed, " +
+                        "Medicin.trade_name, " +
+                        "Medicin.note, " +
+                        "Medicin.dosis_amount, " +
+                        "Medicin.when_to_use, " +
+                        "Medicin.when_not_to_use, " +
+                        "Medicin.how_to_use, " +
+                        "Active_Ingredient.name as active_ingredient, " +
+                        "Unit.unit, " +
+                        "Icon.name as icon " +
+                     "FROM Medicin " +
+                        "INNER JOIN Active_Ingredient on Medicin.Active_Ingredient_id = Active_Ingredient.id " +
+                        "INNER JOIN Unit on Medicin.Unit_id = Unit.id " +
+                        "INNER JOIN Icon on Medicin.Icon_id = Icon.id " +
+                     "WHERE "+ 
+                        "Medicin.id=" + med_id + " " +
+                     ";" , 
+                     tx, 
+                     scope.events.MED_RETRIEVED, 
+                     caller_scope
+                  );
+                  scope.query(
+                     "SELECT " + 
+                        "time, " +
+                        "amount " +
+                     "FROM Dosis " +
+                     "WHERE "+ 
+                        "Dosis.Med_id=" + med_id + " " +
+                     ";" , 
+                     tx, 
+                     scope.events.MED_TIMES_RETRIEVED, 
+                     caller_scope
+                  );
+               }
+            );
+         },
          get_settings: function(caller_scope) {
             var scope = this;
             this.connection.transaction(

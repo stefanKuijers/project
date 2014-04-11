@@ -1,5 +1,5 @@
-angular.module('project.controller.overview', ['project.service.user.medicins', 'project.service.phonestorage'])
-   .controller('OverviewCtrl', function($ionicPlatform, $scope, $filter, Medicins, Phonestorage) {
+angular.module('project.controller.overview', ['project.service.phonestorage'])
+   .controller('OverviewCtrl', function($ionicPlatform, $scope, $filter, Phonestorage) {
       if (Phonestorage.initialized) 
          get_meds();
       else
