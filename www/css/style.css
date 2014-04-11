@@ -119,10 +119,14 @@
 }
 
 .med-detail .med-name {
+   margin-bottom: 0;
+   margin-top: 10px;
    width:70%;
 }
 
 .med-detail .dose-detail {
+   font-size: 36px;
+   margin-top: 20px;
    width: 20%;
 }
 
@@ -132,6 +136,12 @@
 
 .secondary-info .item {
    white-space: normal;
+}
+
+.med-detail .item-divider {
+   padding-top: 20px;
+   padding-bottom: 20px;
+   margin-top: 20px;
 }
 
 

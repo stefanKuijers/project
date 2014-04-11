@@ -18,22 +18,40 @@
 
          <div class="list secondary-info">
 
-            <div class="item item-divider">
+            <div class="item item-divider item-icon-left">
+               <i class="icon ion-clock"></i>
                Inamemomenten
             </div>
 
-            <div class="item dosis" ng-repeat="dose in times">
+            <dose-item class="item dosis" ng-repeat="dose in times" data-ng-click="dose_click()" data-id="{{dose.id}}" data-dose-item>
                <div class="time">
-                  {{dose.time}}
+                  <div ng-if="dose.editable == true">
+                     <input type="time" value="{{dose.time}}">
+                  </div>
+                  <div ng-if="dose.editable == false">
+                     {{dose.time}}
+                  </div>
                </div>
-               <div class="dose-amount">{{dose.amount}} <span>x</span></div>
+               <div class="dose-amount">
+                  <div ng-if="dose.editable == true">
+                     <input type="number" value="{{dose.amount}}">
+                  </div>
+                  <div ng-if="dose.editable == false">
+                     {{dose.amount}}
+                  </div>
+                  <span>x</span>
+               </div>
                <div class="dose">
                   <div class="amount">{{med.dosis_amount}}</div>
                   <div class="unit">{{med.unit}}</div>
                </div>
-            </div>
+            </dose-item>
+            <dose-item class="item dosis item-icon-right" data-ng-click="new_dose_click()" data-dose-item>
+               <i class="icon ion-plus-round"></i>
+            </dose-item>
 
-            <div class="item item-divider when-to-div">
+            <div class="item item-divider when-to-div item-icon-left">
+               <i class="icon ion-checkmark-round"></i>
                Toepassing
             </div>
 
@@ -41,7 +59,8 @@
                {{med.when_to_use}}         
             </div>
 
-            <div class="item item-divider when-not-div">
+            <div class="item item-divider when-not-div item-icon-left">
+               <i class="icon ion-alert-circled"></i>
                Waarschuwingen
             </div>
 
@@ -49,7 +68,8 @@
                {{med.when_not_to_use}}         
             </div>
 
-            <div class="item item-divider how-div">
+            <div class="item item-divider how-div item-icon-left">
+               <i class="icon ion-person"></i>
                Hoe in te gebruiken
             </div>
 
@@ -57,7 +77,8 @@
                {{med.how_to_use}}         
             </div>
 
-            <div class="item item-divider note-div">
+            <div class="item item-divider note-div item-icon-left">
+               <i class="icon ion-compose"></i>
                Notulen
             </div>
 

@@ -189,6 +189,7 @@ angular.module('project.service.phonestorage', [])
                   );
                   scope.query(
                      "SELECT " + 
+                        "id, " +
                         "time, " +
                         "amount " +
                      "FROM Dosis " +
