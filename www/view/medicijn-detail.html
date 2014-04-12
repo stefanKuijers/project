@@ -23,7 +23,7 @@
                Inamemomenten
             </div>
 
-            <dose-item class="item dosis" ng-repeat="dose in times" data-ng-click="dose_click()" data-id="{{dose.id}}" data-dose-item>
+            <pj-dose-item class="item dosis item-icon-right" ng-repeat="dose in times" data-id="{{dose.id}}" data-pj-dose-item>
                <div class="time">
                   <div ng-if="dose.editable == true">
                      <input type="time" value="{{dose.time}}">
@@ -45,10 +45,18 @@
                   <div class="amount">{{med.dosis_amount}}</div>
                   <div class="unit">{{med.unit}}</div>
                </div>
-            </dose-item>
-            <dose-item class="item dosis item-icon-right" data-ng-click="new_dose_click()" data-dose-item>
+
+               <a ng-if="dose.editable == false" ng-click="edit_dose()">
+                  <i class="icon ion-clock"></i>
+               </a>
+               <a ng-if="dose.editable == true" ng-click="save_dose()">
+                  <i class="icon ion-checkmark-round"></i>
+               </a>
+               
+            </pj-dose-item>
+            <pj-dose-item class="item dosis item-icon-right" data-ng-click="new_dose_click()" data-pj-dose-item>
                <i class="icon ion-plus-round"></i>
-            </dose-item>
+            </pj-dose-item>
 
             <div class="item item-divider when-to-div item-icon-left">
                <i class="icon ion-checkmark-round"></i>
