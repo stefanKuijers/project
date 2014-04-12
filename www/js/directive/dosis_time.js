@@ -30,22 +30,20 @@ angular.module('project.directive.dose_item', [])
             }
 
             scope.save_dose = function() {
-               // save the new time to the database
-               console.log(scope.Phonestorage);
-
+               // update the times on the screen
                if (time = scope.get_time(scope.get_editing_id())) 
                   time.editable = false,
                   scope.set_editing_id(null);
 
                scope.order_times();
+
+               scope.update_dose_time(attrs.id);
             }
 
             scope.delete_dose = function() {
-               // id = attrs.id;
-
-               // delete the time from the database
-               
                // splice it out of scope.times
+
+               scope.delete_dose_time(attrs.id);
             }
 
          } 

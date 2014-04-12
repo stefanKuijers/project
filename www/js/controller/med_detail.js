@@ -33,8 +33,6 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
          $scope.times = $filter('orderBy')($scope.times, 'time', false);
       }
 
-      $scope.Phonestorage = Phonestorage;
-
       var editing_dose_id = null;
       $scope.get_editing_id = function () {return editing_dose_id}
       $scope.set_editing_id = function (value) {editing_dose_id = value}
@@ -45,6 +43,14 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
             if ($scope.times[i].id == id) return $scope.times[i]; 
 
          return false;
+      }
+
+      $scope.update_dose_time = function(id) {
+         // get from scope.times and send to Phonestorage.update_dose
+      }
+
+      $scope.update_dose_time = function(id) {
+         // call Phonestorage.delete_dose
       }
 
    })
