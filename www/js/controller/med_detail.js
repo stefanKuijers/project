@@ -40,18 +40,41 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
 
       $scope.get_time = function(id) {
          for (var i = 0; i < $scope.times.length; i++) 
-            if ($scope.times[i].id == id) return $scope.times[i]; 
+            if ($scope.times[i].id == id) return {index: i, time_object:$scope.times[i]}; 
 
          return false;
       }
 
-      $scope.update_dose_time = function(id) {
-         // get from scope.times and send to Phonestorage.update_dose
+      $scope.insert_dose_time = function(index, time, amount, reoccurence, reminder, interval_unit, med_id) {
+         Phonestorage.insert_dose_time(time, amount, reoccurence, reminder, interval_unit, med_id, $scope);
+         $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
+            $scope.times.push({
+               time: time,
+               amount: amount,
+               editable: false,
+               id: result.insertId
+            });
+
+            $scope.times.splice(index, 1);
+         });
       }
 
-      $scope.update_dose_time = function(id) {
-         // call Phonestorage.delete_dose
+      $scope.update_dose_time = function(index, time, amount) {
+         Phonestorage.update_dose_time($scope.times[index].id, time, amount);
+
+         $scope.times.push({
+            time: time,
+            amount: amount,
+            editable: $scope.times[index].editable,
+            id: $scope.times[index].id
+         });
+
+         $scope.times.splice(index, 1);
       }
 
+      $scope.delete_dose_time = function(id) {
+         Phonestorage.delete_dose_time(id);
+         $scope.times.splice($scope.get_time(id).index, 1);
+      }
    })
 ;

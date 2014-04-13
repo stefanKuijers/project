@@ -5,13 +5,13 @@ angular.module('project.directive.dose_item', [])
 
             scope.edit_dose = function() {
                if (attrs.id == scope.get_editing_id()) return;
-
+               
                if (scope.get_editing_id() !== null) {
-                  if (time = scope.get_time(scope.get_editing_id())) 
+                  if (time = scope.get_time(scope.get_editing_id()).time_object) 
                      time.editable = false;
                }
 
-               if (time = scope.get_time(attrs.id)) 
+               if (time = scope.get_time(attrs.id).time_object) 
                   time.editable = true,
                   scope.set_editing_id(attrs.id);
             }
@@ -30,20 +30,37 @@ angular.module('project.directive.dose_item', [])
             }
 
             scope.save_dose = function() {
-               // update the times on the screen
-               if (time = scope.get_time(scope.get_editing_id())) 
-                  time.editable = false,
+               if (time_object = scope.get_time(attrs.id).time_object) 
+                  time_object.editable = false,
                   scope.set_editing_id(null);
 
-               scope.order_times();
+               if (attrs.id == -1)
+                  scope.insert_dose_time(
+                     scope.get_time(attrs.id).index,
+                     elem.find('input[type=\'time\']').val(), 
+                     elem.find('input[type=\'number\']').val(), 
+                     1, 
+                     true, 
+                     0, 
+                     scope.med.id
+                  );
+               else
+                  scope.update_dose_time(
+                     scope.get_time(attrs.id).index, 
+                     elem.find('input[type=\'time\']').val(), 
+                     elem.find('input[type=\'number\']').val()
+                  );
 
-               scope.update_dose_time(attrs.id);
+
+               scope.order_times();               
             }
 
             scope.delete_dose = function() {
+               console.log("delete");
                // splice it out of scope.times
-
                scope.delete_dose_time(attrs.id);
+
+                  
             }
 
          } 

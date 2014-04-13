@@ -5,9 +5,6 @@
 .bar .title {
    line-height: 50px;
 }
-.bar .button.button-icon .icon:before, .bar .button.button-icon:before, .bar .button.button-icon.icon-left:before, .bar .button.button-icon.icon-right:before {
-   line-height: 40px;
-}
 .bar .button {
    line-height: 40px;
 }
@@ -28,6 +25,29 @@
    font-size: 22px;
    font-weight: bold;
 }
+
+.bar .button.button-icon .icon:before, 
+.bar .button.button-icon:before, 
+.bar .button.button-icon.icon-left:before, 
+.bar .button.button-icon.icon-right:before,
+.item .icon {
+   font-size: 40px;
+   line-height: 40px;
+}
+
+.item-icon-right .icon {
+   right: 12px;
+}
+
+.item-icon-left .icon {
+   left: 12px;
+}
+
+.item-icon-left {
+   padding-left: 55px;
+}
+
+
 
 /* global */
 .padding-view {
@@ -143,6 +163,72 @@
    padding-bottom: 20px;
    margin-top: 20px;
 }
+
+.time input {
+   width: 90%;
+   margin-right: 10%;
+}
+
+.dose-amount {
+   width: 20%;
+}
+
+.time {
+   width:20%;
+}
+
+.dose-amount span {
+   width: 20%;
+   float:left;
+}
+
+.dose-amount div {
+   width: 30%;
+   margin-right: 30%;
+   padding-left: 5px;
+   float:left;
+}
+
+.delete-button .icon {
+   right: 110px;
+}
+
+.item.dosis.add-item {
+   padding: 26px 0;
+}
+
+.item.dosis {
+   padding-top: 26px;
+   padding-bottom: 26px;
+   font-size: 18px;
+}
+
+.item.dosis.editing {
+   font-weight: bold;
+}
+
+.item.dosis.editing input[type='number'],
+.item.dosis.editing input[type='time'] {
+   font-size: 18px;
+   font-weight: bold;
+   border: 1px solid rgba(100,100,100,0.6);
+
+}
+
+.item.dosis.editing input[type='number'] {
+   padding-left: 5px;
+}
+
+.item.dosis.editing .dose-amount div {
+   padding-left: 0;
+}
+
+.item.dosis.editing span, 
+.item.dosis.editing .dose {
+   padding-top: 5px;
+}
+
+
 
 
 
