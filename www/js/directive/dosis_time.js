@@ -51,18 +51,12 @@ angular.module('project.directive.dose_item', [])
                      elem.find('input[type=\'number\']').val()
                   );
 
-
                scope.order_times();               
             }
 
             scope.delete_dose = function() {
-               console.log("delete");
-               // splice it out of scope.times
-               scope.delete_dose_time(attrs.id);
-
-                  
+               scope.delete_dose_time(attrs.id);                  
             }
-
          } 
       }
    })

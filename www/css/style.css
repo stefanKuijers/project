@@ -165,8 +165,7 @@
 }
 
 .time input {
-   width: 90%;
-   margin-right: 10%;
+   width: 100%;
 }
 
 .dose-amount {
@@ -228,8 +227,91 @@
    padding-top: 5px;
 }
 
+/* new medicin */
+.new-med-container {
+   padding: 10%;
+   text-align: center;
+}
 
+.row.question {
+   
+}
 
+.row.answer .item {
+   
+}
+
+.radio-container {
+   width: 150px;
+   margin: auto;
+}
+
+.pj-radio {
+   position:relative;
+   display:block;
+   width:100%;
+   padding:50%;
+   border-radius: 50%;
+   background-color: rgba(100,100,100, 0.1);
+   border:10px solid rgba(100,100,100, 0.2);
+}
+
+.pj-radio.selected {
+   border:10px solid rgba(100,100,100, 0.5);
+}
+
+.pj-radio i,
+.pj-radio label {
+   position:absolute;
+   top:0;
+   left:0;
+   right:0;
+   line-height: 150px;
+}
+
+.pj-radio label {
+   font-size: 36px;
+}
+
+.pj-radio i {
+   display: none;
+   font-size: 120px;
+   opacity: 0.1;
+}
+
+.pj-radio.selected i {
+   display: block;
+}
+
+.row.med-add-options {
+   position:absolute;
+   left:0;
+   right:0;
+   bottom:140px;
+   z-index: -1;
+   opacity: 0.2;
+}
+
+.row.med-add-options.question-answered {
+   z-index: 10;
+   opacity: 1;
+}
+
+/* new med scan */
+.scan-cam-placeholder {
+   width: 80%;
+   margin:auto;
+   padding-bottom: 100%;
+}
+
+.scanned-it-button {
+   position:absolute;
+   left: 0;
+   right: 0;
+   bottom: 0;
+}
+
+/* new med type */
 
 
 /* wireframe styles */

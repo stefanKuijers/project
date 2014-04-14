@@ -12,15 +12,6 @@ angular.module('project.service.phonestorage', [])
                vibration_input:        { type: "bool", value: "false"},
                sound_input:            { type: "bool", value: "true"}
             },
-            meds_pre: {
-               0: { id: 0, dosis: [{time: "08:00", amount: 2}, {time: "12:00", amount: 1}, {time: "18:00", amount: 2}], trade_name: 'Ultacit', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "Hydrotalciet", form: "tablet_1", dose:{amount:200, unit:"mg"}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} },
-               1: { id: 1, dosis: [{time: "08:00", amount: 1}], trade_name: 'Paracetamol Trekpleister', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: false, active_ingredient: "Paracetamol", form: "tablet_2", dose:{amount:100, unit:"mg"}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} },
-               2: { id: 2, dosis: [{time: "12:00", amount: 2}], trade_name: 'Pectrofree', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "Dextromethorfan", form: "tablet_1", dose:{amount:250, unit:"mg"}, interaction: {description: "Dit medicijn kent bepaalde wisselwerkingen met andere medicijnen", status: {code:2, name:"Schadelijk"}, combination_med_id: 3}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} },
-               3: { id: 3, dosis: [{time: "12:00", amount: 1}], trade_name: 'Nurofee', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "Nurofeen", form: "liquid", dose:{amount:200, unit:"ml"}, interaction: {description: "Dit medicijn kent bepaalde wisselwerkingen met andere medicijnen", status: {code:0, name:"Niet Schadelijk"}, combination_med_id: 4}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} },
-               4: { id: 4, dosis: [{time: "12:00", amount: 1}], trade_name: 'Miconazolnitraat', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "miconazol", form: "tablet_3", dose:{amount:400, unit:"mg"}, interaction: {description: "Dit medicijn kent bepaalde wisselwerkingen met andere medicijnen", status: {code:1, name:"Mogelijke bijwerkingen"}, combination_med_id: 3}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} },
-               5: { id: 5, dosis: [{time: "16:30", amount: 1}], trade_name: 'Ipraalox', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "paracetamol", form: "liquid", dose:{amount:10, unit:"cl"}, interaction: {description: "Dit medicijn kent bepaalde wisselwerkingen met andere medicijnen", status: {code:2, name:"Schadelijk"}, combination_med_id: 3}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} },
-               6: { id: 6, dosis: [{time: "16:30", amount: 2}], trade_name: 'Davitamon', description: "Dit medicijn word soms gebruikt. Dit vooral in gevallen dat het nodig is hoewel dit niet altijd het geval is.", prescribed: true, active_ingredient: "paracetamol", form: "powder", dose:{amount:20, unit:"gr"}, interaction: {description: "Dit medicijn kent bepaalde wisselwerkingen met andere medicijnen", status: {code:0, name:"Niet Schadelijk"}, combination_med_id: 4}, information: {bijwerkingen: "Dit medicijn heeft de volgende bijwerkingen: - niet goed - slecht - soms echt niet lekker", houdbaarheid: "Dit medicijn blijft lang goed"}, conditions: {care_machine_usage: {title: "machine gebruik", description: "Dit medicijn heeft geen effect op het reactievermogen en kan daarom zonder probleem gebruikt worden in combinatie met het besturen van auto of het gebruik van machines."}, breast_feading: {title: "Borstvoeding", description: "Geen effect op borst voeding"}} }
-            },
             meds: {
                0: { 
                   id: 0, 
@@ -79,7 +70,8 @@ angular.module('project.service.phonestorage', [])
                   active_ingredient: 2
                }   
             },
-            active_ingredients : ["Paracetamol", "Hydrotalciet", "Nurofeen", "Dextromethorfan", "Hydrochloorthiazide"]
+            active_ingredients : ["Paracetamol", "Hydrotalciet", "Nurofeen", "Dextromethorfan", "Hydrochloorthiazide"],
+            auto_complete_list: ["Nurofee", "Miconazolnitraat", "Paracetamol Trekpleister", "Hydrochloorthiazide", "Ibuprofen 200mg", "Ibuprofen 400mg", "Oxazepam", "Citrosan", "Indurfamo", "Ibasoloina", "Ibufanol"]
          },
          event_aggregater: {},
          initialized: false,
@@ -103,15 +95,16 @@ angular.module('project.service.phonestorage', [])
             interaction_statusses:         ["Ongevaarlijk", "Enigzins gevaarlijk", "gevaarlijk", "extreem gevaarlijk"]
          },
          events: {
-            STORAGE_READY:          "STORAGE_READY",
-            STORAGE_INITIALIZED:    "STORAGE_INITIALIZED",
-            TABLE_DOES_NOT_EXIST:   "TABLE_DOES_NOT_EXIST",
-            SETTINGS_RETRIEVED:     "SETTINGS_RETRIEVED",
-            MED_OVERVIEW_RETRIEVED: "MEDS_RETRIEVED",
-            MED_RETRIEVED:          "MED_RETRIEVED",
-            MED_TIMES_RETRIEVED:    "MED_TIMES_RETRIEVED",
-            SETTING_STORED:         "SETTING_STORED",
-            DOSE_INSERTED:          "DOSE_INSERTED" 
+            STORAGE_READY:           "STORAGE_READY",
+            STORAGE_INITIALIZED:     "STORAGE_INITIALIZED",
+            TABLE_DOES_NOT_EXIST:    "TABLE_DOES_NOT_EXIST",
+            SETTINGS_RETRIEVED:      "SETTINGS_RETRIEVED",
+            MED_OVERVIEW_RETRIEVED:  "MEDS_RETRIEVED",
+            MED_RETRIEVED:           "MED_RETRIEVED",
+            MED_TIMES_RETRIEVED:     "MED_TIMES_RETRIEVED",
+            SETTING_STORED:          "SETTING_STORED",
+            DOSE_INSERTED:           "DOSE_INSERTED",
+            COMPLETE_LIST_RETRIEVED: "COMPLETE_LIST_RETRIEVED" 
          },
 
          init: function(event_scope) {
@@ -211,6 +204,9 @@ angular.module('project.service.phonestorage', [])
                   scope.query("SELECT * FROM " + scope.settings.SETTINGS_TABLE_NAME, tx, scope.events.SETTINGS_RETRIEVED, caller_scope);
                }
             );
+         },
+         get_auto_complete_list: function(caller_scope) {
+            caller_scope.$emit(this.events.COMPLETE_LIST_RETRIEVED, this.default_values.auto_complete_list);
          },
 
          get_reminders: function() {},

@@ -9,9 +9,7 @@ angular.module('project.controller.settings', ['project.service.phonestorage'])
       function get_settings() {
          Phonestorage.get_settings($scope);
          $scope.$on(Phonestorage.events.SETTINGS_RETRIEVED, function(e, result) {
-            // console.log(result.rows.item(0));
             for (var i = 0; i < result.rows.length; i++){
-               // console.log("Setting = " + i + " key = " + result.rows.item(i).key + " value =  " + result.rows.item(i).value + " type =  " + result.rows.item(i).type);
                $scope[result.rows.item(i).key] = type_cast(result.rows.item(i).type, result.rows.item(i).value);
             }
          });
