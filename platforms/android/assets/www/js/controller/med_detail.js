@@ -1,5 +1,5 @@
-angular.module('project.controller.med_info', ['project.service.phonestorage', 'project.directive.dose_item'])
-   .controller('MedInfoCtrl', function($scope, $stateParams, $filter, Phonestorage) {
+angular.module('project.controller.med_info', ['project.service.phonestorage', 'project.directive.dose_item', 'project.service.notification'])
+   .controller('MedInfoCtrl', function($scope, $stateParams, $filter, Phonestorage, Notification) {
       $scope.times = false;
 
       if (Phonestorage.initialized) 
@@ -75,6 +75,8 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
             id: $scope.times[index].id
          });
          $scope.order_times();
+
+         Notification.add();
       }
 
       $scope.delete_dose_time = function(id) {

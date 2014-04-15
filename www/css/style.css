@@ -331,6 +331,7 @@
 @media screen and (orientation:portrait) {
 
 }
+
 @media screen and (orientation:landscape) {
    .bar-footer {
       height: 140px;

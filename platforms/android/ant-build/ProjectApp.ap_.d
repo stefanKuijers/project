@@ -99,6 +99,7 @@ C:\dev\project\platforms\android\assets\www\js\directive\dosis_time.js \
 C:\dev\project\platforms\android\assets\www\js\directive\radio.js \
 C:\dev\project\platforms\android\assets\www\js\directive\search.js \
 C:\dev\project\platforms\android\assets\www\js\service\api.js \
+C:\dev\project\platforms\android\assets\www\js\service\notification.js \
 C:\dev\project\platforms\android\assets\www\js\service\phonestorage.js \
 C:\dev\project\platforms\android\assets\www\js\service\user \
 C:\dev\project\platforms\android\assets\www\js\service\user\medicins.js \
@@ -170,8 +171,11 @@ C:\dev\project\platforms\android\assets\www\lib\ionic\scss\ionicons\_ionicons-an
 C:\dev\project\platforms\android\assets\www\lib\ionic\scss\ionicons\_ionicons-font.scss \
 C:\dev\project\platforms\android\assets\www\lib\ionic\scss\ionicons\_ionicons-icons.scss \
 C:\dev\project\platforms\android\assets\www\lib\ionic\scss\ionicons\_ionicons-variables.scss \
+C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.local-notification \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar \
+C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.local-notification\www \
+C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.local-notification\www\local-notification.js \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\www \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\www\device.js \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www \

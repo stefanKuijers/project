@@ -6,7 +6,18 @@
     "config_munge": {
         "res/xml/config.xml": {
             "/*": {
-                "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>": 1
+                "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>": 1,
+                "<feature name=\"LocalNotification\"><param name=\"android-package\" value=\"de.appplant.cordova.plugin.localnotification.LocalNotification\" /></feature>": 1
+            }
+        },
+        "AndroidManifest.xml": {
+            "/manifest/application": {
+                "<receiver android:name=\"de.appplant.cordova.plugin.localnotification.Receiver\" />": 1,
+                "<receiver android:name=\"de.appplant.cordova.plugin.localnotification.Restore\"><intent-filter><action android:name=\"android.intent.action.BOOT_COMPLETED\" /></intent-filter></receiver>": 1,
+                "<activity android:launchMode=\"singleInstance\" android:name=\"de.appplant.cordova.plugin.localnotification.ReceiverActivity\" />": 1
+            },
+            "/manifest": {
+                "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />": 1
             }
         }
     },
@@ -18,6 +29,9 @@
             "PACKAGE_NAME": "com.ionicframework.starter"
         },
         "org.apache.cordova.statusbar": {
+            "PACKAGE_NAME": "com.ionicframework.starter"
+        },
+        "de.appplant.cordova.plugin.local-notification": {
             "PACKAGE_NAME": "com.ionicframework.starter"
         }
     },
