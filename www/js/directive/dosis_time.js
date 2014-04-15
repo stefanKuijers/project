@@ -17,7 +17,9 @@ angular.module('project.directive.dose_item', [])
             }
 
             scope.new_dose_click = function() {
+               console.log("new click");
                if (scope.get_editing_id() !== null) return;
+               console.log("new post return");
 
                scope.times.push({
                   id:-1,
