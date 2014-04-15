@@ -9,9 +9,7 @@ angular.module('project.controller.settings', ['project.service.phonestorage'])
       function get_settings() {
          Phonestorage.get_settings($scope);
          $scope.$on(Phonestorage.events.SETTINGS_RETRIEVED, function(e, result) {
-            // console.log(result.rows.item(0));
             for (var i = 0; i < result.rows.length; i++){
-               // console.log("Setting = " + i + " key = " + result.rows.item(i).key + " value =  " + result.rows.item(i).value + " type =  " + result.rows.item(i).type);
                $scope[result.rows.item(i).key] = type_cast(result.rows.item(i).type, result.rows.item(i).value);
             }
          });
@@ -25,7 +23,7 @@ angular.module('project.controller.settings', ['project.service.phonestorage'])
             break;
 
             case "bool":
-               return value === "true" ? true : false;
+               return value == 'true';
             break;
 
             case "num": 
@@ -41,6 +39,11 @@ angular.module('project.controller.settings', ['project.service.phonestorage'])
          $scope[setting_key] = !$scope[setting_key];
 
          Phonestorage.update_setting(setting_key, $scope[setting_key]);
+      }
+
+      $scope.reset_device_storage = function() {
+         Phonestorage.setup_storage();
+         $ionicSideMenuDelegate.toggleRight();
       }
    })
 ;

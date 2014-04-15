@@ -19,10 +19,6 @@ angular.module(
          );
 
          API.init($rootScope);
-         $rootScope.$on(API.events.MED_INTERACTION, function(e, result) {
-            alert("INTERACTION", result);
-         });
-
          $rootScope.$on(API.events.CONNECTION_LOST, function(e, result) {
             alert("Connection lost", e, result);
          });

@@ -5,7 +5,9 @@ angular.module(
       'project.controller.nav_control',
       'project.controller.overview',
       'project.controller.med_info',
-      'project.controller.new_med'
+      'project.controller.new_med',
+      'project.controller.new_med_type',
+      'project.controller.new_med_scan'
    ]
 ).config(function($stateProvider, $urlRouterProvider) {
    
@@ -27,11 +29,17 @@ angular.module(
          })
          .state('nieuw-scan', {
             url:                     '/nieuw/scan',
+            controller:              'NewMedScanCtrl',
             templateUrl:             'view/new-med-scan.html'
          })
          .state('nieuw-typ', {
             url:                     '/nieuw/type',
+            controller:              'NewMedTypeCtrl',
             templateUrl:             'view/new-med-type.html'
+         })
+         .state('nieuw-detail', {
+            url:                     '/nieuw/medicijn/:name',
+            templateUrl:             'view/medicijn-detail.html'
          })
          .state('geschiedenis', {
             url:                     '/geschiedenis',

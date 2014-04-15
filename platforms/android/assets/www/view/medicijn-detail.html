@@ -57,6 +57,9 @@
                </a>
                
             </pj-dose-item>
+            <div class="item" ng-if="times.length == false">
+               Klik op de plus om een innamemoment toe te voegen.
+            </div>
             <pj-dose-item class="item dosis add-item item-icon-right" data-ng-click="new_dose_click()" data-pj-dose-item>
                <i class="icon ion-plus-round"></i>
             </pj-dose-item>
