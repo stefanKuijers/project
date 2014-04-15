@@ -19,7 +19,6 @@ angular.module('project.directive.search', [])
                      if (scope.auto_list[list_index].toLowerCase().match(scope.search_string.toLowerCase())) 
                         scope.search_results.push(scope.auto_list[list_index])
                   }
-                  console.log(scope.search_results);
                }
             );
 
@@ -29,6 +28,10 @@ angular.module('project.directive.search', [])
                   list_length = scope.auto_list.length;
                }
             );
+
+            scope.select_result = function(result) {
+               scope.choose_result(result);
+            }
          } 
       }
    })

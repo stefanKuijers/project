@@ -37,6 +37,10 @@ angular.module(
             controller:              'NewMedTypeCtrl',
             templateUrl:             'view/new-med-type.html'
          })
+         .state('nieuw-detail', {
+            url:                     '/nieuw/medicijn/:name',
+            templateUrl:             'view/medicijn-detail.html'
+         })
          .state('geschiedenis', {
             url:                     '/geschiedenis',
             templateUrl:             'view/history.html'

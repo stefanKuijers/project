@@ -88,21 +88,23 @@ angular.module('project.service.phonestorage', [])
             REMINDER_TABLE_NAME:           "Reminder",
             REMINDER_DOSIS_TABLE_NAME:     "Reminder_Dosis",
             INTERVAL_UNIT_TABLE_NAME:      "Interval_Unit", 
-            accepted_units:                ["ml", "cl", "dl", "mg", "g"],
+            accepted_units:                ["ml", "cl", "dl", "mg", "g", "pch", "sachet"],
             accepted_interval_units:       ["dag", "week", "maand"],
             accepted_icons:                ["tablet_1", "tablet_2", "tablet_3", "liquid", "powder", "injection"],
             interaction_statusses:         ["Ongevaarlijk", "Enigzins gevaarlijk", "gevaarlijk", "extreem gevaarlijk"]
          },
          events: {
-            STORAGE_READY:           "STORAGE_READY",
-            STORAGE_INITIALIZED:     "STORAGE_INITIALIZED",
-            TABLE_DOES_NOT_EXIST:    "TABLE_DOES_NOT_EXIST",
-            SETTINGS_RETRIEVED:      "SETTINGS_RETRIEVED",
-            MED_OVERVIEW_RETRIEVED:  "MEDS_RETRIEVED",
-            MED_RETRIEVED:           "MED_RETRIEVED",
-            MED_TIMES_RETRIEVED:     "MED_TIMES_RETRIEVED",
-            SETTING_STORED:          "SETTING_STORED",
-            DOSE_INSERTED:           "DOSE_INSERTED"
+            STORAGE_READY:              "STORAGE_READY",
+            STORAGE_INITIALIZED:        "STORAGE_INITIALIZED",
+            TABLE_DOES_NOT_EXIST:       "TABLE_DOES_NOT_EXIST",
+            SETTINGS_RETRIEVED:         "SETTINGS_RETRIEVED",
+            MED_OVERVIEW_RETRIEVED:     "MEDS_RETRIEVED",
+            MED_RETRIEVED:              "MED_RETRIEVED",
+            MED_TIMES_RETRIEVED:        "MED_TIMES_RETRIEVED",
+            SETTING_STORED:             "SETTING_STORED",
+            DOSE_INSERTED:              "DOSE_INSERTED",
+            INTERACTION_LIST_RETRIEVED: "INTERACTION_LIST_RETRIEVED",
+            MED_NAMES_RETRIEVED:        "MED_NAMES_RETRIEVED"
          },
 
          init: function(event_scope) {
@@ -203,8 +205,18 @@ angular.module('project.service.phonestorage', [])
                }
             );
          },
-         get_auto_complete_list: function(caller_scope) {
-            caller_scope.$emit(this.events.COMPLETE_LIST_RETRIEVED, this.default_values.auto_complete_list);
+         get_med_names: function(caller_scope) {
+            var scope = this;
+            this.connection.transaction(
+               function(tx) {
+                  scope.query(
+                     "SELECT trade_name FROM Medicin;" , 
+                     tx, 
+                     scope.events.MED_NAMES_RETRIEVED, 
+                     caller_scope
+                  );
+               }
+            );
          },
 
          get_reminders: function() {},
@@ -352,7 +364,7 @@ angular.module('project.service.phonestorage', [])
                   tx.executeSql(
                      'INSERT INTO ' + scope.settings.INTERACTION_TABLE_NAME + 
                      ' (description, Interaction_Status_id, Primary_med_id, Secondary_med_id) ' + 
-                     'SELECT "Deze twee medicijnen hebben een gevaarlijke wisselwerking.", 2, 0, 2 UNION ALL ' +
+                     'SELECT "Deze twee medicijnen hebben een gevaarlijke wisselwerking.", 2, 4, 2 UNION ALL ' +
                      'SELECT "Deze medicijnen verslechteren elkaars werking.", 0, 1, 3 ;'
                   );
 

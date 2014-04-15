@@ -23,7 +23,7 @@ angular.module('project.controller.settings', ['project.service.phonestorage'])
             break;
 
             case "bool":
-               return value === "true" ? true : false;
+               return value == 'true';
             break;
 
             case "num": 
