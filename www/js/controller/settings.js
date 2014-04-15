@@ -40,5 +40,10 @@ angular.module('project.controller.settings', ['project.service.phonestorage'])
 
          Phonestorage.update_setting(setting_key, $scope[setting_key]);
       }
+
+      $scope.reset_device_storage = function() {
+         Phonestorage.setup_storage();
+         $ionicSideMenuDelegate.toggleRight();
+      }
    })
 ;

@@ -117,10 +117,10 @@ angular.module('project.service.phonestorage', [])
             var scope = this;
 
             // comment this line
-            // this.event_aggregater.$on(this.events.TABLE_DOES_NOT_EXIST , function(e, result) {
+            this.event_aggregater.$on(this.events.TABLE_DOES_NOT_EXIST , function(e, result) {
                scope.setup_storage();
             // and this line to force rebuild database on device
-            // });
+            });
          },
 
          /**
@@ -350,7 +350,7 @@ angular.module('project.service.phonestorage', [])
                query, 
                [], 
                function(transaction, result) { // a query succeeded
-                  console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
+                  // console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
                   
                   if (success_event === scope.events.STORAGE_INITIALIZED)
                      scope.initialized = true,
