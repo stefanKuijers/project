@@ -1,5 +1,5 @@
 angular.module('project.service.phonestorage', [])
-   .service('Phonestorage', function($ionicPlatform) {
+   .service('Phonestorage', function() {
       return {
          default_values: {
             settings: {
@@ -70,8 +70,7 @@ angular.module('project.service.phonestorage', [])
                   active_ingredient: 2
                }   
             },
-            active_ingredients : ["Paracetamol", "Hydrotalciet", "Nurofeen", "Dextromethorfan", "Hydrochloorthiazide"],
-            auto_complete_list: ["Nurofee", "Miconazolnitraat", "Paracetamol Trekpleister", "Hydrochloorthiazide", "Ibuprofen 200mg", "Ibuprofen 400mg", "Oxazepam", "Citrosan", "Indurfamo", "Ibasoloina", "Ibufanol"]
+            active_ingredients : ["Paracetamol", "Hydrotalciet", "Nurofeen", "Dextromethorfan", "Hydrochloorthiazide"]
          },
          event_aggregater: {},
          initialized: false,
@@ -103,8 +102,7 @@ angular.module('project.service.phonestorage', [])
             MED_RETRIEVED:           "MED_RETRIEVED",
             MED_TIMES_RETRIEVED:     "MED_TIMES_RETRIEVED",
             SETTING_STORED:          "SETTING_STORED",
-            DOSE_INSERTED:           "DOSE_INSERTED",
-            COMPLETE_LIST_RETRIEVED: "COMPLETE_LIST_RETRIEVED" 
+            DOSE_INSERTED:           "DOSE_INSERTED"
          },
 
          init: function(event_scope) {
