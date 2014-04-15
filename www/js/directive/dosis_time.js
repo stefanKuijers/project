@@ -17,10 +17,8 @@ angular.module('project.directive.dose_item', [])
             }
 
             scope.new_dose_click = function() {
-               console.log("new click");
                if (scope.get_editing_id() !== null) return;
-               console.log("new post return");
-
+               
                scope.times.push({
                   id:-1,
                   amount:1,
@@ -52,12 +50,11 @@ angular.module('project.directive.dose_item', [])
                      elem.find('input[type=\'time\']').val(), 
                      elem.find('input[type=\'number\']').val()
                   );
-
-               scope.order_times();               
             }
 
             scope.delete_dose = function() {
-               scope.delete_dose_time(attrs.id);                  
+               scope.delete_dose_time(attrs.id);
+               scope.set_editing_id(null);                  
             }
          } 
       }

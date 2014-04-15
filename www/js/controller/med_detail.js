@@ -12,9 +12,7 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
 
          $scope.$on(Phonestorage.events.MED_RETRIEVED, function(e, result) {
             $scope.med = result.rows.item(0);
-            for (var i = 0; i < result.rows.length; i++)
-               console.log("med retrieved @med_detail", result.rows.item(i));
-
+            
             $scope.$apply();
          });
 
@@ -49,7 +47,9 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
 
       $scope.insert_dose_time = function(index, time, amount, reoccurence, reminder, interval_unit, med_id) {
          Phonestorage.insert_dose_time(time, amount, reoccurence, reminder, interval_unit, med_id, $scope);
-         $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
+         var listenForInsert = $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
+            $scope.times.splice(index, 1);
+
             $scope.times.push({
                time: time,
                amount: amount,
@@ -57,13 +57,16 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
                id: result.insertId
             });
 
-            $scope.times.splice(index, 1);
+            $scope.order_times();
             $scope.$apply();
+
+            listenForInsert(); // unbind listener
          });
       }
 
       $scope.update_dose_time = function(index, time, amount) {
          Phonestorage.update_dose_time($scope.times[index].id, time, amount);
+         $scope.times.splice(index, 1);
 
          $scope.times.push({
             time: time,
@@ -71,15 +74,12 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
             editable: $scope.times[index].editable,
             id: $scope.times[index].id
          });
-
-         $scope.times.splice(index, 1);
+         $scope.order_times();
       }
 
       $scope.delete_dose_time = function(id) {
          Phonestorage.delete_dose_time(id);
          $scope.times.splice($scope.get_time(id).index, 1);
       }
-
-      console.log($scope.times);
    })
 ;
