@@ -1,7 +1,5 @@
 angular.module('project.directive.search', [])
    .directive("pjSearch", function() {
-      console.log("search dir init");
-
       return {
          link: function(scope, elem, attrs) {
             var list_index = 0, 

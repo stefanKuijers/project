@@ -104,7 +104,8 @@ angular.module('project.service.phonestorage', [])
             SETTING_STORED:             "SETTING_STORED",
             DOSE_INSERTED:              "DOSE_INSERTED",
             INTERACTION_LIST_RETRIEVED: "INTERACTION_LIST_RETRIEVED",
-            MED_NAMES_RETRIEVED:        "MED_NAMES_RETRIEVED"
+            MED_NAMES_RETRIEVED:        "MED_NAMES_RETRIEVED",
+            MED_ADDED:                  "MED_ADDED"
          },
 
          init: function(event_scope) {
@@ -224,7 +225,45 @@ angular.module('project.service.phonestorage', [])
          get_conditions: function() {},
 
          /* ADD */
-         add_medicin: function(data) {},
+         add_medicin: function(med, event_scope) {
+            var scope = this;
+            console.log("insert medicin at storage");
+            this.connection.transaction(
+               function(tx) {
+                  scope.query(
+                     'INSERT INTO ' + scope.settings.MED_TABLE_NAME + ' ' + 
+                        '( prescribed, ' +
+                           'description, ' +
+                           'trade_name, ' +
+                           'note, ' +
+                           'dosis_amount, ' +
+                           'when_to_use, ' +
+                           'when_not_to_use, ' +
+                           'how_to_use, ' +
+                           'Icon_id, ' +
+                           'Unit_id, ' +
+                           'Active_Ingredient_id' +
+                           ') ' +
+                     'VALUES ' +
+                        '( "' + med.prescribed + '", ' +
+                           '"' + med.description + '", ' +
+                           '"' + med.trade_name + '", ' +
+                           '"' + med.note + '", ' +
+                           + med.dosis_amount + ', ' +
+                           '"' + med.when_to_use + '", ' +
+                           '"' + med.when_not_to_use + '", ' +
+                           '"' + med.how_to_use + '", ' +
+                           + med.Icon_id + ', ' +
+                           + med.Unit_id + ', ' +
+                           '"' + med.active_ingredient + '"' +
+                     ');',
+                     tx,
+                     scope.events.MED_ADDED,
+                     event_scope
+                  );
+               }
+            );
+         },
          insert_dose_time: function(time, amount, reoccurence, reminder, interval_unit, med_id, event_scope) {
             var scope = this;
             console.log("insert dose at storage");
@@ -311,7 +350,7 @@ angular.module('project.service.phonestorage', [])
                query, 
                [], 
                function(transaction, result) { // a query succeeded
-                  // console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
+                  console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
                   
                   if (success_event === scope.events.STORAGE_INITIALIZED)
                      scope.initialized = true,

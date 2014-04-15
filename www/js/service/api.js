@@ -118,8 +118,6 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   function(e, result) {
                      var medicin = result;
                      
-                     console.log("med back. check interactions");
-                     // caller_scope.$emit(scope.events.SAFE_MED_RETRIEVED, "safe med object {}");
                      caller_scope.$on(
                         scope.events.INTERACTION_LIST_RETRIEVED,
                         function (e, result) {
@@ -128,8 +126,6 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                            caller_scope.$on(
                               Phonestorage.events.MED_NAMES_RETRIEVED, 
                               function(e, result) {
-                                 console.log("got both lists", result, interaction_list);
-
                                  var meds_in_use = [];
                                  for (var i = 0; i < result.rows.length; i++){
                                     meds_in_use[i] = result.rows.item(i).trade_name;
@@ -147,8 +143,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                );
             }
 
-            // select right med from fake data
-            // later this 
+            // select right med from fake data  
             var result_med;
             for (med in this.fake_data.medicin)
                if (this.fake_data.medicin[med].trade_name === med_name)
@@ -162,6 +157,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                result_med
             );
          },
+
          get_interaction_list: function(med_name, caller_scope) {
             caller_scope.$emit(this.events.INTERACTION_LIST_RETRIEVED, this.fake_data.interaction_list);
 
@@ -219,7 +215,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             PRIVATE FUNCTIONS
          */
          call: function(url, success_event, error_event, event_scope, fake_data) {
-            console.log("API.call", url, success_event, event_scope, fake_data);
+            // console.log("API.call", url, success_event, event_scope, fake_data);
             if (fake_data)
                event_scope.$emit(success_event, fake_data);
 
