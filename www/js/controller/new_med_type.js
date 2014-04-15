@@ -6,7 +6,6 @@ angular.module('project.controller.new_med_type', ['project.service.api', 'proje
       API.get_auto_complete_list($scope);
 
       $scope.choose_result = function(med_name) {
-
          var med_prescribed = window.localStorage.getItem("new_med_prescribed") == 'true'; // retrieve and typecast to boolean
          $scope.$on(API.events.SAFE_MED_RETRIEVED, function(e, medicin) {
             
@@ -16,7 +15,7 @@ angular.module('project.controller.new_med_type', ['project.service.api', 'proje
             Phonestorage.add_medicin(medicin, $scope);
          });
          
-         API.get_medicin_by_name(med_name, med_prescribed, $scope);
+         API.get_med_by(API.config.get_med_by.name, med_name, med_prescribed, $scope);
       }
    })
 ;

@@ -17,7 +17,8 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   when_to_use: "Dit medicijn werkt vochtafdrijvend. Te gebruiken bij: hartfalen, leverziekte, nierziekte, longoedeem, hoge bloeddruk of voorkoming van nierstenen. Dit medicijn zorgt ervoor dat u extra vochtafdrijft.",
                   when_not_to_use: "U word afgeraden dit medicijn te gebruiken wanneer u diabetes of vast gestelde nierproblemen heeft. ",
                   how_to_use: "Bij het ontbijt innemen met water. Blijf gedurende de dag een gewone hoeveelheid drinken.",
-                  active_ingredient: 4
+                  active_ingredient: 4,
+                  code: 12345678901
                },
                1: { 
                   id: 6, 
@@ -30,7 +31,8 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   when_to_use: "Dit medicijn werkt pijnstillend. Te gebruiken bij: hoofdpijn, kiespijn, ongesteldheidspijn.",
                   when_not_to_use: "U word afgeraden dit medicijn te gebruiken wanneer u diabetes of vast gestelde nierproblemen heeft. ",
                   how_to_use: "Bij het ontbijt innemen met water. Blijf gedurende de dag een gewone hoeveelheid drinken.",
-                  active_ingredient: 0
+                  active_ingredient: 0,
+                  code: 12345678902
                },
                2: { 
                   id: 7, 
@@ -43,7 +45,8 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   when_to_use: "Dit medicijn werkt vochtafdrijvend. Te gebruiken bij: hartfalen, leverziekte, nierziekte, longoedeem, hoge bloeddruk of voorkoming van nierstenen. Dit medicijn zorgt ervoor dat u extra vochtafdrijft.",
                   when_not_to_use: "U word afgeraden dit medicijn te gebruiken wanneer u diabetes of vast gestelde nierproblemen heeft. ",
                   how_to_use: "Bij het ontbijt innemen met water. Blijf gedurende de dag een gewone hoeveelheid drinken.",
-                  active_ingredient: 3
+                  active_ingredient: 3,
+                  code: 12345678903
                },
                3: { 
                   id: 8, 
@@ -56,7 +59,8 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   when_to_use: "Dit medicijn werkt vochtafdrijvend. Te gebruiken bij: hartfalen, leverziekte, nierziekte, longoedeem, hoge bloeddruk of voorkoming van nierstenen. Dit medicijn zorgt ervoor dat u extra vochtafdrijft.",
                   when_not_to_use: "U word afgeraden dit medicijn te gebruiken wanneer u diabetes of vast gestelde nierproblemen heeft. ",
                   how_to_use: "Bij het ontbijt innemen met water. Blijf gedurende de dag een gewone hoeveelheid drinken.",
-                  active_ingredient: 4
+                  active_ingredient: 4,
+                  code: 12345678904
                },
             },
             interaction_list: [
@@ -85,6 +89,10 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                get_auto_complete_list: "get_list",
                get_med_by_name:        "get_med/name/",
                get_med_by_code:        "get_med/code/"
+            },
+            get_med_by: {
+               name: "name",
+               code: "code"
             }
          },
 
@@ -108,15 +116,15 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             );
          },
 
-         get_medicin_by_name: function(med_name, prescribed, caller_scope) {
-            console.log("get med", med_name, prescribed, caller_scope);
-
+         get_med_by: function (attr, value, prescribed, caller_scope) {
+            console.log("get med by called", attr, value);
             if (!prescribed) {
                var scope = this;
                this.root_scope.$on(
                   this.events.UNCHECKED_MED_RETRIEVED, 
                   function(e, result) {
                      var medicin = result;
+                     medicin.prescribed = prescribed;
                      
                      caller_scope.$on(
                         scope.events.INTERACTION_LIST_RETRIEVED,
@@ -137,7 +145,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                            Phonestorage.get_med_names(caller_scope);
                         }
                      );
-                     scope.get_interaction_list(med_name, caller_scope);
+                     scope.get_interaction_list(medicin.trade_name, caller_scope);
                      
                   }
                );
@@ -146,11 +154,24 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             // select right med from fake data  
             var result_med;
             for (med in this.fake_data.medicin)
-               if (this.fake_data.medicin[med].trade_name === med_name)
+               if (this.fake_data.medicin[med].trade_name === value || this.fake_data.medicin[med].code === value)
                   result_med =  this.fake_data.medicin[med];
          
+            var get_by_url;
+            switch (attr) {
+               case this.config.get_med_by.code:
+                  get_by_url = this.config.url.get_med_by_code;
+               break;
+
+               case this.config.get_med_by.name:
+                  get_by_url = this.config.url.get_med_by_name;
+               break;
+
+               default: alert("wrong get by attr provided", attr);
+            } 
+
             this.call(
-               this.config.url.base + this.config.url.get_med_by_name + encodeURIComponent(med_name), 
+               this.config.url.base + get_by_url + encodeURIComponent(attr), 
                prescribed ? this.events.SAFE_MED_RETRIEVED : this.events.UNCHECKED_MED_RETRIEVED,
                this.events.API_CALL_FAILED,
                prescribed ? caller_scope : this.root_scope,
@@ -215,7 +236,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             PRIVATE FUNCTIONS
          */
          call: function(url, success_event, error_event, event_scope, fake_data) {
-            // console.log("API.call", url, success_event, event_scope, fake_data);
+            console.log("API.call", url, success_event, event_scope, fake_data);
             if (fake_data)
                event_scope.$emit(success_event, fake_data);
 
