@@ -11,7 +11,7 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
          $scope.$on(Phonestorage.events.MED_RETRIEVED, function(e, result) {
             $scope.med = result.rows.item(0);
             for (var i = 0; i < result.rows.length; i++)
-               console.log(result.rows.item(i));
+               console.log("med retrieved @med_detail", result.rows.item(i));
 
             $scope.$apply();
          });

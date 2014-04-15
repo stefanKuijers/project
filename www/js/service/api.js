@@ -115,7 +115,9 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                var scope = this;
                this.root_scope.$on(
                   this.events.UNCHECKED_MED_RETRIEVED, 
-                  function() {
+                  function(e, result) {
+                     var medicin = result;
+                     
                      console.log("med back. check interactions");
                      // caller_scope.$emit(scope.events.SAFE_MED_RETRIEVED, "safe med object {}");
                      caller_scope.$on(
@@ -133,7 +135,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                                     meds_in_use[i] = result.rows.item(i).trade_name;
                                  }
 
-                                 scope.check_for_interaction(meds_in_use, interaction_list, caller_scope);
+                                 scope.check_for_interaction(meds_in_use, interaction_list, medicin, caller_scope);
                               }
                            );
                            Phonestorage.get_med_names(caller_scope);
@@ -146,6 +148,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             }
 
             // select right med from fake data
+            // later this 
             var result_med;
             for (med in this.fake_data.medicin)
                if (this.fake_data.medicin[med].trade_name === med_name)
@@ -191,7 +194,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             // );
          },
 
-         check_for_interaction: function(meds_in_use, interaction_list, caller_scope) {
+         check_for_interaction: function(meds_in_use, interaction_list, medicin, caller_scope) {
             console.log("cheking for interactions", interaction_list, meds_in_use);
             var interactions = [];
             for (var i = 0; i < interaction_list.length; i++) {
@@ -207,7 +210,9 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             }
 
             if (interactions.length > 0)
-               caller_scope.$emit(scope.events.MED_INTERACTION, interactions);
+               caller_scope.$emit(this.events.MED_INTERACTION, {med: medicin, med_interactions: interactions});
+            else
+               caller_scope.$emit(this.events.SAFE_MED_RETRIEVED, medicin);
          },
 
          /**
