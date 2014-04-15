@@ -47,6 +47,10 @@
    padding-left: 55px;
 }
 
+.popup {
+   width: 300px;
+}
+
 
 
 /* global */
@@ -108,6 +112,7 @@
 
 .med-list .med-info {
    margin-left: 10px;
+   min-width: 50%;
 }
 
 .bar-footer .button {
@@ -311,8 +316,7 @@
    bottom: 0;
 }
 
-/* new med type */
-
+/* history */
 
 /* wireframe styles */
 .placeholder-img {

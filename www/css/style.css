@@ -332,5 +332,32 @@
 
 }
 @media screen and (orientation:landscape) {
+   .bar-footer {
+      height: 140px;
+   }
 
+   .has-footer {
+      bottom: 138px;
+   }
+
+   .nav-icon {
+      width: 80px;
+      height: 80px;
+   }
+
+   .radio-container {
+      width: 100px;
+   }
+
+   .pj-radio i, .pj-radio label {
+      line-height: 100px;
+   }
+
+   .new-med-container {
+      padding: 2% 10%;
+   }
+
+   .row.med-add-options {
+      bottom: 60px;
+   }
 }

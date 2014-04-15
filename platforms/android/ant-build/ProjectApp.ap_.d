@@ -75,6 +75,8 @@ C:\dev\project\platforms\android\assets\www\bower_components\persistence\lib\per
 C:\dev\project\platforms\android\assets\www\bower_components\persistence\lib\persistence.sync.server.php \
 C:\dev\project\platforms\android\assets\www\bower_components\persistence\lib\persistence.sync.server.php.sql \
 C:\dev\project\platforms\android\assets\www\css\style.css \
+C:\dev\project\platforms\android\assets\www\css\thesis_project.sublime-project \
+C:\dev\project\platforms\android\assets\www\css\thesis_project.sublime-workspace \
 C:\dev\project\platforms\android\assets\www\img\ionic.png \
 C:\dev\project\platforms\android\assets\www\img\placeholder.png \
 C:\dev\project\platforms\android\assets\www\js\app.js \
@@ -174,6 +176,7 @@ C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\ww
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\www\device.js \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www\statusbar.js \
+C:\dev\project\platforms\android\assets\www\view\dialog \
 C:\dev\project\platforms\android\assets\www\view\history.html \
 C:\dev\project\platforms\android\assets\www\view\medicijn-detail.html \
 C:\dev\project\platforms\android\assets\www\view\new-med-scan.html \
@@ -181,4 +184,5 @@ C:\dev\project\platforms\android\assets\www\view\new-med-type.html \
 C:\dev\project\platforms\android\assets\www\view\new-med.html \
 C:\dev\project\platforms\android\assets\www\view\overzicht.html \
 C:\dev\project\platforms\android\assets\www\view\settings.html \
+C:\dev\project\platforms\android\assets\www\view\dialog\med_interaction.html \
 C:\dev\project\platforms\android\ant-build\AndroidManifest.xml \

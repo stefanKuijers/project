@@ -64,9 +64,9 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                },
             },
             interaction_list: [
-               {status: "Gevaarlijk", primary_med_name: "Ibuprofen 400mg", secondary_med_name: "Oxazepam", description: "Deze twee medicinen gaan niet samen"},
-               {status: "Ongevaarlijk", primary_med_name: "Ibuprofen 200mg", secondary_med_name: "Citrosan", description: "De combinatie van deze twee medicijnen verminderd de werking van Citrosan"},
-               {status: "Gevaarlijk", primary_med_name: "Ibuprofen 200mg", secondary_med_name: "Oxazepam", description: "Deze twee medicinen gaan niet samen"}
+               {status: "Gevaarlijk", primary_med_name: "Ibuprofen 400mg", secondary_med_name: "Oxazepam", description: "De werking van Oxazepam word zeer versterkt bij herhaald gebruik van Ibuprofen."},
+               {status: "Ongevaarlijk", primary_med_name: "Oxazepam", secondary_med_name: "Citrosan", description: "De combinatie van deze twee medicijnen verminderd de werking van Citrosan"},
+               {status: "Gevaarlijk", primary_med_name: "Citrosan", secondary_med_name: "Ibuprofen 200mg", description: "Deze twee medicinen gaan niet samen"}
             ]
          },
          events: {
@@ -212,14 +212,11 @@ angular.module('project.service.api', ['project.service.phonestorage'])
          },
 
          check_for_interaction: function(meds_in_use, interaction_list, medicin, caller_scope) {
-            console.log("cheking for interactions", interaction_list, meds_in_use);
             var interactions = [];
             for (var i = 0; i < interaction_list.length; i++) {
                for (var ii = 0; ii < meds_in_use.length; ii++) {
-                  console.log(interaction_list[i].primary_med_name, interaction_list[i].secondary_med_name, meds_in_use[ii]);
-                  if (
-                     interaction_list[i].primary_med_name === meds_in_use[ii] ||
-                     interaction_list[i].secondary_med_name === meds_in_use[ii]
+                  if ((interaction_list[i].primary_med_name === meds_in_use[ii] && interaction_list[i].secondary_med_name === medicin.trade_name) ||
+                      (interaction_list[i].primary_med_name === medicin.trade_name && interaction_list[i].secondary_med_name === meds_in_use[ii])
                   ) {
                      interactions.push(interaction_list[i]);
                   }
@@ -236,7 +233,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             PRIVATE FUNCTIONS
          */
          call: function(url, success_event, error_event, event_scope, fake_data) {
-            console.log("API.call", url, success_event, event_scope, fake_data);
+            // console.log("API.call", url, success_event, event_scope, fake_data);
             if (fake_data)
                event_scope.$emit(success_event, fake_data);
 
