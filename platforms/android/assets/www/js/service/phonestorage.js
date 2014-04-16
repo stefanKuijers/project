@@ -105,7 +105,9 @@ angular.module('project.service.phonestorage', [])
             DOSE_INSERTED:              "DOSE_INSERTED",
             INTERACTION_LIST_RETRIEVED: "INTERACTION_LIST_RETRIEVED",
             MED_NAMES_RETRIEVED:        "MED_NAMES_RETRIEVED",
-            MED_ADDED:                  "MED_ADDED"
+            MED_ADDED:                  "MED_ADDED",
+            DOSIS_BY_TIME_RETRIEVED:    "DOSIS_BY_TIME_RETRIEVED",
+            DOSE_UPDATED:               "DOSE_UPDATED"
          },
 
          init: function(event_scope) {
@@ -115,11 +117,8 @@ angular.module('project.service.phonestorage', [])
             this.table_exists(this.settings.MED_TABLE_NAME);
 
             var scope = this;
-
-            // comment this line
             this.event_aggregater.$on(this.events.TABLE_DOES_NOT_EXIST , function(e, result) {
                scope.setup_storage();
-            // and this line to force rebuild database on device
             });
          },
 
@@ -219,6 +218,37 @@ angular.module('project.service.phonestorage', [])
                }
             );
          },
+         get_dosis_by_time: function(time, caller_scope) {
+            // raw query
+            // SELECT Reminder.time, Reminder.task_id, Dosis.med_id, Medicin.trade_name FROM Reminder_Dosis JOIN Reminder ON Reminder_Dosis.Reminder_id = Reminder.id JOIN Dosis ON Reminder_Dosis.Dosis_id = Dosis.id JOIN Medicin ON Dosis.med_id = Medicin.id
+         
+            var scope = this;
+            this.connection.transaction(
+               function(tx) {
+                  scope.query(
+                     "SELECT " +
+                        // "Reminder.time, " +
+                        "Reminder.task_id, " +
+                        // "Dosis.med_id, " +
+                        "Medicin.trade_name " +
+                     "FROM " +
+                        "Reminder_Dosis " +
+                     "JOIN Reminder " +
+                        "ON Reminder_Dosis.Reminder_id = Reminder.id " +
+                     "JOIN Dosis " +
+                       "ON Reminder_Dosis.Dosis_id = Dosis.id " +
+                     "JOIN Medicin " +
+                        "ON Dosis.med_id = Medicin.id " +
+                     "WHERE " +
+                        "Dosis.time = '"+ time +"'" +
+                     ";" , 
+                     tx, 
+                     scope.events.DOSIS_BY_TIME_RETRIEVED, 
+                     caller_scope
+                  );
+               }
+            );
+         },
 
          get_reminders: function() {},
          get_history: function() {},
@@ -296,7 +326,7 @@ angular.module('project.service.phonestorage', [])
                }
             );
          },
-         update_dose_time: function(id, time, amount) {
+         update_dose_time: function(id, time, amount, event_scope) {
             var scope = this;
             this.connection.transaction(
                function(tx) {
@@ -307,7 +337,9 @@ angular.module('project.service.phonestorage', [])
                            "amount=" + amount + " " + 
                         "WHERE id='" + id + "'" +
                      ";", 
-                     tx
+                     tx,
+                     scope.events.DOSE_UPDATED,
+                     event_scope
                   );
                }
             );

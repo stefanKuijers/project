@@ -173,11 +173,16 @@ C:\dev\project\platforms\android\assets\www\lib\ionic\scss\ionicons\_ionicons-ic
 C:\dev\project\platforms\android\assets\www\lib\ionic\scss\ionicons\_ionicons-variables.scss \
 C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.local-notification \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device \
+C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.dialogs \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar \
 C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.local-notification\www \
 C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.local-notification\www\local-notification.js \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\www \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device\www\device.js \
+C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.dialogs\www \
+C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.dialogs\www\android \
+C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.dialogs\www\notification.js \
+C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.dialogs\www\android\notification.js \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www\statusbar.js \
 C:\dev\project\platforms\android\assets\www\view\dialog \
@@ -189,4 +194,5 @@ C:\dev\project\platforms\android\assets\www\view\new-med.html \
 C:\dev\project\platforms\android\assets\www\view\overzicht.html \
 C:\dev\project\platforms\android\assets\www\view\settings.html \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_interaction.html \
+C:\dev\project\platforms\android\assets\www\view\dialog\med_reminder.html \
 C:\dev\project\platforms\android\ant-build\AndroidManifest.xml \

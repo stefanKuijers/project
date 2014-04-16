@@ -1,5 +1,5 @@
-angular.module('project.controller.settings', ['project.service.phonestorage'])
-   .controller('Settings', function($scope, $ionicSideMenuDelegate, Phonestorage) {
+angular.module('project.controller.settings', ['project.service.phonestorage', 'project.service.notification'])
+   .controller('Settings', function($scope, $ionicSideMenuDelegate, Phonestorage, Notification) {
       
       if (Phonestorage.initialized) 
          get_settings();
@@ -43,6 +43,11 @@ angular.module('project.controller.settings', ['project.service.phonestorage'])
 
       $scope.reset_device_storage = function() {
          Phonestorage.setup_storage();
+         $ionicSideMenuDelegate.toggleRight();
+      }
+
+      $scope.cancel_all_notifications = function() {
+         Notification.cancel_all();
          $ionicSideMenuDelegate.toggleRight();
       }
    })

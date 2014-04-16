@@ -7,7 +7,8 @@
         "res/xml/config.xml": {
             "/*": {
                 "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>": 1,
-                "<feature name=\"LocalNotification\"><param name=\"android-package\" value=\"de.appplant.cordova.plugin.localnotification.LocalNotification\" /></feature>": 1
+                "<feature name=\"LocalNotification\"><param name=\"android-package\" value=\"de.appplant.cordova.plugin.localnotification.LocalNotification\" /></feature>": 1,
+                "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>": 1
             }
         },
         "AndroidManifest.xml": {
@@ -32,6 +33,9 @@
             "PACKAGE_NAME": "com.ionicframework.starter"
         },
         "de.appplant.cordova.plugin.local-notification": {
+            "PACKAGE_NAME": "com.ionicframework.starter"
+        },
+        "org.apache.cordova.dialogs": {
             "PACKAGE_NAME": "com.ionicframework.starter"
         }
     },

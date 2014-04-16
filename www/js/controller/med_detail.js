@@ -65,7 +65,13 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
       }
 
       $scope.update_dose_time = function(index, time, amount) {
-         Phonestorage.update_dose_time($scope.times[index].id, time, amount);
+         var update_dose_listener = $scope.$on(Phonestorage.events.DOSE_UPDATED, function(e, result) {
+            update_dose_listener();
+
+            Notification.add(time);
+         });
+         Phonestorage.update_dose_time($scope.times[index].id, time, amount, $scope);
+         
          $scope.times.splice(index, 1);
 
          $scope.times.push({
@@ -75,8 +81,6 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
             id: $scope.times[index].id
          });
          $scope.order_times();
-
-         Notification.add();
       }
 
       $scope.delete_dose_time = function(id) {

@@ -4,10 +4,11 @@ angular.module(
       'ionic',
       'project.router',
       'project.service.phonestorage',
-      'project.service.api'
+      'project.service.notification',
+      'project.service.api',
    ]
 ).run( 
-   function($rootScope, $ionicPlatform, Phonestorage, API) {
+   function($rootScope, $ionicPlatform, Phonestorage, Notification, API) {
       $ionicPlatform.ready(function() {
          Phonestorage.init($rootScope);
 
@@ -17,6 +18,8 @@ angular.module(
                $rootScope.$broadcast(Phonestorage.events.STORAGE_READY, "broadcast from root");
             }
          );
+
+         Notification.init($rootScope);
 
          API.init($rootScope);
          $rootScope.$on(API.events.CONNECTION_LOST, function(e, result) {
