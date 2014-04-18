@@ -8,18 +8,18 @@
       <div class="row answer">
          <div class="col">
             <div class="radio-container">
-               <pj-radio ng-class="{'selected': answer === true}" class="pj-radio" data-group="new-med-group" data-value="true" ng-click="toggle_radio(true)" data-pj-radio>
+               <div pj-radio ng-class="{'selected': answer === true}" class="pj-radio" data-group="new-med-group" data-value="true" ng-click="toggle_radio(true)">
                   <label>Ja</label>
                   <i class="radio-icon ion-checkmark"></i>
-               </pj-radio>
+               </div>
             </div>
          </div>
          <div class="col">
             <div class="radio-container">
-               <pj-radio ng-class="{'selected': answer === false}" class="pj-radio" data-group="new-med-group" data-value="false" ng-click="toggle_radio(false)" data-pj-radio>
+               <div pj-radio ng-class="{'selected': answer === false}" class="pj-radio" data-group="new-med-group" data-value="false" ng-click="toggle_radio(false)">
                   <label>Nee</label>
                   <i class="radio-icon ion-checkmark"></i>
-               </pj-radio>
+               </div>
             </div>
          </div>
       </div>
