@@ -40,7 +40,7 @@ angular.module('project.directive.dose_item', [])
                      elem.find('input[type=\'time\']').val(), 
                      elem.find('input[type=\'number\']').val(), 
                      1, 
-                     true, 
+                     1, 
                      0, 
                      scope.med.id
                   );

@@ -85,8 +85,6 @@ angular.module('project.service.phonestorage', [])
             ACTIVE_INGREDIENT_TABLE_NAME:  "Active_Ingredient",
             INTERACTION_STATUS_TABLE_NAME: "Interaction_Status",
             DOSIS_TABLE_NAME:              "Dosis",
-            REMINDER_TABLE_NAME:           "Reminder",
-            REMINDER_DOSIS_TABLE_NAME:     "Reminder_Dosis",
             INTERVAL_UNIT_TABLE_NAME:      "Interval_Unit", 
             accepted_units:                ["ml", "cl", "dl", "mg", "g", "pch", "sachet"],
             accepted_interval_units:       ["dag", "week", "maand"],
@@ -171,9 +169,9 @@ angular.module('project.service.phonestorage', [])
                         "Unit.unit, " +
                         "Icon.name as icon " +
                      "FROM Medicin " +
-                        "INNER JOIN Active_Ingredient on Medicin.Active_Ingredient_id = Active_Ingredient.id " +
-                        "INNER JOIN Unit on Medicin.Unit_id = Unit.id " +
-                        "INNER JOIN Icon on Medicin.Icon_id = Icon.id " +
+                        "JOIN Active_Ingredient on Medicin.Active_Ingredient_id = Active_Ingredient.id " +
+                        "JOIN Unit on Medicin.Unit_id = Unit.id " +
+                        "JOIN Icon on Medicin.Icon_id = Icon.id " +
                      "WHERE "+ 
                         "Medicin.id=" + med_id + " " +
                      ";" , 
@@ -219,26 +217,16 @@ angular.module('project.service.phonestorage', [])
             );
          },
          get_dosis_by_time: function(time, caller_scope) {
-            // raw query
-            // SELECT Reminder.time, Reminder.task_id, Dosis.med_id, Medicin.trade_name FROM Reminder_Dosis JOIN Reminder ON Reminder_Dosis.Reminder_id = Reminder.id JOIN Dosis ON Reminder_Dosis.Dosis_id = Dosis.id JOIN Medicin ON Dosis.med_id = Medicin.id
-         
             var scope = this;
             this.connection.transaction(
                function(tx) {
                   scope.query(
                      "SELECT " +
-                        // "Reminder.time, " +
-                        "Reminder.task_id, " +
-                        // "Dosis.med_id, " +
+                        "Dosis.reminder_task_id, " +
                         "Medicin.trade_name " +
                      "FROM " +
-                        "Reminder_Dosis " +
-                     "JOIN Reminder " +
-                        "ON Reminder_Dosis.Reminder_id = Reminder.id " +
-                     "JOIN Dosis " +
-                       "ON Reminder_Dosis.Dosis_id = Dosis.id " +
-                     "JOIN Medicin " +
-                        "ON Dosis.med_id = Medicin.id " +
+                        "Dosis " +
+                     "JOIN Medicin ON Dosis.med_id = Medicin.id " +
                      "WHERE " +
                         "Dosis.time = '"+ time +"'" +
                      ";" , 
@@ -294,15 +282,15 @@ angular.module('project.service.phonestorage', [])
                }
             );
          },
-         insert_dose_time: function(time, amount, reoccurence, reminder, interval_unit, med_id, event_scope) {
+         insert_dose_time: function(time, amount, reoccurence, reminder_task_id, interval_unit, med_id, event_scope) {
             var scope = this;
             console.log("insert dose at storage");
             this.connection.transaction(
                function(tx) {
                   scope.query(
                      'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + ' ' +
-                        '(amount, time, reoccurence, reminder, Interval_Unit_id, Med_id) ' + 
-                     'VALUES (' + amount +', "' + time + '", '+ reoccurence +', "'+ reminder +'", '+ interval_unit +', '+ med_id +')' +
+                        '(amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
+                     'VALUES (' + amount +', "' + time + '", '+ reoccurence +', "'+ reminder_task_id +'", '+ interval_unit +', '+ med_id +')' +
                      ';',
                      tx,
                      scope.events.DOSE_INSERTED,
@@ -446,70 +434,26 @@ angular.module('project.service.phonestorage', [])
                         'amount INT, ' +
                         'time TIME, ' +
                         'reoccurence INT, ' +
-                        'reminder BOOL, ' +
+                        'reminder_task_id INT, ' +
                         'Interval_Unit_id INT REFERENCES ' + scope.settings.INTERVAL_UNIT_TABLE_NAME + '(id),' +
                         'Med_id INT REFERENCES ' + scope.settings.MED_TABLE_NAME + '(id)' +
                      ')'
                   );
                   tx.executeSql(
                      'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + 
-                     ' (amount, time, reoccurence, reminder, Interval_Unit_id, Med_id) ' + 
-                     'SELECT 2, "06:00", 1, "true", 0, 0 UNION ALL ' +
-                     'SELECT 1, "08:00", 1, "true", 0, 0 UNION ALL ' +
-                     'SELECT 2, "08:00", 1, "false", 1, 1 UNION ALL ' +
-                     'SELECT 3, "08:00", 1, "true", 0, 2 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, "true", 0, 0 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, "true", 0, 1 UNION ALL ' +
-                     'SELECT 2, "13:00", 1, "true", 2, 2 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, "true", 0, 3 UNION ALL ' +
-                     'SELECT 1, "16:00", 1, "true", 0, 3 UNION ALL ' +
-                     'SELECT 1, "18:30", 1, "false", 0, 2 UNION ALL ' +
-                     'SELECT 1, "18:30", 1, "true", 0, 0 UNION ALL ' +
-                     'SELECT 2, "22:00", 1, "true", 0, 1;'
-                  );
-
-                  tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.REMINDER_TABLE_NAME);
-                  tx.executeSql(
-                     'CREATE TABLE IF NOT EXISTS ' + scope.settings.REMINDER_TABLE_NAME + ' (' +
-                        'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
-                        'time TIME, ' +
-                        'task_id INT' +
-                     ')'
-                  );
-                  tx.executeSql(
-                     'INSERT INTO ' + scope.settings.REMINDER_TABLE_NAME + 
-                     ' (time, task_id) ' + 
-                     ' SELECT "06:00", 1 UNION ALL ' +
-                     ' SELECT "08:00", 2 UNION ALL ' +
-                     ' SELECT "13:00", 3 UNION ALL ' +
-                     ' SELECT "16:00", 4 UNION ALL ' +
-                     ' SELECT "18:30", 5 UNION ALL ' +
-                     ' SELECT "22:00", 6;'
-                  );
-
-                  tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.REMINDER_DOSIS_TABLE_NAME);
-                  tx.executeSql(
-                     'CREATE TABLE IF NOT EXISTS ' + scope.settings.REMINDER_DOSIS_TABLE_NAME + ' (' +
-                        'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
-                        'Reminder_id INT REFERENCES ' + scope.settings.REMINDER_TABLE_NAME + '(id),' +
-                        'Dosis_id INT REFERENCES ' + scope.settings.DOSIS_TABLE_NAME + '(id)' +
-                     ')'
-                  );
-                  tx.executeSql(
-                     'INSERT INTO ' + scope.settings.REMINDER_DOSIS_TABLE_NAME + 
-                     ' (Reminder_id, Dosis_id)' + 
-                     ' SELECT 0, 0 UNION ALL ' +
-                     ' SELECT 1, 1 UNION ALL ' +
-                     ' SELECT 1, 2 UNION ALL ' +
-                     ' SELECT 1, 3 UNION ALL ' +
-                     ' SELECT 2, 4 UNION ALL ' +
-                     ' SELECT 2, 5 UNION ALL ' +
-                     ' SELECT 2, 6 UNION ALL ' +
-                     ' SELECT 2, 7 UNION ALL ' +
-                     ' SELECT 3, 8 UNION ALL ' +
-                     ' SELECT 4, 9 UNION ALL ' +
-                     ' SELECT 2, 10 UNION ALL ' +
-                     ' SELECT 5, 11;'
+                     ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
+                     'SELECT 2, "06:00", 1, 1, 0, 0 UNION ALL ' +
+                     'SELECT 1, "08:00", 1, 2, 0, 0 UNION ALL ' +
+                     'SELECT 2, "08:00", 1, 2, 1, 1 UNION ALL ' +
+                     'SELECT 3, "08:00", 1, 2, 0, 2 UNION ALL ' +
+                     'SELECT 1, "13:00", 1, 3, 0, 0 UNION ALL ' +
+                     'SELECT 1, "13:00", 1, 3, 0, 1 UNION ALL ' +
+                     'SELECT 2, "13:00", 1, 3, 2, 2 UNION ALL ' +
+                     'SELECT 1, "13:00", 1, 3, 0, 3 UNION ALL ' +
+                     'SELECT 1, "16:00", 1, 4, 0, 3 UNION ALL ' +
+                     'SELECT 1, "18:30", 1, 5, 0, 2 UNION ALL ' +
+                     'SELECT 1, "18:30", 1, 5, 0, 0 UNION ALL ' +
+                     'SELECT 2, "22:00", 1, 6, 0, 1;'
                   );
 
                   // Create the med table
@@ -563,8 +507,6 @@ angular.module('project.service.phonestorage', [])
             this.connection.transaction(
                function(tx) {
                   tx.executeSql('DROP TABLE IF EXISTS ' + table_name);
-
-                  // how to auto increment the id?
                   tx.executeSql('CREATE TABLE IF NOT EXISTS ' + table_name + ' (id INTEGER PRIMARY KEY AUTOINCREMENT, key VARCHAR(50), value VARCHAR(50), type VARCHAR(4))');
                   
                   var query_pre_fix = 'INSERT INTO ' + table_name + ' (key, value, type) VALUES ';
