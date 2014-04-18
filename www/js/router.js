@@ -7,9 +7,11 @@ angular.module(
       'project.controller.med_info',
       'project.controller.new_med',
       'project.controller.new_med_type',
-      'project.controller.new_med_scan'
+      'project.controller.new_med_scan',
+      'project.controller.history'
    ]
-).config(function($stateProvider, $urlRouterProvider) {
+).config(
+   ['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
    
       $stateProvider
          .state('overzicht', {
@@ -43,9 +45,10 @@ angular.module(
          })
          .state('geschiedenis', {
             url:                     '/geschiedenis',
+            controller:              'HistoryCtrl',
             templateUrl:             'view/history.html'
          })
       ;
       $urlRouterProvider.otherwise('/');
-   })
+   }])
 ;

@@ -1,5 +1,5 @@
 angular.module('project.directive.dose_item', [])
-   .directive("pjDoseItem", function() {
+   .directive("pjDoseItem", [function() {
       return {
          link: function(scope, elem, attrs) {
 
@@ -58,5 +58,5 @@ angular.module('project.directive.dose_item', [])
             }
          } 
       }
-   })
+   }])
 ;

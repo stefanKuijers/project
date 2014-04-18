@@ -1,5 +1,5 @@
 angular.module('project.service.api', ['project.service.phonestorage'])
-   .service('API', function(Phonestorage) {
+   .service('API', ['Phonestorage', function(Phonestorage) {
       return {
          initialized:false,
          root_scope: {},
@@ -247,6 +247,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
 
             // succes
             // event_scope.$emit(success_event, result_data);
+
             // fail
          },
 
@@ -254,5 +255,5 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             return true;
          }
       }
-   })
+   }])
 ;

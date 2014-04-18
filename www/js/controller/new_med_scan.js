@@ -1,5 +1,5 @@
 angular.module('project.controller.new_med_scan', ['project.service.api', 'project.service.phonestorage'])
-   .controller('NewMedScanCtrl', function($scope, $ionicPopup, API, Phonestorage) {
+   .controller('NewMedScanCtrl', ['$scope', '$ionicPopup', 'API', 'Phonestorage', function($scope, $ionicPopup, API, Phonestorage) {
       
       // fake data that could be extracted from a scan
       $scope.current_scan = {
@@ -54,5 +54,5 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
          
          Phonestorage.add_medicin(medicin, $scope);
       }
-   })
+   }])
 ;

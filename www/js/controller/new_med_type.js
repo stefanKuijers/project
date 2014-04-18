@@ -1,5 +1,5 @@
 angular.module('project.controller.new_med_type', ['project.service.api', 'project.service.phonestorage', 'project.directive.search'])
-   .controller('NewMedTypeCtrl', function($scope, $ionicPopup, API, Phonestorage) {
+   .controller('NewMedTypeCtrl', ['$scope', '$ionicPopup', 'API', 'Phonestorage', function($scope, $ionicPopup, API, Phonestorage) {
       $scope.$on(API.events.AUTO_COMPLETE_LIST_RETRIEVED, function(e, result) {
          $scope.auto_list = result;
       });
@@ -54,5 +54,5 @@ angular.module('project.controller.new_med_type', ['project.service.api', 'proje
          
          Phonestorage.add_medicin(medicin, $scope);
       }
-   })
+   }])
 ;

@@ -56,33 +56,28 @@ angular.module('project.service.notification', ['project.service.phonestorage'])
 
          add: function(time, caller_scope) {
             var scope = this;
-            alert("not.add");
             var event_scope = caller_scope ? caller_scope : this.root_scope;
+
             var added_listener = event_scope.$on(Phonestorage.events.DOSIS_BY_TIME_RETRIEVED, function(e, result) {
                added_listener(); // remove listener
-               alert("got dose by time");
-
+               
                var meds_string = "";
                var task_id = result.rows.item(0).task_id;
                for (var i = 0; i < result.rows.length; i++){
                   meds_string += result.rows.item(i).trade_name + " ";
                }
-               alert("meds_string");
+               
+               var date_time = new Date(),
+                  parts = time.split(":"),
+                  hours = parseInt(parts[0], 10),
+                  minutes = parseInt(parts[1], 10);
 
-                  var date_time = new Date(),
-                     parts = time.split(":"),
-                     hours = parseInt(parts[0], 10),
-                     minutes = parseInt(parts[1], 10);
-               alert("setup date");
-
-                  date_time.setHours(hours);
-                  date_time.setMinutes(minutes);
-                  date_time.setSeconds(0);
-               alert("specified date ready to add");
-
-               // alert("pre check " + (window.plugin === 'undefined'));
+               date_time.setHours(hours);
+               date_time.setMinutes(minutes);
+               date_time.setSeconds(0);
+               
                if (window.plugin !== 'undefined') {
-                  alert("passed check");
+                  // alert("passed check");
                   //alert("task_id: " + task_id + " date_time: " + date_time + " meds_string: " + meds_string + " title: " + scope.config.default_notification_settings.title);
                   window.plugin.notification.local.add({
                      id:         "" + task_id,                                       // STRING. Id from the dosis table.
@@ -94,19 +89,13 @@ angular.module('project.service.notification', ['project.service.phonestorage'])
                      autoCancel: scope.config.default_notification_settings.ongoing, // Setting this flag and the notification is automatically canceled when the user clicks it
                      ongoing:    scope.config.default_notification_settings.ongoing  // Prevent clearing of notification (Android only)
                   });
-                  alert("added Notification");
+                  // alert("added Notification");
 
-                  window.plugin.notification.local.isScheduled(task_id, function (isScheduled) {
-                     alert('Notification with ID ' + task_id + ' is scheduled: ' + isScheduled);
-                  }, scope);
                }
-               alert("setting date: " + date_time.toString());
-               alert("Options " + task_id + " " + meds_string);
+               // alert("setting date: " + date_time.toString());
+               // alert("Options " + task_id + " " + meds_string);
             });
             Phonestorage.get_dosis_by_time(time, event_scope);
-
-
-
          },
 
          cancel: function(id) {

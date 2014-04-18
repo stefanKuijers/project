@@ -1,5 +1,5 @@
 angular.module('project.service.phonestorage', [])
-   .service('Phonestorage', function() {
+   .service('Phonestorage', [function() {
       return {
          default_values: {
             settings: {
@@ -594,5 +594,5 @@ angular.module('project.service.phonestorage', [])
             scope.event_aggregater.$broadcast(scope.events.STORAGE_INITIALIZED, "got initialized");
          }
       }
-   })
+   }])
 ;

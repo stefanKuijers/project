@@ -1,5 +1,5 @@
 angular.module('project.directive.radio', [])
-   .directive("pjRadio", function() {
+   .directive("pjRadio", [function() {
       return {
          link: function(scope, elem, attrs) {
             scope.toggle_radio = function(value) {
@@ -7,5 +7,5 @@ angular.module('project.directive.radio', [])
             }
          } 
       }
-   })
+   }])
 ;

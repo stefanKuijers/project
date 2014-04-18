@@ -4,11 +4,11 @@
          <a class="item" ng-repeat="med in med_overview" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
             <div class="time-container" ng-class="{'time-header': med.time_header==true}">
                <span ng-if="med.time_header" class="time">
-               {{med.time}}
+                  {{med.time}}
                </span>
             </div>
             <div class="med-icon med-icon-{{med.icon}} placeholder-img">
-            {{med.icon}}
+               <span style="color: rgba(1,1,1,0)">{{med.icon}}</span>
             </div>
             <div class="med-info">
                <div class="med-name"><h2>{{med.trade_name}}</h2></div>

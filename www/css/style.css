@@ -48,7 +48,20 @@
 }
 
 .popup {
-   width: 300px;
+   width: 400px;
+}
+
+h3.popup-title {
+   font-size: 25px;
+}
+
+h5.popup-sub-title {
+   font-size: 18px;
+}
+
+a.item::after {
+   font-size: 40px;
+   margin-top: -20px;
 }
 
 
@@ -321,11 +334,15 @@
 /* wireframe styles */
 .placeholder-img {
    background-size: 100%;
-   color:rgba(100,100,100,0.3);
    background-repeat: no-repeat;
    text-align: center;
    background-image: url('../img/placeholder.png');
    background-position: 50%;
+}
+
+.button-label {
+   color: black;
+   font-weight: bold;
 }
 
 @media screen and (orientation:portrait) {

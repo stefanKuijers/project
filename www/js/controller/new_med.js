@@ -1,5 +1,5 @@
 angular.module('project.controller.new_med', ['project.directive.radio'])
-   .controller('NewMedCtrl', function($scope) {
+   .controller('NewMedCtrl', ['$scope', function($scope) {
       $scope.question_answered = false;
       $scope.answer = null;
 
@@ -11,5 +11,5 @@ angular.module('project.controller.new_med', ['project.directive.radio'])
          // funky stuff should probable move to MV*-PerfectPlace
          window.localStorage.setItem("new_med_prescribed", value);
       }
-   })
+   }])
 ;

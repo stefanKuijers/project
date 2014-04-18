@@ -1,5 +1,5 @@
 angular.module('project.directive.search', [])
-   .directive("pjSearch", function() {
+   .directive("pjSearch", [function() {
       return {
          link: function(scope, elem, attrs) {
             var list_index = 0, 
@@ -32,5 +32,5 @@ angular.module('project.directive.search', [])
             }
          } 
       }
-   })
+   }])
 ;

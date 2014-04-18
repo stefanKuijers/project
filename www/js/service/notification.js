@@ -1,5 +1,5 @@
 angular.module('project.service.notification', ['project.service.phonestorage'])
-   .service('Notification', function($ionicPopup, Phonestorage) {
+   .service('Notification', ['$ionicPopup', 'Phonestorage', function($ionicPopup, Phonestorage) {
       // documentation on window.plugin.notification.local
       // https://github.com/katzer/cordova-plugin-local-notifications
 
@@ -76,9 +76,9 @@ angular.module('project.service.notification', ['project.service.phonestorage'])
                date_time.setMinutes(minutes);
                date_time.setSeconds(0);
                
-               if (window.plugin !== 'undefined') {
+               if (window.plugin !== undefined) {
                   // alert("passed check");
-                  //alert("task_id: " + task_id + " date_time: " + date_time + " meds_string: " + meds_string + " title: " + scope.config.default_notification_settings.title);
+                  // alert("task_id: " + task_id + " date_time: " + date_time + " meds_string: " + meds_string + " title: " + scope.config.default_notification_settings.title);
                   window.plugin.notification.local.add({
                      id:         "" + task_id,                                       // STRING. Id from the dosis table.
                      date:       date_time,                                          // From the dosis table
@@ -91,6 +91,8 @@ angular.module('project.service.notification', ['project.service.phonestorage'])
                   });
                   // alert("added Notification");
 
+               } else {
+                  alert("Notification plugin not available. Probably the app is not running on a mobile device");
                }
                // alert("setting date: " + date_time.toString());
                // alert("Options " + task_id + " " + meds_string);
@@ -185,5 +187,5 @@ angular.module('project.service.notification', ['project.service.phonestorage'])
 
 
       }
-   })
+   }])
 ;
