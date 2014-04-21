@@ -1,19 +1,11 @@
 C:\dev\project\platforms\android\ant-build\classes.dex : \
 C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\BuildConfig.class \
 C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\ProjectApp.class \
-C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$array.class \
 C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$attr.class \
-C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$color.class \
-C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$dimen.class \
 C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$drawable.class \
-C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$id.class \
-C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$layout.class \
-C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$menu.class \
-C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$raw.class \
 C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$string.class \
 C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R$xml.class \
 C:\dev\project\platforms\android\ant-build\classes\com\ionicframework\starter\R.class \
-C:\dev\project\platforms\android\ant-build\classes\com\phonegap\plugins\barcodescanner\BarcodeScanner.class \
 C:\dev\project\platforms\android\ant-build\classes\de\appplant\cordova\plugin\localnotification\LocalNotification$1.class \
 C:\dev\project\platforms\android\ant-build\classes\de\appplant\cordova\plugin\localnotification\LocalNotification$2.class \
 C:\dev\project\platforms\android\ant-build\classes\de\appplant\cordova\plugin\localnotification\LocalNotification$3.class \
@@ -43,5 +35,4 @@ C:\dev\project\platforms\android\ant-build\classes\org\apache\cordova\dialogs\No
 C:\dev\project\platforms\android\ant-build\classes\org\apache\cordova\dialogs\Notification$5.class \
 C:\dev\project\platforms\android\ant-build\classes\org\apache\cordova\dialogs\Notification.class \
 C:\dev\project\platforms\android\ant-build\dexedLibs\classes-01d7c2a8d30254de58aa1610e1b34ef7.jar \
-C:\dev\project\platforms\android\ant-build\dexedLibs\com.google.zxing.client.android.captureactivity-9ff8511fb2bec9f3e8ffb149424f04d1.jar \
 C:\dev\project\platforms\android\ant-build\dexedLibs\android-support-v4-8925d979a339c8bbce1b635108961b02.jar \

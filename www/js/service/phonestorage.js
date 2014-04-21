@@ -282,7 +282,7 @@ angular.module('project.service.phonestorage', [])
                }
             );
          },
-         insert_dose_time: function(time, amount, reoccurence, reminder_task_id, interval_unit, med_id, event_scope) {
+         insert_dose_time: function(dose_time, med_id, event_scope) {
             var scope = this;
             console.log("insert dose at storage");
             this.connection.transaction(
@@ -290,7 +290,7 @@ angular.module('project.service.phonestorage', [])
                   scope.query(
                      'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + ' ' +
                         '(amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
-                     'VALUES (' + amount +', "' + time + '", '+ reoccurence +', "'+ reminder_task_id +'", '+ interval_unit +', '+ med_id +')' +
+                     'VALUES (' + dose_time.amount +', "' + dose_time.time + '", '+ dose_time.reoccurence +', "'+ dose_time.reminder_task_id +'", '+ dose_time.interval_unit +', '+ med_id +')' +
                      ';',
                      tx,
                      scope.events.DOSE_INSERTED,
@@ -314,16 +314,16 @@ angular.module('project.service.phonestorage', [])
                }
             );
          },
-         update_dose_time: function(id, time, amount, event_scope) {
+         update_dose_time: function(dose_time, event_scope) {
             var scope = this;
             this.connection.transaction(
                function(tx) {
                   scope.query(
                      "UPDATE " + scope.settings.DOSIS_TABLE_NAME + " " +
                         "SET " +
-                           "time='" + time + "', " + 
-                           "amount=" + amount + " " + 
-                        "WHERE id='" + id + "'" +
+                           "time='" + dose_time.time + "', " + 
+                           "amount=" + dose_time.amount + " " + 
+                        "WHERE id='" + dose_time.id + "'" +
                      ";", 
                      tx,
                      scope.events.DOSE_UPDATED,

@@ -35,21 +35,9 @@ angular.module('project.directive.dose_item', [])
                   scope.set_editing_id(null);
 
                if (attrs.id == -1)
-                  scope.insert_dose_time(
-                     scope.get_time(attrs.id).index,
-                     elem.find('input[type=\'time\']').val(), 
-                     elem.find('input[type=\'number\']').val(), 
-                     1, 
-                     1, 
-                     0, 
-                     scope.med.id
-                  );
+                  scope.insert_dose_time( scope.get_time(attrs.id).index, scope.med.id );
                else
-                  scope.update_dose_time(
-                     scope.get_time(attrs.id).index, 
-                     elem.find('input[type=\'time\']').val(), 
-                     elem.find('input[type=\'number\']').val()
-                  );
+                  scope.update_dose_time( scope.get_time(attrs.id).index );
             }
 
             scope.delete_dose = function() {

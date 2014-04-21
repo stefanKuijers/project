@@ -24,7 +24,7 @@
             <div pj-dose-item class="item dosis item-icon-right" ng-repeat="dose in times" data-id="{{dose.id}}" ng-class="{'editing': dose.editable==true}">
                <div class="time">
                   <div ng-if="dose.editable == true">
-                     <input type="time" step="60" value="{{dose.time}}">
+                     <input type="time" step="60" ng-model="dose.time">
                   </div>
                   <div ng-if="dose.editable == false">
                      {{dose.time}}
@@ -32,7 +32,7 @@
                </div>
                <div class="dose-amount">
                   <div ng-if="dose.editable == true">
-                     <input type="number" value="{{dose.amount}}">
+                     <input type="number" ng-model="dose.amount">
                   </div>
                   <div ng-if="dose.editable == false">
                      {{dose.amount}}
