@@ -5,9 +5,6 @@
 .bar .title {
    line-height: 50px;
 }
-.bar .button.button-icon .icon:before, .bar .button.button-icon:before, .bar .button.button-icon.icon-left:before, .bar .button.button-icon.icon-right:before {
-   line-height: 40px;
-}
 .bar .button {
    line-height: 40px;
 }
@@ -16,8 +13,62 @@
    top: 50px;
 }
 
+.has-footer {
+   bottom: 188px;
+}
+
 .bar-footer {
-   height: 70px;
+   height: 190px;
+}
+
+.item h2 {
+   font-size: 22px;
+   font-weight: bold;
+}
+
+.bar .button.button-icon .icon:before, 
+.bar .button.button-icon:before, 
+.bar .button.button-icon.icon-left:before, 
+.bar .button.button-icon.icon-right:before,
+.item .icon {
+   font-size: 40px;
+   line-height: 40px;
+}
+
+.item-icon-right .icon {
+   right: 12px;
+}
+
+.item-icon-left .icon {
+   left: 12px;
+}
+
+.item-icon-left {
+   padding-left: 55px;
+}
+
+.popup {
+   width: 400px;
+}
+
+h3.popup-title {
+   font-size: 25px;
+}
+
+h5.popup-sub-title {
+   font-size: 18px;
+}
+
+a.item::after {
+   font-size: 40px;
+   margin-top: -20px;
+}
+
+
+
+/* global */
+.padding-view {
+   padding: 10px;
 }
 
 /* view specific */
@@ -27,37 +78,304 @@
 }
 
 /* overzicht */
-.med-list .time,
-.med-list .icon,
-.med-list .med_info,
-.med-list .dose_amount,
-.med-list .dose,
-.med-list .amount,
-.med-list .unit {
+.med-list .time-container,
+.med-list .med-icon,
+.med-list .med-info,
+.dose-amount,
+.dose,
+.amount,
+.unit {
    float: left;
 }
 
-.med-list .time,
-.med-list .icon {
-   width: 80px;
+.med-list .time-container,
+.med-list .med-icon {
+   width: 60px;
+   height: 60px;
 }
 
-.med-list .med_name {
+.med-list .med-icon {
+   margin-left: 70px;
+   text-align: center;
+}
+.med-list .time-container{
+   border-right: 1px solid #ddd;
+   position:absolute;
+   height:100px;
+   top:0;
+   padding-top: 14px;
+}
+
+.med-list .time-container.time-header {
+   font-weight: bold;
+}
+
+.med-list .med-name {
    padding-bottom: 4px;
 }
 
-.med-list .dosis {
+.dosis {
    clear: left;
 }
 
-.med-list .dose_amount,
-.med-list .dose .amount {
+.dose-amount,
+.dose .amount {
    padding-right: 5px;
+}
+
+.med-list .med-info {
+   margin-left: 10px;
+   min-width: 50%;
+}
+
+.bar-footer .button {
+   width:100%;
+   padding-bottom:50%;
+}
+.nav-icon {
+   width: 120px;
+   height:120px;
+   margin: 0 auto;
+}
+
+/* med-detail */
+.med-detail .med-icon {
+   width: 40%;
+   padding-bottom: 40%;
+   margin:auto;
+}
+
+.med-detail .med-name,
+.med-detail .dose-detail,
+.med-detail .time,
+.med-detail .dose-amount {
+   float:left;
+}
+
+.med-detail .time {
+   margin-right: 10px;
+}
+
+.med-detail .med-name {
+   margin-bottom: 0;
+   margin-top: 10px;
+   width:70%;
+}
+
+.med-detail .dose-detail {
+   font-size: 36px;
+   margin-top: 20px;
+   width: 20%;
+}
+
+.med-detail .description {
+   clear: left;
+}
+
+.secondary-info .item {
+   white-space: normal;
+}
+
+.med-detail .item-divider {
+   padding-top: 20px;
+   padding-bottom: 20px;
+   margin-top: 20px;
+}
+
+.time input {
+   width: 100%;
+}
+
+.dose-amount {
+   width: 20%;
+}
+
+.time {
+   width:20%;
+}
+
+.dose-amount span {
+   width: 20%;
+   float:left;
+}
+
+.dose-amount div {
+   width: 30%;
+   margin-right: 30%;
+   padding-left: 5px;
+   float:left;
+}
+
+.delete-button .icon {
+   right: 110px;
+}
+
+.item.dosis.add-item {
+   padding: 26px 0;
+}
+
+.item.dosis {
+   padding-top: 26px;
+   padding-bottom: 26px;
+   font-size: 18px;
+}
+
+.item.dosis.editing {
+   font-weight: bold;
+}
+
+.item.dosis.editing input[type='number'],
+.item.dosis.editing input[type='time'] {
+   font-size: 18px;
+   font-weight: bold;
+   border: 1px solid rgba(100,100,100,0.6);
+
+}
+
+.item.dosis.editing input[type='number'] {
+   padding-left: 5px;
+}
+
+.item.dosis.editing .dose-amount div {
+   padding-left: 0;
+}
+
+.item.dosis.editing span, 
+.item.dosis.editing .dose {
+   padding-top: 5px;
+}
+
+/* new medicin */
+.new-med-container {
+   padding: 10%;
+   text-align: center;
+}
+
+.row.question {
+   
+}
+
+.row.answer .item {
+   
+}
+
+.radio-container {
+   width: 150px;
+   margin: auto;
+}
+
+.pj-radio {
+   position:relative;
+   display:block;
+   width:100%;
+   padding:50%;
+   border-radius: 50%;
+   background-color: rgba(100,100,100, 0.1);
+   border:10px solid rgba(100,100,100, 0.2);
+}
+
+.pj-radio.selected {
+   border:10px solid rgba(100,100,100, 0.5);
+}
+
+.pj-radio i,
+.pj-radio label {
+   position:absolute;
+   top:0;
+   left:0;
+   right:0;
+   line-height: 150px;
+}
+
+.pj-radio label {
+   font-size: 36px;
+}
+
+.pj-radio i {
+   display: none;
+   font-size: 120px;
+   opacity: 0.1;
+}
+
+.pj-radio.selected i {
+   display: block;
+}
+
+.row.med-add-options {
+   position:absolute;
+   left:0;
+   right:0;
+   bottom:140px;
+   z-index: -1;
+   opacity: 0.2;
+}
+
+.row.med-add-options.question-answered {
+   z-index: 10;
+   opacity: 1;
+}
+
+/* new med scan */
+.scan-cam-placeholder {
+   width: 80%;
+   margin:auto;
+   padding-bottom: 100%;
+}
+
+.scanned-it-button {
+   position:absolute;
+   left: 0;
+   right: 0;
+   bottom: 0;
+}
+
+/* history */
+
+/* wireframe styles */
+.placeholder-img {
+   background-size: 100%;
+   background-repeat: no-repeat;
+   text-align: center;
+   background-image: url('../img/placeholder.png');
+   background-position: 50%;
+}
+
+.button-label {
+   color: black;
+   font-weight: bold;
 }
 
 @media screen and (orientation:portrait) {
 
 }
-@media screen and (orientation:landscape) {
 
+@media screen and (orientation:landscape) {
+   .bar-footer {
+      height: 140px;
+   }
+
+   .has-footer {
+      bottom: 138px;
+   }
+
+   .nav-icon {
+      width: 80px;
+      height: 80px;
+   }
+
+   .radio-container {
+      width: 100px;
+   }
+
+   .pj-radio i, .pj-radio label {
+      line-height: 100px;
+   }
+
+   .new-med-container {
+      padding: 2% 10%;
+   }
+
+   .row.med-add-options {
+      bottom: 60px;
+   }
 }

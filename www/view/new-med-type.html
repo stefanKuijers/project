@@ -1,17 +1,19 @@
-<ion-view title="Voer Naam In">
-   <ion-content>
-
-      <div class="list list-inset">
+<ion-view title="Voer Medicijnnaam In">
+   <ion-content class="has-padding">
+      <div pj-search class="list list-inset">
          <label class="item item-input">
             <i class="icon ion-search placeholder-icon"></i>
-            <input type="text" placeholder="Search">
+            <input type="text" placeholder="Medicijnnaam" ng-model="search_string">
          </label>
+         <div 
+            class="item item-icon-right" 
+            ng-repeat="result in search_results" 
+            ng-click="select_result('{{result}}')"
+         >
+            {{result}}
+            <i class="icon ion-chevron-right placeholder-icon"></i>
+         </div>
       </div>
-
-      <a class="button button-positive button-block" href="#/med/new">
-         Selecteer
-      </a>
-
    </ion-content>
 </ion-view>
   
