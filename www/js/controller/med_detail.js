@@ -20,7 +20,7 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
             $scope.times = [];
 
             for (var i = 0; i < result.rows.length; i++) {
-               $scope.times[i] = result.rows.item(i);
+               $scope.times[i] = angular.copy(result.rows.item(i));
                $scope.times[i].editable = false;
             }
 
@@ -45,18 +45,11 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
          return false;
       }
 
-      $scope.insert_dose_time = function(index, time, amount, reoccurence, reminder, interval_unit, med_id) {
-         Phonestorage.insert_dose_time(time, amount, reoccurence, reminder, interval_unit, med_id, $scope);
+      $scope.insert_dose_time = function(index, med_id) {
+         Phonestorage.insert_dose_time($scope.times[index], med_id, $scope);
          var listenForInsert = $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
-            $scope.times.splice(index, 1);
-
-            $scope.times.push({
-               time: time,
-               amount: amount,
-               editable: false,
-               id: result.insertId
-            });
-
+            $scope.times[index].id = insertId;
+            
             $scope.order_times();
             $scope.$apply();
 
