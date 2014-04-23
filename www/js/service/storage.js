@@ -1,107 +1,134 @@
 angular.module('project.service.persistencejs', [])
-    .service('Persistencejs', [function() {
-    persistence.store.websql.config(
-        persistence,
-        'Project_Database',         // DB name
-        '0.0.1',                    // DB version
-        'Database for med project', // DB display name and description
-        5 * 1024 * 1024,            // DB size (5 MB)
-        0                           // SQLitePlugin Background processing disabled
-    );
+   .service('Persistencejs', [
+      function() {
+         var constant = {
+            type: {
+               BOOL: 'BOOL',
+               INT:  'INT',
+               NUM:  'NUM',
+               TEXT: 'TEXT'
+            },
+            key: {
+               vibration_notification: 'vibration_notification',
+               shake_to_take:          'shake_to_take',
+               visual_notification:    'visual_notification',
+               vibration_input:        'vibration_input',
+               sound_input:            'sound_input',
+               sound_volume:           'sound_volume',
+               screen_contrast:        'screen_contrast'
+            }
+         };
+         var default_settings = [
+            {key: constant.key.vibration_notification, value: 'false', type: constant.type.BOOL},
+            {key: constant.key.shake_to_take, value: 'true', type: constant.type.BOOL},
+            {key: constant.key.visual_notification, value: 'false', type: constant.type.BOOL},
+            {key: constant.key.vibration_input, value: true, type: constant.type.BOOL},
+            {key: constant.key.sound_input, value: false, type: constant.type.BOOL},
+            {key: constant.key.sound_volume, value: 25, type: constant.type.INT},
+            {key: constant.key.screen_contrast, value: 75, type: constant.type.INT}
+         ];
+         persistence.debug = false;
+         persistence.store.websql.config(
+            persistence,
+            'Project_Database',         // DB name
+            '0.0.1',                    // DB version
+            'Database for med project', // DB display name and description
+            5 * 1024 * 1024,            // DB size (5 MB)
+            0                           // SQLitePlugin Background processing disabled
+         );
 
-    var Setting = persistence.define('SettingTable', {
-        key: "TEXT",
-        value: "TEXT",
-        type: "TEXT"
-    });
+         var Setting = persistence.define('SettingTable', {
+            key:   "TEXT",
+            value: "TEXT",
+            type:  "TEXT"
+         });
 
-    persistence.schemaSync();
+         persistence.schemaSync();
 
-    return {
-        //singleton containing all methods to be called
-        add: function(item) {
-            var s = new Setting();
-            s.key = item.key;
-            s.value = item.value ? 'true' : 'false';
-            s.type = item.type;
-            persistence.add(s);
-            persistence.flush();
-        },
+         //singleton containing all methods to be called
+         return {
+            events: {
+               FETCHED_SETTINGS : "FETCHED_SETTINGS"
+            },
 
-        updateOrAdd: function(key, value, type) {
-            var insert = function(key, value, type) {
-                    self.add({
-                        key: key,
-                        value: value,
-                        type: type,
-                    });
-                },
-                self = this;
+            init: function() {
+               var self = this;
+               Setting.all().list(function(settings) {
+                  if (settings.length < 1) 
+                     self.set_default_settings();
+               });
+            },
 
-            Setting.all().filter('key','=',key).one(function(item){
-                if (!item && type) {
-                    insert(key, value, type);
-                    return;
-                }
-                item.value = value ? 'true' : 'false';
-                persistence.flush();
-            });
-        },
+            set_default_settings: function(scope) {
+               for (setting in default_settings)
+                  this.updateOrAdd( default_settings[setting] );
+            },
 
-        update: function(key, value) {
-            Setting.all().filter('key','=',key).one(function(item){
-                if (!item) return;
-                item.value = value ? 'true' : 'false';
-                persistence.flush();
-            });
-        },
+            add: function(item) {
+               var s = new Setting();
+               s.key = item.key;
+               s.value = item.value + '';
+               s.type = item.type;
+               persistence.add(s);
+               persistence.flush();
+            },
 
-        remove: function(key) {
-            Setting.all().filter('key','=',key).destroyAll();
-        },
+            updateOrAdd: function(setting_item) {
+               var insert = function() {
+                  self.add({
+                     key: setting_item.key,
+                     value: setting_item.value,
+                     type: setting_item.type,
+                  });
+               },
 
-        clearAllItems: function() {
-            Setting.all().destroyAll();
-        },
+               self = this;
+               Setting.all().filter('key', '=', setting_item.key).one(function(item) {
+                  if (!item && setting_item.type) {
+                     insert();
+                     return;
+                  }
 
-        fetchAll: function(caller_scope, assignKeyValues) {
-            assignKeyValues = assignKeyValues || false;
-            Setting.all().list(function(items){
-                var itemCount = items.length,
-                    settings = [];
+                  item.value = setting_item.value + '';
+                  persistence.flush();
+               });
+            },
 
-                items.forEach(function(item){
-                    var setting = {
-                        key: item.key,
-                        value: null,
-                        type: item.type
-                    };
+            update: function(key, value) {
+               Setting.all().filter('key', '=', key).one(function(item) {
+                  if (!item) return;
 
-                    // some wacky hacky stuff
-                    switch(setting.type) {
-                        case "bool":
-                            setting.value = (value == 'true');
-                            break;
-                        case "num":
-                        case "int":
-                            setting.value = new Number(item.value);
-                            break;
-                        default:
-                            setting.value = item.value;
-                    }
+                  item.value = value + '';
+                  persistence.flush();
+               });
+            },
 
-                    settings.push(setting);
-                    if(--itemCount == 0){
-                        if (assignKeyValues) {
-                            for (var i = 0; i < settings.length; i++) {
-                                caller_scope[settings[i].key] = settings[i].value;
-                            }
-                        } else {
-                            caller_scope.settings = settings;
-                        }
-                    }
-                });
-            });
-        }
-    };
-}]);
+            remove: function(key) {
+               Setting.all().filter('key', '=', key).destroyAll();
+            },
+
+            clearAllItems: function() {
+               Setting.all().destroyAll();
+            },
+
+            get_settings: function(scope) {
+               var parsed_settings = {}, self = this;
+
+               Setting.all().list(function(settings) {
+                  var parsed_value;
+                  settings.forEach(function(setting) {
+                     switch (setting.type) {
+                        case constant.type.BOOL: parsed_value = (setting.value == 'true'); break;
+                        case constant.type.INT: parsed_value = setting.value; break;
+                        default: parsed_value = setting.value;
+                     }
+
+                     parsed_settings[setting.key] = parsed_value;
+                  });
+                  scope.$emit(self.events.FETCHED_SETTINGS, parsed_settings);
+               });
+            }
+         };
+      }
+   ])
+;

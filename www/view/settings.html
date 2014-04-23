@@ -8,7 +8,7 @@
       </div>
       <div class="item range range-positive">
          <i class="icon ion-volume-low"></i>
-         <input type="range" name="volume">
+         <input type="range" name="volume" min="0" max="100" ng-model="settings.sound_volume">
          <i class="icon ion-volume-high"></i>
       </div>
       <div class="item item-input item-select">
@@ -21,60 +21,22 @@
             <option>Toeter</option>
          </select>
       </div>
-      <div class="item item-toggle">
-         Vibreer
-         <label class="toggle toggle-assertive">
-            <input type="checkbox" ng-checked="vibration_notification" ng-click="toggle_setting('vibration_notification')">
-            <div class="track">
-               <div class="handle"></div>
-            </div>
-         </label>
-      </div>
-      <div class="item item-toggle">
-         Schud om medicijn te nemen
-         <label class="toggle toggle-assertive">
-            <input type="checkbox" ng-checked="shake_to_take" ng-click="toggle_setting('shake_to_take')">
-            <div class="track">
-               <div class="handle"></div>
-            </div>
-         </label>
-      </div>
-      <div class="item item-toggle">
-         Visueele Feedback
-         <label class="toggle toggle-assertive">
-            <input type="checkbox" ng-checked="visual_notification" ng-click="toggle_setting('visual_notification')">
-            <div class="track">
-               <div class="handle"></div>
-            </div>
-         </label>
-      </div>
+      <ion-toggle ng-model="settings.vibration_notification">Vibreer: {{vibration_notification}}</ion-toggle>
+      <ion-toggle ng-model="settings.shake_to_take">Schud om medicijn te nemen</ion-toggle>
+      <ion-toggle ng-model="settings.visual_notification">Visueele Feedback</ion-toggle>
       <div class="item range range-positive">
          <i class="icon ion-ios7-sunny-outline"></i>
-         <input type="range" name="volume" min="0" max="100" value="33">
+         <input type="range" name="contrast" min="0" max="100" ng-model="settings.screen_contrast">
          <i class="icon ion-ios7-sunny"></i>
       </div>
 
       <div class="item item-divider">
          Invoer
       </div>
-      <div class="item item-toggle">
-         Vibratie bij invoer
-         <label class="toggle toggle-assertive">
-            <input type="checkbox" ng-checked="vibration_input" ng-click="toggle_setting('vibration_input')">
-            <div class="track">
-               <div class="handle"></div>
-            </div>
-         </label>
-      </div>
-      <div class="item item-toggle">
-         Geluid bij invoer
-         <label class="toggle toggle-assertive">
-            <input type="checkbox" ng-checked="sound_input" ng-click="toggle_setting('sound_input')">
-            <div class="track">
-               <div class="handle"></div>
-            </div>
-         </label>
-      </div>
+      <ion-toggle ng-model="settings.vibration_input">Vibratie bij invoer</ion-toggle>
+      <ion-toggle ng-model="settings.sound_input">Geluid bij invoer</ion-toggle>
+      
+      
       <div class="item item-divider">
          Debug
       </div>
@@ -87,6 +49,12 @@
       <div class="item item-button-right">
          Cancel All Notifications
          <button class="button button-positive" ng-click="cancel_all_notifications()">
+            <i class="icon ion-trash-b"></i>
+         </button>
+      </div>
+      <div class="item item-button-right">
+         Reset Default Settings
+         <button class="button button-positive" ng-click="reset_default_settings()">
             <i class="icon ion-trash-b"></i>
          </button>
       </div>
