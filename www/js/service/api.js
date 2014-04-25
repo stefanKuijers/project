@@ -18,7 +18,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   when_not_to_use: "U word afgeraden dit medicijn te gebruiken wanneer u diabetes of vast gestelde nierproblemen heeft. ",
                   how_to_use: "Bij het ontbijt innemen met water. Blijf gedurende de dag een gewone hoeveelheid drinken.",
                   active_ingredient: 4,
-                  code: 12345678901
+                  code: 3524555018862
                },
                1: { 
                   id: 6, 
@@ -32,7 +32,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   when_not_to_use: "U word afgeraden dit medicijn te gebruiken wanneer u diabetes of vast gestelde nierproblemen heeft. ",
                   how_to_use: "Bij het ontbijt innemen met water. Blijf gedurende de dag een gewone hoeveelheid drinken.",
                   active_ingredient: 0,
-                  code: 12345678902
+                  code: 8711218006129
                },
                2: { 
                   id: 7, 
@@ -46,7 +46,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   when_not_to_use: "U word afgeraden dit medicijn te gebruiken wanneer u diabetes of vast gestelde nierproblemen heeft. ",
                   how_to_use: "Bij het ontbijt innemen met water. Blijf gedurende de dag een gewone hoeveelheid drinken.",
                   active_ingredient: 3,
-                  code: 12345678903
+                  code: 5000167046045
                },
                3: { 
                   id: 8, 
@@ -154,9 +154,13 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             // select right med from fake data  
             var result_med;
             for (med in this.fake_data.medicin)
-               if (this.fake_data.medicin[med].trade_name === value || this.fake_data.medicin[med].code === value)
+               if (this.fake_data.medicin[med].trade_name == value || this.fake_data.medicin[med].code == value)
                   result_med =  this.fake_data.medicin[med];
          
+            if (!result_med) 
+               alert("scanned med not in API. Code:" + value), 
+               result_med = this.fake_data.medicin[3];
+
             var get_by_url;
             switch (attr) {
                case this.config.get_med_by.code:
