@@ -284,7 +284,6 @@ angular.module('project.service.phonestorage', [])
          },
          insert_dose_time: function(dose_time, med_id, event_scope) {
             var scope = this;
-            console.log("insert dose at storage");
             this.connection.transaction(
                function(tx) {
                   scope.query(

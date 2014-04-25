@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"setting_ke",
+				"setting_key_exp"
+			],
+			[
+				"clear",
+				"clearTimeout"
+			],
+			[
+				"sound_",
+				"sound_volume"
+			],
+			[
+				"vibra",
+				"vibration_input"
+			],
+			[
 				"delete",
 				"delete_from"
 			],
@@ -498,90 +514,50 @@
 			[
 				"rou",
 				"routerTemplatesLoaded"
-			],
-			[
-				"file",
-				"filePath"
-			],
-			[
-				"leg",
-				"length"
-			],
-			[
-				"re",
-				"request"
-			],
-			[
-				"ex",
-				"exec"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "/C/dev/project/www/js/service/phonestorage.js",
+			"file": "/C/dev/barcode/www/js/index.js",
 			"settings":
 			{
-				"buffer_size": 25783,
-				"line_ending": "Windows"
+				"buffer_size": 1877,
+				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/C/dev/project/www/js/controller/med_detail.js",
+			"file": "/C/dev/barcode/www/index.html",
 			"settings":
 			{
-				"buffer_size": 2636,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/controller/new_med_scan.js",
-			"settings":
-			{
-				"buffer_size": 2399,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/index.html",
-			"settings":
-			{
-				"buffer_size": 2788,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/directive/dosis_time.js",
-			"settings":
-			{
-				"buffer_size": 1640,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/view/medicijn-detail.html",
-			"settings":
-			{
-				"buffer_size": 3712,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/service/storage.js",
-			"settings":
-			{
-				"buffer_size": 3539,
-				"line_ending": "Windows"
+				"buffer_size": 3763,
+				"line_ending": "Unix"
 			}
 		}
 	],
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 73.0,
+		"height": 269.0,
 		"selected_items":
 		[
+			[
+				"reinden",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"reinde",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"forma",
+				"Format Code"
+			],
+			[
+				"form",
+				"Format Code"
+			],
 			[
 				"install",
 				"Package Control: Install Package"
@@ -591,20 +567,12 @@
 				"Package Control: Install Package"
 			],
 			[
-				"form",
-				"Format Code"
-			],
-			[
 				"rein",
 				"Indentation: Reindent Lines"
 			],
 			[
 				"rei",
 				"Indentation: Reindent Lines"
-			],
-			[
-				"forma",
-				"Format Code"
 			],
 			[
 				"format",
@@ -736,17 +704,24 @@
 	},
 	"file_history":
 	[
+		"/C/dev/project/www/js/service/phonestorage.js",
+		"/C/Users/S/Downloads/kuijerss_wp1.sql",
+		"/C/dev/project/www/index.html",
+		"/C/dev/project/www/js/controller/settings.js",
+		"/C/dev/project/www/view/settings.html",
+		"/C/dev/project/www/js/app.js",
+		"/C/dev/project/www/js/service/storage.js",
+		"/C/dev/project/www/js/controller/med_detail.js",
+		"/C/dev/project/www/js/controller/new_med_scan.js",
+		"/C/dev/project/www/js/directive/dosis_time.js",
+		"/C/dev/project/www/view/medicijn-detail.html",
 		"/C/dev/project/plugins/android.json",
 		"/C/dev/project/www/lib/live-templates.js",
-		"/C/dev/project/www/js/controller/med_detail.js",
 		"/C/dev/project-api/server.js",
-		"/C/dev/project/www/view/medicijn-detail.html",
 		"/C/Users/S/Dropbox/projecten/investconsult/Werk/gk_startup_quickstart_J25/media/editors/codemirror/js/tokenizephp.js",
 		"/C/dev/project/www/view/new-med-type.html",
 		"/C/dev/project/www/view/new-med.html",
-		"/C/dev/project/www/js/directive/dosis_time.js",
 		"/C/dev/project/www/js/router.js",
-		"/C/dev/project/www/js/service/phonestorage.js",
 		"/C/dev/project/www/js/service/notification.js",
 		"/C/dev/project/www/js/service/api.js",
 		"/C/dev/project/www/js/services.js",
@@ -754,19 +729,14 @@
 		"/C/dev/project/www/js/controllers.js",
 		"/C/dev/project/www/js/directive/search.js",
 		"/C/dev/project/www/js/directive/radio.js",
-		"/C/dev/project/www/index.html",
 		"/C/dev/project/www/js/controller/history.js",
 		"/C/dev/project/www/js/controller/new_med_type.js",
-		"/C/dev/project/www/js/controller/settings.js",
 		"/C/dev/project/www/js/controller/overview.js",
-		"/C/dev/project/www/js/controller/new_med_scan.js",
 		"/C/dev/project/www/js/controller/new_med.js",
 		"/C/dev/project/www/js/controller/nav_control.js",
 		"/C/dev/project/www/view/dialog/med_reminder.html",
 		"/C/dev/project/www/view/overzicht.html",
 		"/C/dev/project/www/css/style.css",
-		"/C/dev/project/www/js/app.js",
-		"/C/dev/project/www/view/settings.html",
 		"/C/dev/project/www/config.xml",
 		"/C/dev/project/config.xml",
 		"/C/dev/project/www/view/new-med-scan.html",
@@ -861,9 +831,7 @@
 		"/C/Users/S/Desktop/Doelgroep_Kennis_Verkeerd_Medicijngebruik_Responses.csv",
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/wp-config 2.php",
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/wp-config.php",
-		"/C/Windows/System32/drivers/etc/hosts",
-		"/C/Users/S/Desktop/hosts",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/Designer_class.php"
+		"/C/Windows/System32/drivers/etc/hosts"
 	],
 	"find":
 	{
@@ -899,6 +867,23 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"1",
+			"Persistencejs",
+			"ee",
+			"eee",
+			"ee",
+			"result",
+			"FETCHED_SETTINGS",
+			"items",
+			"self.",
+			":",
+			"]);",
+			" \"",
+			"// ",
+			"3",
+			"2",
+			"bool",
+			"vibration_notification",
 			"barcodescanner",
 			"value",
 			"ue=\"{{dose",
@@ -1009,24 +994,7 @@
 			"unit",
 			"UNIT_",
 			"Nurofeen",
-			"value",
-			"icons",
-			"this",
-			"table_name",
-			"TABLE_NAME",
-			"table_name",
-			"TABLE_NAME",
-			"table_name",
-			"\"",
-			"'",
-			"\"",
-			"scope.settings.SETTINGS_TABLE_NAME",
-			"scope.settings.MED_TABLE_NAME",
-			"scope.settings.SETTINGS_TABLE_NAME",
-			"excludes",
-			"vibration_input",
-			"results",
-			"scope.events.STORAGE_READY"
+			"value"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1035,7 +1003,7 @@
 		"replace_history":
 		[
 		],
-		"reverse": false,
+		"reverse": true,
 		"show_context": true,
 		"use_buffer2": true,
 		"whole_word": false,
@@ -1044,24 +1012,24 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/C/dev/project/www/js/service/phonestorage.js",
+					"file": "/C/dev/barcode/www/js/index.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 25783,
+						"buffer_size": 1877,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								13473,
-								13473
+								1424,
+								1424
 							]
 						],
 						"settings":
@@ -1069,179 +1037,35 @@
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 5808.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/C/dev/project/www/js/controller/med_detail.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2636,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2428,
-								2428
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 924.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/C/dev/project/www/js/controller/new_med_scan.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2399,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								430,
-								2399
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/C/dev/project/www/index.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2788,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								458,
-								458
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/C/dev/project/www/js/directive/dosis_time.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1640,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1175,
-								1175
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 264.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/C/dev/project/www/view/medicijn-detail.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3712,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1027,
-								1027
-							],
-							[
-								1350,
-								1350
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 154.0,
+						"translation.y": 528.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "/C/dev/project/www/js/service/storage.js",
-					"semi_transient": true,
+					"buffer": 1,
+					"file": "/C/dev/barcode/www/index.html",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3539,
+						"buffer_size": 3763,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1877,
+								1877
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+							"syntax": "Packages/HTML/HTML.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 792.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -1382,7 +1206,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 416.0,
+	"side_bar_width": 409.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

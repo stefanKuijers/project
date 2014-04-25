@@ -1,3 +1,5 @@
 .idea/
 node_modules/
 platforms/android/assets/www/
+thesis_project.sublime-project
+thesis_project.sublime-workspace
