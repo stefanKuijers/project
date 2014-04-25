@@ -1,36 +1,23 @@
 angular.module('project.controller.new_med_scan', ['project.service.api', 'project.service.phonestorage'])
    .controller('NewMedScanCtrl', ['$scope', '$ionicPopup', 'API', 'Phonestorage', function($scope, $ionicPopup, API, Phonestorage) {
-      
-      // function success(resultArray) {
-
-      //    alert("Scanned " + resultArray[0] + " code: " + resultArray[1]);
-
-      //        // NOTE: Scandit SDK Phonegap Plugin Versions 1.* for iOS report
-      //        // the scanning result as a concatenated string.
-      //        // Starting with version 2.0.0, the Scandit SDK Phonegap
-      //        // Plugin for iOS reports the result as an array
-      //        // identical to the way the Scandit SDK plugin for Android reports results.
-
-      //        // If you are running the Scandit SDK Phonegap Plugin Version 1.* for iOS,
-      //        // use the following approach to generate a result array from the string result returned:
-      //        // resultArray = result.split("|");
-      // }
-
+ 
       function scan_failure(error) {
          alert("Failed: " + error);
       }
 
       function scan() {
-         // See below for all available options. 
-         cordova.exec(scan_success, scan_failure, "ScanditSDK", "scan",[
-            "0YrawIQwEeOWJH/OZoV+Yf93mpkacyj9h9j8BVZHykk",
-            {
-               "beep": true,
-               "1DScanning" : true,
-               "2DScanning" : true
-            }
-            ]
-         );
+         if (typeof cordova !== 'undefined')
+            cordova.exec(scan_success, scan_failure, "ScanditSDK", "scan",[
+               "0YrawIQwEeOWJH/OZoV+Yf93mpkacyj9h9j8BVZHykk",
+               {
+                  "beep": true,
+                  "1DScanning" : true,
+                  "2DScanning" : true
+               }
+               ]
+            );
+         else
+            alert("The camera of this device is not available");
       }
 
       scan_success = function(scan_result) {
@@ -81,7 +68,6 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
          
          Phonestorage.add_medicin(medicin, $scope);
       }
-
 
       scan();
    }])

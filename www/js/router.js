@@ -31,7 +31,7 @@ angular.module(
          })
          .state('nieuw-scan', {
             url:                     '/nieuw/scan',
-            controller:              'NewMedScanCtrl',
+            controller:              'NewMedScanCtrl' ,
             templateUrl:             'view/new-med-scan.html'
          })
          .state('nieuw-typ', {
