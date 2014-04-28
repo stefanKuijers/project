@@ -2,7 +2,8 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
    .controller('NewMedScanCtrl', ['$scope', '$ionicPopup', 'API', 'Phonestorage', function($scope, $ionicPopup, API, Phonestorage) {
  
       function scan_failure(error) {
-         alert("Failed: " + error);
+         // alert("Failed: " + error);
+         window.location = "#/nieuw";
       }
 
       function scan() {
@@ -24,6 +25,7 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
          var med_prescribed = window.localStorage.getItem("new_med_prescribed") == 'true'; // retrieve and typecast to boolean
          var safe_med_listener = $scope.$on(API.events.SAFE_MED_RETRIEVED, function(e, medicin) {
             safe_med_listener();
+            medicin.prescribed = med_prescribed;
             
             $scope.add_med_to_storage(medicin);
          });

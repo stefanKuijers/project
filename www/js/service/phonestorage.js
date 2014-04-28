@@ -245,7 +245,7 @@ angular.module('project.service.phonestorage', [])
          /* ADD */
          add_medicin: function(med, event_scope) {
             var scope = this;
-            console.log("insert medicin at storage");
+            console.log("insert medicin at storage", med);
             this.connection.transaction(
                function(tx) {
                   scope.query(
@@ -284,6 +284,7 @@ angular.module('project.service.phonestorage', [])
          },
          insert_dose_time: function(dose_time, med_id, event_scope) {
             var scope = this;
+            console.log(dose_time);
             this.connection.transaction(
                function(tx) {
                   scope.query(
@@ -363,6 +364,7 @@ angular.module('project.service.phonestorage', [])
          },
 
          query: function(query, tx, success_event, caller_scope) {
+            console.log("exec query", query);
             var scope = this;
             var event_scope = caller_scope ? caller_scope : this.event_aggregater;
             tx.executeSql(

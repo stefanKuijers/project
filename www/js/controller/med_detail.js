@@ -46,15 +46,16 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
       }
 
       $scope.insert_dose_time = function(index, med_id) {
-         Phonestorage.insert_dose_time($scope.times[index], med_id, $scope);
          var listenForInsert = $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
-            $scope.times[index].id = insertId;
+            listenForInsert(); // unbind listener
+
+            $scope.times[index].id = result.insertId;
             
             $scope.order_times();
             $scope.$apply();
-
-            listenForInsert(); // unbind listener
          });
+
+         Phonestorage.insert_dose_time(fake_add_properties($scope.times[index]), med_id, $scope);
       }
 
       $scope.update_dose_time = function(index) {
@@ -63,9 +64,18 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
 
             Notification.add($scope.times[index].time);
          });
-         Phonestorage.update_dose_time($scope.times[index], $scope);
+         Phonestorage.update_dose_time(fake_add_properties($scope.times[index]), $scope);
          
          $scope.order_times();
+      }
+
+      function fake_add_properties(dose_time) {
+         var fake_dose_time = angular.copy(dose_time);
+         fake_dose_time.reoccurence = 1; 
+         fake_dose_time.reminder_task_id = 1;
+         fake_dose_time.interval_unit = 1;
+
+         return fake_dose_time
       }
 
       $scope.delete_dose_time = function(id) {

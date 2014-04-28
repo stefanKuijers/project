@@ -3,5 +3,7 @@ angular.module('project.controller.nav_control', [])
       $scope.showSettings = function() {
          $ionicSideMenuDelegate.toggleRight();
       };
+
+      $scope.hide_back_button = true;
    }])
 ;

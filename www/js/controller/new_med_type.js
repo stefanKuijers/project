@@ -9,7 +9,7 @@ angular.module('project.controller.new_med_type', ['project.service.api', 'proje
          var med_prescribed = window.localStorage.getItem("new_med_prescribed") == 'true'; // retrieve and typecast to boolean
          var safe_med_listener = $scope.$on(API.events.SAFE_MED_RETRIEVED, function(e, medicin) {
             safe_med_listener();
-
+            medicin.prescribed = med_prescribed;
             
             $scope.add_med_to_storage(medicin);
          });

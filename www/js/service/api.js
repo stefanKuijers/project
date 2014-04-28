@@ -117,7 +117,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
          },
 
          get_med_by: function (attr, value, prescribed, caller_scope) {
-            console.log("get med by called", attr, value);
+            console.log("get med by called", attr, value, prescribed);
             if (!prescribed) {
                var scope = this;
                this.root_scope.$on(
@@ -216,6 +216,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
          },
 
          check_for_interaction: function(meds_in_use, interaction_list, medicin, caller_scope) {
+            // console.log("check for interactions", meds_in_use, interaction_list, medicin);
             var interactions = [];
             for (var i = 0; i < interaction_list.length; i++) {
                for (var ii = 0; ii < meds_in_use.length; ii++) {

@@ -6,9 +6,10 @@ angular.module('project.controller.overview', ['project.service.phonestorage'])
          $scope.$on(Phonestorage.events.STORAGE_READY, get_meds);
 
       function get_meds() {
-         Phonestorage.get_med_overview($scope);
          $scope.med_overview = [];
-         $scope.$on(Phonestorage.events.MED_OVERVIEW_RETRIEVED, function(e, result) {
+         var get_overview_listener = $scope.$on(Phonestorage.events.MED_OVERVIEW_RETRIEVED, function(e, result) {
+            get_overview_listener();
+            
             for (var i = 0; i < result.rows.length; i++){
                $scope.med_overview[i] = result.rows.item(i);
             }
@@ -24,6 +25,7 @@ angular.module('project.controller.overview', ['project.service.phonestorage'])
 
             $scope.$apply();
          });
+         Phonestorage.get_med_overview($scope);
       }     
    }])
 ;
