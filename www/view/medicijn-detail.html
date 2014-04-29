@@ -16,55 +16,47 @@
 
          <div class="list secondary-info">
 
-            <div class="item item-divider item-icon-left">
-               <i class="icon ion-clock"></i>
+            <div class="item item-divider">
                Inamemomenten
             </div>
-
-            <div pj-dose-item class="item dosis item-icon-right" ng-repeat="dose in times" data-id="{{dose.id}}" ng-class="{'editing': dose.editable==true}">
-               <div class="time">
-                  <div ng-if="dose.editable == true">
-                     <input class="time-input" type="time" step="60" ng-model="dose.time">
+            <div class="item header-item">
+               <div class="row header-row">
+                  <div class="col col-time">Tijd</div>
+                  <div class="col col-amount">Hoeveel</div>
+                  <div class="col col-interval">Herhaling</div>
+                  <div class="col col-reminder">Herinnering</div>
+                  <div class="col col-delete"></div>
+               </div>
+            </div>
+            <div pj-dose-item class="item dosis" ng-repeat="dose in times" data-id="{{dose.id}}">
+               <div class="row item-row">
+                  <div class="col col-time">
+                     <button class="button button-block button-positive" ng-click="adjust_time()">{{dose.time}}</button>
                   </div>
-                     <div class="about"></div>
-                  <div ng-if="dose.editable == false">
-                     {{dose.time}}
+                  <div class="col col-amount">
+                     <button class="button button-block button-positive" ng-click="adjust_amount()">{{dose.amount}}</button>
+                  </div>
+                  <div class="col col-interval">
+                     <button class="button button-block button-positive" ng-click="adjust_interval()">{{dose.interval}}</button>
+                  </div>
+                  <div class="col col-reminder">
+                     <ion-toggle ng-model="dose.reminder"></ion-toggle>
+                  </div>
+                  
+                  <div class="col col-delete">
+                     <button class="button button-block button-assertive" ng-click="delete()">verwijder</button>
                   </div>
                </div>
-               <div class="dose-amount">
-                  <div ng-if="dose.editable == true">
-                     <input type="number" ng-model="dose.amount">
-                  </div>
-                  <div ng-if="dose.editable == false">
-                     {{dose.amount}}
-                  </div>
-                  <span>x</span>
-               </div>
-               <div class="dose">
-                  <div class="amount">{{med.dosis_amount}}</div>
-                  <div class="unit">{{med.unit}}</div>
-               </div>
-
-               <a ng-if="dose.editable == false" ng-click="edit_dose()">
-                  <i class="icon ion-edit"></i>
-               </a>
-               <a ng-if="dose.editable == true" class="delete-button " ng-click="delete_dose()">
-                  <i class="icon ion-trash-b"></i>
-               </a>
-               <a ng-if="dose.editable == true" class="" ng-click="save_dose()">
-                  <i class="icon ion-checkmark-round"></i>
-               </a>
                
             </div>
             <div class="item" ng-if="times.length == false">
-               Klik op de plus om een innamemoment toe te voegen.
+               Dit medicijn heeft nog geen inname momenten.
             </div>
-            <div pj-dose-item class="item dosis add-item item-icon-right" data-ng-click="new_dose_click()">
-               <i class="icon ion-plus-round"></i>
+            <div class="item dosis add-item item-icon-right" ng-click="new_dose_click()">
+               Innamemoment Toevoegen<i class="icon ion-plus-round"></i>
             </div>
 
-            <div class="item item-divider when-to-div item-icon-left">
-               <i class="icon ion-checkmark-round"></i>
+            <div class="item item-divider when-to-div">
                Toepassing
             </div>
 
@@ -72,8 +64,7 @@
                {{med.when_to_use}}         
             </div>
 
-            <div class="item item-divider when-not-div item-icon-left">
-               <i class="icon ion-alert-circled"></i>
+            <div class="item item-divider when-not-div">
                Waarschuwingen
             </div>
 
@@ -81,8 +72,7 @@
                {{med.when_not_to_use}}         
             </div>
 
-            <div class="item item-divider how-div item-icon-left">
-               <i class="icon ion-person"></i>
+            <div class="item item-divider how-div">
                Hoe te gebruiken
             </div>
 
@@ -90,8 +80,7 @@
                {{med.how_to_use}}         
             </div>
 
-            <div class="item item-divider note-div item-icon-left">
-               <i class="icon ion-compose"></i>
+            <div class="item item-divider note-div">
                Notulen
             </div>
 

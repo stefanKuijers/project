@@ -220,7 +220,12 @@ a.item::after {
    margin-top: 20px;
 }
 
-.time input {
+.col-reminder .item {
+   border: none;
+   overflow: visible;
+}
+
+/*.time input {
    width: 100%;
 }
 
@@ -279,7 +284,7 @@ a.item::after {
 .item.dosis.editing span, 
 .item.dosis.editing .dose {
    padding-top: 5px;
-}
+}*/
 
 /* new medicin */
 .new-med-container {

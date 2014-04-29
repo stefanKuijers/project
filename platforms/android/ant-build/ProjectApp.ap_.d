@@ -104,6 +104,7 @@ C:\dev\project\platforms\android\assets\www\js\controller\settings.js \
 C:\dev\project\platforms\android\assets\www\js\directive\dosis_time.js \
 C:\dev\project\platforms\android\assets\www\js\directive\radio.js \
 C:\dev\project\platforms\android\assets\www\js\directive\search.js \
+C:\dev\project\platforms\android\assets\www\js\directive\time-picker.js \
 C:\dev\project\platforms\android\assets\www\js\service\api.js \
 C:\dev\project\platforms\android\assets\www\js\service\notification.js \
 C:\dev\project\platforms\android\assets\www\js\service\phonestorage.js \
@@ -200,6 +201,8 @@ C:\dev\project\platforms\android\assets\www\view\new-med-type.html \
 C:\dev\project\platforms\android\assets\www\view\new-med.html \
 C:\dev\project\platforms\android\assets\www\view\overzicht.html \
 C:\dev\project\platforms\android\assets\www\view\settings.html \
+C:\dev\project\platforms\android\assets\www\view\ui \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_interaction.html \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_reminder.html \
+C:\dev\project\platforms\android\assets\www\view\ui\time-picker.html \
 C:\dev\project\platforms\android\ant-build\AndroidManifest.xml \

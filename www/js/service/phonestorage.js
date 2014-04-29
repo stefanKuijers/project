@@ -181,10 +181,14 @@ angular.module('project.service.phonestorage', [])
                   );
                   scope.query(
                      "SELECT " + 
-                        "id, " +
-                        "time, " +
-                        "amount " +
+                        "Dosis.id, " +
+                        "Dosis.time, " +
+                        "Dosis.amount, " +
+                        "Dosis.reminder_task_id, " +
+                        "Dosis.reoccurence, " +
+                        "Interval_Unit.name as interval " +
                      "FROM Dosis " +
+                        "JOIN Interval_Unit on Dosis.Interval_Unit_id = Interval_Unit.id " +
                      "WHERE "+ 
                         "Dosis.Med_id=" + med_id + " " +
                      ";" , 
@@ -455,6 +459,13 @@ angular.module('project.service.phonestorage', [])
                      'SELECT 1, "18:30", 1, 5, 0, 2 UNION ALL ' +
                      'SELECT 1, "18:30", 1, 5, 0, 0 UNION ALL ' +
                      'SELECT 2, "22:00", 1, 6, 0, 1;'
+                  );
+                  tx.executeSql(
+                     'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + 
+                     ' (amount, time, reoccurence, Interval_Unit_id, Med_id) ' + 
+                     'SELECT 1, "08:00", 1, 0, 0 UNION ALL ' +
+                     'SELECT 1, "13:00", 1, 0, 0 UNION ALL ' +
+                     'SELECT 2, "22:00", 1, 0, 1;'
                   );
 
                   // Create the med table
