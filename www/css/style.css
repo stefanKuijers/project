@@ -64,6 +64,10 @@ a.item::after {
    margin-top: -20px;
 }
 
+.placeholder-icon:first-child {
+   padding-right: 12px;
+}
+
 
 
 /* global */

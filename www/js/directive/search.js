@@ -42,10 +42,6 @@ angular.module('project.directive.search', [])
                }
             }
             setTimeout(set_focus, 350);
-            // setTimeout(set_focus, 1000);
-            // setTimeout(set_focus, 1500);
-            // setTimeout(set_focus, 2000);
-            // setTimeout(set_focus, 2500);
          } 
       }
    }])
