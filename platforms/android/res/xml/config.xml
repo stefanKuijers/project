@@ -13,6 +13,9 @@
     <feature name="Notification">
         <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
     </feature>
+    <feature name="SoftKeyboard">
+        <param name="android-package" value="org.apache.cordova.plugin.softkeyboard.SoftKeyboard" />
+    </feature>
     <feature name="ScanditSDK">
         <param name="android-package" value="com.mirasense.scanditsdk.plugin.ScanditSDK" />
     </feature>
@@ -29,6 +32,7 @@
     <preference name="webviewbounce" value="false" />
     <preference name="UIWebViewBounce" value="false" />
     <preference name="DisallowOverscroll" value="true" />
+    <preference name="KeyboardDisplayRequiresUserAction" value="false" />
     <feature name="StatusBar">
         <param name="ios-package" onload="true" value="CDVStatusBar" />
     </feature>

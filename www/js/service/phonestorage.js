@@ -364,7 +364,7 @@ angular.module('project.service.phonestorage', [])
          },
 
          query: function(query, tx, success_event, caller_scope) {
-            console.log("exec query", query);
+            // console.log("exec query", query);
             var scope = this;
             var event_scope = caller_scope ? caller_scope : this.event_aggregater;
             tx.executeSql(

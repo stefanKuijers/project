@@ -1,35 +1,51 @@
 angular.module('project.directive.search', [])
    .directive("pjSearch", [function() {
       return {
-         link: function(scope, elem, attrs) {
+         link: function($scope, $elem, $attrs) {
+
             var list_index = 0, 
-                list_length = scope.auto_list.length;
+                list_length = $scope.auto_list.length;
 
-            scope.search_string = "";
-            scope.search_results = [];
+            $scope.search_string = "";
+            $scope.search_results = [];
 
-            scope.$watch(
+            $scope.$watch(
                'search_string', 
                function() { 
-                  scope.search_results = [];
-                  if (scope.search_string === "") return;
+                  $scope.search_results = [];
+                  if ($scope.search_string === "") return;
                   for (list_index = 0; list_index < list_length; list_index++) {
-                     if (scope.auto_list[list_index].toLowerCase().match(scope.search_string.toLowerCase())) 
-                        scope.search_results.push(scope.auto_list[list_index])
+                     if ($scope.auto_list[list_index].toLowerCase().match($scope.search_string.toLowerCase())) 
+                        $scope.search_results.push($scope.auto_list[list_index])
                   }
                }
             );
 
-            scope.$watch(
+            $scope.$watch(
                'auto_list', 
                function() { 
-                  list_length = scope.auto_list.length;
+                  list_length = $scope.auto_list.length;
                }
             );
 
-            scope.select_result = function(result) {
-               scope.choose_result(result);
+            $scope.select_result = function(result) {
+               $scope.choose_result(result);
             }
+
+            function set_focus() {
+               var el_input = $elem.find('input');
+               el_input.focus();
+               el_input.trigger('click');
+
+               if (typeof cordova !== 'undefined') {
+                  cordova.plugins.SoftKeyboard.show();
+               }
+            }
+            setTimeout(set_focus, 350);
+            // setTimeout(set_focus, 1000);
+            // setTimeout(set_focus, 1500);
+            // setTimeout(set_focus, 2000);
+            // setTimeout(set_focus, 2500);
          } 
       }
    }])

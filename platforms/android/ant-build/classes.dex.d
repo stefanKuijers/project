@@ -37,6 +37,7 @@ C:\dev\project\platforms\android\ant-build\classes\org\apache\cordova\dialogs\No
 C:\dev\project\platforms\android\ant-build\classes\org\apache\cordova\dialogs\Notification$5$1.class \
 C:\dev\project\platforms\android\ant-build\classes\org\apache\cordova\dialogs\Notification$5.class \
 C:\dev\project\platforms\android\ant-build\classes\org\apache\cordova\dialogs\Notification.class \
+C:\dev\project\platforms\android\ant-build\classes\org\apache\cordova\plugin\softkeyboard\SoftKeyboard.class \
 C:\dev\project\platforms\android\ant-build\dexedLibs\classes-01d7c2a8d30254de58aa1610e1b34ef7.jar \
 C:\dev\project\platforms\android\ant-build\dexedLibs\scanditsdk-barcodepicker-android-3.5.2-ac7db53bb51e8147efcab60dadb61252.jar \
 C:\dev\project\platforms\android\ant-build\dexedLibs\android-support-v4-8925d979a339c8bbce1b635108961b02.jar \

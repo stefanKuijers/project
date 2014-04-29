@@ -1,0 +1,13 @@
+{
+    "version": "1.0.3",
+    "name": "org.apache.cordova.plugin.softkeyboard",
+    "cordova_name": "SoftKeyboard",
+    "description": "Controls Soft Keyboard on touch devices (so far only Android).",
+    "license": "MIT",
+    "engines": [
+        {
+            "name": "cordova",
+            "version": ">=3.0.0"
+        }
+    ]
+}
