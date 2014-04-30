@@ -87,7 +87,7 @@ angular.module('project.service.phonestorage', [])
             DOSIS_TABLE_NAME:              "Dosis",
             INTERVAL_UNIT_TABLE_NAME:      "Interval_Unit", 
             accepted_units:                ["ml", "cl", "dl", "mg", "g", "pch", "sachet"],
-            accepted_interval_units:       ["dag", "week", "maand"],
+            accepted_interval_units:       ["dagelijks", "weekelijks", "maandelijks"],
             accepted_icons:                ["tablet_1", "tablet_2", "tablet_3", "liquid", "powder", "injection"],
             interaction_statusses:         ["Ongevaarlijk", "Enigzins gevaarlijk", "gevaarlijk", "extreem gevaarlijk"]
          },

@@ -1,5 +1,18 @@
-angular.module('project.controller.med_info', ['project.service.phonestorage', 'project.directive.dose_item', 'project.service.notification'])
+angular.module(
+   'project.controller.med_info', [
+
+      'project.service.phonestorage', 
+      'project.directive.dose_item', 
+      'project.directive.time_picker',
+      'project.directive.number_picker',
+      'project.directive.interval_picker',
+      'project.directive.day_selector',
+      'project.service.notification'
+   ])
    .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', 'Phonestorage', 'Notification', function($scope, $stateParams, $filter, Phonestorage, Notification) {
+      $scope.events = {
+         DOSE_CHANGED: 'DOSE_CHANGED'
+      }
       $scope.times = false;
 
       if (Phonestorage.initialized) 
@@ -33,6 +46,17 @@ angular.module('project.controller.med_info', ['project.service.phonestorage', '
       $scope.order_times = function() {
          $scope.times = $filter('orderBy')($scope.times, 'time', false);
       }
+
+      $scope.$on($scope.events.DOSE_CHANGED, function(e, updated_dose) {
+         console.log("dose_changed", updated_dose);
+      });
+
+      // $scope.update_dosis = function(id, property, new_value) {
+      //    console.log(id, property, new_value);
+      //    var dosis = $scope.get_time(id);
+
+      //    dosis.time_object[property] = new_value;
+      // }
 
       // var editing_dose_id = null;
       // $scope.get_editing_id = function () {return editing_dose_id}

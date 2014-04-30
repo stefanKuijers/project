@@ -201,8 +201,6 @@ C:\dev\project\platforms\android\assets\www\view\new-med-type.html \
 C:\dev\project\platforms\android\assets\www\view\new-med.html \
 C:\dev\project\platforms\android\assets\www\view\overzicht.html \
 C:\dev\project\platforms\android\assets\www\view\settings.html \
-C:\dev\project\platforms\android\assets\www\view\ui \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_interaction.html \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_reminder.html \
-C:\dev\project\platforms\android\assets\www\view\ui\time-picker.html \
 C:\dev\project\platforms\android\ant-build\AndroidManifest.xml \
