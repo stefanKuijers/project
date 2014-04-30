@@ -32,7 +32,7 @@ angular.module('project.directive.number_picker', [])
                         100
                      );
                   }, 
-                  100
+                  150
                );
                
             });

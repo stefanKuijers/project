@@ -40,7 +40,7 @@ angular.module('project.directive.time_picker', [])
                         100
                      );
                   }, 
-                  100
+                  150
                );
                
             });
