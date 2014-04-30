@@ -35,6 +35,11 @@ angular.module(
             for (var i = 0; i < result.rows.length; i++) {
                $scope.times[i] = angular.copy(result.rows.item(i));
                $scope.times[i].reminder = typeof $scope.times[i].reminder_task_id === 'number';
+
+               if (typeof $scope.times[i].special_interval === 'string')
+                  $scope.times[i].days = JSON.parse($scope.times[i].special_interval);
+               else
+                  $scope.times[i].days = false; 
             }
 
             $scope.order_times();
@@ -49,26 +54,16 @@ angular.module(
 
       $scope.$on($scope.events.DOSE_CHANGED, function(e, updated_dose) {
          console.log("dose_changed", updated_dose);
+
+         var update_dose_listener = $scope.$on(Phonestorage.events.DOSE_UPDATED, function(e, result) {
+             update_dose_listener();
+             console.log("dose saved to storage", result);
+            //Notification.add($scope.times[index].time);
+         });
+         Phonestorage.update_dose_time(updated_dose.dose, $scope);
+         
+         $scope.order_times();
       });
-
-      // $scope.update_dosis = function(id, property, new_value) {
-      //    console.log(id, property, new_value);
-      //    var dosis = $scope.get_time(id);
-
-      //    dosis.time_object[property] = new_value;
-      // }
-
-      // var editing_dose_id = null;
-      // $scope.get_editing_id = function () {return editing_dose_id}
-      // $scope.set_editing_id = function (value) {editing_dose_id = value}
-
-
-      // $scope.get_time = function(id) {
-      //    for (var i = 0; i < $scope.times.length; i++) 
-      //       if ($scope.times[i].id == id) return {index: i, time_object:$scope.times[i]}; 
-
-      //    return false;
-      // }
 
       // $scope.insert_dose_time = function(index, med_id) {
       //    var listenForInsert = $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
@@ -83,16 +78,6 @@ angular.module(
       //    Phonestorage.insert_dose_time(fake_add_properties($scope.times[index]), med_id, $scope);
       // }
 
-      // $scope.update_dose_time = function(index) {
-      //    var update_dose_listener = $scope.$on(Phonestorage.events.DOSE_UPDATED, function(e, result) {
-      //       update_dose_listener();
-
-      //       Notification.add($scope.times[index].time);
-      //    });
-      //    Phonestorage.update_dose_time(fake_add_properties($scope.times[index]), $scope);
-         
-      //    $scope.order_times();
-      // }
 
       // function fake_add_properties(dose_time) {
       //    var fake_dose_time = angular.copy(dose_time);

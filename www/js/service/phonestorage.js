@@ -87,7 +87,7 @@ angular.module('project.service.phonestorage', [])
             DOSIS_TABLE_NAME:              "Dosis",
             INTERVAL_UNIT_TABLE_NAME:      "Interval_Unit", 
             accepted_units:                ["ml", "cl", "dl", "mg", "g", "pch", "sachet"],
-            accepted_interval_units:       ["dagelijks", "weekelijks", "maandelijks"],
+            accepted_interval_units:       ["geen", "dagelijks", "weekelijks", "maandelijks"],
             accepted_icons:                ["tablet_1", "tablet_2", "tablet_3", "liquid", "powder", "injection"],
             interaction_statusses:         ["Ongevaarlijk", "Enigzins gevaarlijk", "gevaarlijk", "extreem gevaarlijk"]
          },
@@ -186,6 +186,7 @@ angular.module('project.service.phonestorage', [])
                         "Dosis.amount, " +
                         "Dosis.reminder_task_id, " +
                         "Dosis.reoccurence, " +
+                        "Dosis.special_interval, " +
                         "Interval_Unit.name as interval " +
                      "FROM Dosis " +
                         "JOIN Interval_Unit on Dosis.Interval_Unit_id = Interval_Unit.id " +
@@ -293,8 +294,8 @@ angular.module('project.service.phonestorage', [])
                function(tx) {
                   scope.query(
                      'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + ' ' +
-                        '(amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
-                     'VALUES (' + dose_time.amount +', "' + dose_time.time + '", '+ dose_time.reoccurence +', "'+ dose_time.reminder_task_id +'", '+ dose_time.interval_unit +', '+ med_id +')' +
+                        '(amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id, special_interval) ' + 
+                     'VALUES (' + dose_time.amount +', "' + dose_time.time + '", '+ dose_time.reoccurence +', "'+ dose_time.reminder_task_id +'", '+ dose_time.interval_unit +', '+ med_id + ', "' + dose_time.special_interval + '")' +
                      ';',
                      tx,
                      scope.events.DOSE_INSERTED,
@@ -326,6 +327,7 @@ angular.module('project.service.phonestorage', [])
                      "UPDATE " + scope.settings.DOSIS_TABLE_NAME + " " +
                         "SET " +
                            "time='" + dose_time.time + "', " + 
+                           "special_interval='" + dose_time.special_interval + "', " + 
                            "amount=" + dose_time.amount + " " + 
                         "WHERE id='" + dose_time.id + "'" +
                      ";", 
@@ -441,7 +443,8 @@ angular.module('project.service.phonestorage', [])
                         'reoccurence INT, ' +
                         'reminder_task_id INT, ' +
                         'Interval_Unit_id INT REFERENCES ' + scope.settings.INTERVAL_UNIT_TABLE_NAME + '(id),' +
-                        'Med_id INT REFERENCES ' + scope.settings.MED_TABLE_NAME + '(id)' +
+                        'Med_id INT REFERENCES ' + scope.settings.MED_TABLE_NAME + '(id),' +
+                        'special_interval VARCHAR(50)' +
                      ')'
                   );
                   tx.executeSql(
@@ -449,23 +452,27 @@ angular.module('project.service.phonestorage', [])
                      ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
                      'SELECT 2, "06:00", 1, 1, 0, 0 UNION ALL ' +
                      'SELECT 1, "08:00", 1, 2, 0, 0 UNION ALL ' +
-                     'SELECT 2, "08:00", 1, 2, 1, 1 UNION ALL ' +
                      'SELECT 3, "08:00", 1, 2, 0, 2 UNION ALL ' +
                      'SELECT 1, "13:00", 1, 3, 0, 0 UNION ALL ' +
                      'SELECT 1, "13:00", 1, 3, 0, 1 UNION ALL ' +
-                     'SELECT 2, "13:00", 1, 3, 2, 2 UNION ALL ' +
+                     'SELECT 2, "13:00", 1, 3, 0, 2 UNION ALL ' +
                      'SELECT 1, "13:00", 1, 3, 0, 3 UNION ALL ' +
                      'SELECT 1, "16:00", 1, 4, 0, 3 UNION ALL ' +
                      'SELECT 1, "18:30", 1, 5, 0, 2 UNION ALL ' +
-                     'SELECT 1, "18:30", 1, 5, 0, 0 UNION ALL ' +
-                     'SELECT 2, "22:00", 1, 6, 0, 1;'
+                     'SELECT 1, "18:30", 1, 5, 0, 0;'
                   );
                   tx.executeSql(
                      'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + 
                      ' (amount, time, reoccurence, Interval_Unit_id, Med_id) ' + 
-                     'SELECT 1, "08:00", 1, 0, 0 UNION ALL ' +
+                     'SELECT 1, "08:00", 1, 0, 2 UNION ALL ' +
                      'SELECT 1, "13:00", 1, 0, 0 UNION ALL ' +
                      'SELECT 2, "22:00", 1, 0, 1;'
+                  );
+                  tx.executeSql(
+                     'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + 
+                     ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id, special_interval) ' + 
+                     'SELECT 2, "08:00", 1, 2, 1, 1, \'{"monday":false,"tuesday":false,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\' UNION ALL ' +
+                     'SELECT 2, "22:00", 1, 6, 1, 1, \'{"monday":true,"tuesday":true,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\';'
                   );
 
                   // Create the med table

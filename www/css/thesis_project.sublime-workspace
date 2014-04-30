@@ -4,6 +4,54 @@
 		"selected_items":
 		[
 			[
+				"each",
+				"each	.each()"
+			],
+			[
+				"new_value",
+				"new_value"
+			],
+			[
+				"set",
+				"setTimeout"
+			],
+			[
+				"clea",
+				"clearInterval"
+			],
+			[
+				"mouse",
+				"mousedown	mousedown"
+			],
+			[
+				"Interval_u",
+				"Interval_Unit_id"
+			],
+			[
+				"Interval_",
+				"Interval_Unit"
+			],
+			[
+				"get_met",
+				"get_med_listener"
+			],
+			[
+				"font",
+				"font-variant"
+			],
+			[
+				"fon",
+				"font-size"
+			],
+			[
+				"padding",
+				"padding-right"
+			],
+			[
+				"type",
+				"type	$.type()"
+			],
+			[
 				"med_in",
 				"meds_in_use"
 			],
@@ -34,14 +82,6 @@
 			[
 				"margin",
 				"margin-top"
-			],
-			[
-				"font",
-				"font-size"
-			],
-			[
-				"fon",
-				"font-weight"
 			],
 			[
 				"noti",
@@ -228,10 +268,6 @@
 				"auto_complete_list"
 			],
 			[
-				"padding",
-				"padding-bottom"
-			],
-			[
 				"lo",
 				"localStorage"
 			],
@@ -392,10 +428,6 @@
 				"MED_DATA_RETRIEVED"
 			],
 			[
-				"set",
-				"setup_connection"
-			],
-			[
 				"M",
 				"MED_TABLE_NAME"
 			],
@@ -482,72 +514,24 @@
 			[
 				"stat",
 				"stateProvider"
-			],
-			[
-				"url",
-				"urlRouterProvider"
-			],
-			[
-				"tab",
-				"tab-account"
-			],
-			[
-				"sta",
-				"stateProvider"
-			],
-			[
-				"content",
-				"contentType"
-			],
-			[
-				"has",
-				"hasChanged"
-			],
-			[
-				"new",
-				"newValue"
-			],
-			[
-				"old",
-				"oldInfo"
-			],
-			[
-				"start",
-				"startTracking"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "/C/dev/project/www/js/controller/new_med_scan.js",
-			"settings":
-			{
-				"buffer_size": 2915,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/controller/new_med_type.js",
-			"settings":
-			{
-				"buffer_size": 2501,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/service/phonestorage.js",
-			"settings":
-			{
-				"buffer_size": 25822,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "/C/dev/project/www/js/controller/med_detail.js",
 			"settings":
 			{
-				"buffer_size": 2961,
+				"buffer_size": 3384,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/dev/project/www/view/medicijn-detail.html",
+			"settings":
+			{
+				"buffer_size": 3428,
 				"line_ending": "Windows"
 			}
 		},
@@ -555,15 +539,31 @@
 			"file": "/C/dev/project/www/js/directive/dosis_time.js",
 			"settings":
 			{
-				"buffer_size": 1737,
+				"buffer_size": 3527,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/dev/project/www/index.html",
+			"file": "/C/dev/project/www/js/directive/interval-picker.js",
 			"settings":
 			{
-				"buffer_size": 2776,
+				"buffer_size": 1233,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/dev/project/www/js/directive/day-selector.js",
+			"settings":
+			{
+				"buffer_size": 1597,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/dev/project/www/js/service/phonestorage.js",
+			"settings":
+			{
+				"buffer_size": 27230,
 				"line_ending": "Windows"
 			}
 		}
@@ -571,9 +571,13 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 269.0,
+		"height": 490.0,
 		"selected_items":
 		[
+			[
+				"rein",
+				"Indentation: Reindent Lines"
+			],
 			[
 				"reinden",
 				"Indentation: Reindent Lines"
@@ -597,10 +601,6 @@
 			[
 				"insta",
 				"Package Control: Install Package"
-			],
-			[
-				"rein",
-				"Indentation: Reindent Lines"
 			],
 			[
 				"rei",
@@ -736,12 +736,32 @@
 	},
 	"file_history":
 	[
-		"/C/dev/project/www/js/app.js",
-		"/C/dev/project/www/js/controller/overview.js",
-		"/C/dev/project/www/index.html",
-		"/C/dev/project/www/js/controller/nav_control.js",
 		"/C/dev/project/www/js/service/phonestorage.js",
+		"/C/dev/project/www/js/directive/number-picker.js",
+		"/C/dev/project/www/js/directive/time-picker.js",
+		"/C/dev/project/www/js/directive/dosis_time.js",
+		"/C/dev/project/www/css/style.css",
+		"/C/dev/project/www/index.html",
+		"/C/dev/project/www/js/directive/day-selector.js",
+		"/C/dev/project/www/js/directive/interval-picker.js",
+		"/C/dev/project/www/js/controller/new_med.js",
+		"/C/dev/project/www/js/controller/interval.js",
+		"/C/dev/project/www/view/ui/time-picker.html",
+		"/C/dev/project-api/node_modules/restify/node_modules/formidable/test/standalone/test-issue-46.js",
 		"/C/dev/project/www/js/service/api.js",
+		"/C/dev/project/www/js/app.js",
+		"/C/dev/project/plugins/android.json",
+		"/C/dev/project/www/view/settings.html",
+		"/C/dev/project/www/js/controller/new_med_scan.js",
+		"/C/dev/project/www/js/controller/new_med_type.js",
+		"/C/dev/project/www/view/medicijn-detail-new.html",
+		"/C/dev/project/www/view/medicijn-detail.html",
+		"/C/dev/project/www/js/directive/search.js",
+		"/C/dev/project/config.xml",
+		"/C/dev/project/www/config.xml",
+		"/C/dev/project/www/js/directive/focus_and_blur.js",
+		"/C/dev/project/www/js/controller/overview.js",
+		"/C/dev/project/www/js/controller/nav_control.js",
 		"/C/dev/barcode/www/index.html",
 		"/C/dev/barcode/www/js/index.js",
 		"/C/dev/project/www/view/new-med-scan.html",
@@ -751,13 +771,8 @@
 		"/C/Users/S/Desktop/zegnu_replaced_koomen.sql",
 		"/C/Users/S/Downloads/kuijerss_wp1.sql",
 		"/C/dev/project/www/js/controller/settings.js",
-		"/C/dev/project/www/view/settings.html",
 		"/C/dev/project/www/js/service/storage.js",
 		"/C/dev/project/www/js/controller/med_detail.js",
-		"/C/dev/project/www/js/controller/new_med_scan.js",
-		"/C/dev/project/www/js/directive/dosis_time.js",
-		"/C/dev/project/www/view/medicijn-detail.html",
-		"/C/dev/project/plugins/android.json",
 		"/C/dev/project/www/lib/live-templates.js",
 		"/C/dev/project-api/server.js",
 		"/C/Users/S/Dropbox/projecten/investconsult/Werk/gk_startup_quickstart_J25/media/editors/codemirror/js/tokenizephp.js",
@@ -767,16 +782,10 @@
 		"/C/dev/project/www/js/services.js",
 		"/C/dev/project/www/js/friend-detail.html",
 		"/C/dev/project/www/js/controllers.js",
-		"/C/dev/project/www/js/directive/search.js",
 		"/C/dev/project/www/js/directive/radio.js",
 		"/C/dev/project/www/js/controller/history.js",
-		"/C/dev/project/www/js/controller/new_med_type.js",
-		"/C/dev/project/www/js/controller/new_med.js",
 		"/C/dev/project/www/view/dialog/med_reminder.html",
 		"/C/dev/project/www/view/overzicht.html",
-		"/C/dev/project/www/css/style.css",
-		"/C/dev/project/www/config.xml",
-		"/C/dev/project/config.xml",
 		"/C/dev/project/www/view/dialog/med_interaction.html",
 		"/C/dev/project/www/view/history.html",
 		"/C/dev/project/platforms/android/CordovaLib/src/com/squareup/okhttp/TunnelRequest.java",
@@ -854,16 +863,7 @@
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/customer-completed-order.php",
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/login.php",
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/password-protected.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/designer_ajax.js",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/haut-tracking.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/header 2.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/footer.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/page-haut-home.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/blog_posts.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/slider.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/theme.js",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/haut.css",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/content-product_cat.php"
+		"/C/Users/S/AppData/Local/Temp/fz3temp-1/designer_ajax.js"
 	],
 	"find":
 	{
@@ -899,6 +899,71 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			":",
+			"\",",
+			"}}",
+			"{{",
+			", v",
+			"ater",
+			"insdag",
+			"radio",
+			"data.",
+			"clientSide",
+			"\\'",
+			"\n",
+			"choice",
+			"Choose ",
+			"C",
+			"B",
+			"A",
+			"hour",
+			"div",
+			":",
+			"$scope.$parent.new_time",
+			"$scope.new_time",
+			"mutation",
+			"action_interval",
+			"this",
+			"unit",
+			"add",
+			"hour",
+			"\"\"",
+			"id=",
+			"mousedown",
+			"= ",
+			"hour",
+			"add",
+			"ng-click=\"",
+			"<div class=\"",
+			"<button",
+			"++",
+			"hour",
+			"add",
+			"template_url",
+			"_new",
+			"\"button",
+			"button-positive",
+			"dark",
+			"stable",
+			"<button",
+			"button",
+			"{{",
+			"</",
+			"-col",
+			"get_dosis_listener",
+			"item-icon-left",
+			",",
+			"show",
+			"scope",
+			"el",
+			"focus",
+			"return_input_time",
+			"$elem",
+			"element",
+			"attrs",
+			"elem",
+			"scope",
+			"time_input_by_class",
 			"dose_time",
 			"$stateParams",
 			"_this.shouldGoBack",
@@ -961,72 +1026,7 @@
 			"+",
 			"\"",
 			"Miconazolnitraat",
-			"prescribed",
-			"prescribed: true,",
-			"true",
-			"MED_RETRIEVED",
-			"BAD_PARAMETER",
-			"caller_scope",
-			":",
-			"RETRIEVED",
-			"AUTO_COMPLETE_LIST",
-			"result",
-			"check_med_interaction",
-			"results",
-			"$ionicPlatform",
-			"event_scope",
-			"div",
-			"$scope.",
-			":",
-			"strong",
-			"index",
-			"scope.",
-			"right",
-			"console",
-			"value",
-			"setup_settings_table",
-			"SETTINGS_TABLE_NAME",
-			"id INT IDENTITY(1,1) PRIMARY KEY",
-			"time",
-			"false",
-			"}",
-			".dose",
-			"id",
-			"div",
-			"scope.editing_dose_id",
-			"id",
-			"editing_dose_id",
-			"'",
-			"editable",
-			"large",
-			"video",
-			"a",
-			"value",
-			"my-costumer",
-			"div",
-			"px",
-			"parsed_meds",
-			"form",
-			"medicins",
-			"name",
-			"unit",
-			"Unit",
-			"settings",
-			"SETTINGS_",
-			"),",
-			"(",
-			"BOOL(TRUE)",
-			"TRUE",
-			"false",
-			"true",
-			"ALL",
-			"),",
-			"(",
-			"REMINDER_TAB",
-			"DOSIS",
-			"value",
-			"INTERACTION",
-			"Interaction"
+			"prescribed"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1035,7 +1035,7 @@
 		"replace_history":
 		[
 		],
-		"reverse": false,
+		"reverse": true,
 		"show_context": true,
 		"use_buffer2": true,
 		"whole_word": false,
@@ -1049,103 +1049,19 @@
 			[
 				{
 					"buffer": 0,
-					"file": "/C/dev/project/www/js/controller/new_med_scan.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2915,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1268,
-								1268
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 132.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/C/dev/project/www/js/controller/new_med_type.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2501,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								623,
-								623
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 132.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/C/dev/project/www/js/service/phonestorage.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 25822,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								16356,
-								16356
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": -0.0,
-						"translation.y": 7629.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
 					"file": "/C/dev/project/www/js/controller/med_detail.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2961,
+						"buffer_size": 3384,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2309,
-								2309
+								2312,
+								2312
 							]
 						],
 						"settings":
@@ -1153,55 +1069,27 @@
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 792.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/C/dev/project/www/js/directive/dosis_time.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1737,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								153,
-								153
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 924.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "/C/dev/project/www/index.html",
+					"buffer": 1,
+					"file": "/C/dev/project/www/view/medicijn-detail.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2776,
+						"buffer_size": 3428,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								417,
-								417
+								1603,
+								1603
 							]
 						],
 						"settings":
@@ -1210,6 +1098,118 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/dev/project/www/js/directive/dosis_time.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3527,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3031,
+								3031
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": -0.0,
+						"translation.y": 1188.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/C/dev/project/www/js/directive/interval-picker.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1233,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								177,
+								177
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/dev/project/www/js/directive/day-selector.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1597,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								909,
+								909
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/C/dev/project/www/js/service/phonestorage.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 27230,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15291,
+								15291
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 47.0,
+						"translation.y": 6732.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -1264,6 +1264,14 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"time",
+				"project\\www\\view\\ui\\time-picker.html"
+			],
+			[
+				"api",
+				"project\\www\\js\\service\\api.js"
+			],
 			[
 				"rout",
 				"project\\www\\js\\router.js"
@@ -1354,7 +1362,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 186.0,
+	"side_bar_width": 225.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

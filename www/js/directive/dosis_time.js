@@ -7,16 +7,16 @@ angular.module('project.directive.dose_item', [])
                saved     : 2
             }
             $scope.dose_keys = {
-               time    : 'time'    ,
-               amount  : 'amount'  ,
-               interval: 'interval',
-               reminder: 'reminder'
+               time             : 'time'    ,
+               amount           : 'amount'  ,
+               interval         : 'interval',
+               reminder         : 'reminder',
+               days             : 'days',
+               special_interval : 'special_interval'
             }
             $scope.new_values = {};
 
             $scope.$watch('dose.reminder', function(new_value, old_value) {
-               console.log('dose.reminder changed', new_value, old_value);
-
                if (new_value !== old_value)
                   $scope.emit_dose_changed($scope.dose_keys.reminder);
             });
@@ -30,7 +30,7 @@ angular.module('project.directive.dose_item', [])
             }
 
             $scope.adjust_interval = function() {
-               $scope.popup_popup('<div pj-interval-picker></div>', 'Hoeveelheid instellen', $scope.dose_keys.interval);
+               $scope.popup_popup('<div pj-interval-picker></div>', 'Herhaling instellen', $scope.dose_keys.interval);
             }
 
             $scope.delete = function() {
@@ -55,8 +55,16 @@ angular.module('project.directive.dose_item', [])
                     },
                   ]
                }).then(function(res) {
-                  if (res === actions.saved)
+                  if (res === actions.saved) {
+                     if (property === $scope.dose_keys.interval &&
+                         $scope.new_values[property] === 'weekelijks'
+                     ) {
+                        console.log($scope.new_values[property]);
+                        $scope.popup_popup('<div pj-day-selector></div>', 'Selecteer de dagen waarop u het medicijn gaat innemen', $scope.dose_keys.days);
+                     }
+
                      $scope.update_dosis(property);
+                  }
                });
             }
 
@@ -65,7 +73,11 @@ angular.module('project.directive.dose_item', [])
             }
 
             $scope.update_dosis = function(property) {
-               $scope.dose[property] = $scope.new_values[property];
+               if (property === $scope.dose_keys.days)
+                  $scope.dose[$scope.dose_keys.special_interval] = JSON.stringify($scope.new_values[property]);
+               else
+                  $scope.dose[property] = $scope.new_values[property];
+
                $scope.emit_dose_changed(property);
             }
 
