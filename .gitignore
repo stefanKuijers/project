@@ -1,9 +1,6 @@
 .idea/
 node_modules/
-platforms/android/assets/www/
-platforms/android/CordovaLib/
-platforms/android/ant-build/
-platforms/android/res/xml/
+platforms/android/
 plugins/
 *.sublime-workspace
 *.sublime-project
