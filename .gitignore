@@ -1,6 +1,6 @@
 .idea/
 node_modules/
-platforms/android/
+platforms/
 plugins/
 *.sublime-workspace
 *.sublime-project
