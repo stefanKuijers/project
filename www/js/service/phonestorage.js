@@ -87,7 +87,7 @@ angular.module('project.service.phonestorage', [])
             DOSIS_TABLE_NAME:              "Dosis",
             INTERVAL_UNIT_TABLE_NAME:      "Interval_Unit", 
             accepted_units:                ["ml", "cl", "dl", "mg", "g", "pch", "sachet"],
-            accepted_interval_units:       ["geen", "dagelijks", "weekelijks", "maandelijks"],
+            accepted_interval_units:       ["dagelijks", "weekelijks", "geen"],
             accepted_icons:                ["tablet_1", "tablet_2", "tablet_3", "liquid", "powder", "injection"],
             interaction_statusses:         ["Ongevaarlijk", "Enigzins gevaarlijk", "gevaarlijk", "extreem gevaarlijk"]
          },
@@ -371,6 +371,7 @@ angular.module('project.service.phonestorage', [])
 
          query: function(query, tx, success_event, caller_scope) {
             // console.log("exec query", query);
+            alert(query);
             var scope = this;
             var event_scope = caller_scope ? caller_scope : this.event_aggregater;
             tx.executeSql(
@@ -378,6 +379,7 @@ angular.module('project.service.phonestorage', [])
                [], 
                function(transaction, result) { // a query succeeded
                   // console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
+                  //alert(result);
                   
                   if (success_event === scope.events.STORAGE_INITIALIZED)
                      scope.initialized = true,

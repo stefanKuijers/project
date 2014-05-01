@@ -2,6 +2,7 @@ angular.module('project.directive.dose_item', [])
    .directive("pjDoseItem", ['$ionicPopup', function($ionicPopup) {
       return {
          link: function($scope, $element, $attrs) {
+            // alert($scope.dose.interval);
             var actions = {
                cancelled : 1,
                saved     : 2

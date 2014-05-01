@@ -78,16 +78,6 @@ angular.module(
       //    Phonestorage.insert_dose_time(fake_add_properties($scope.times[index]), med_id, $scope);
       // }
 
-
-      // function fake_add_properties(dose_time) {
-      //    var fake_dose_time = angular.copy(dose_time);
-      //    fake_dose_time.reoccurence = 1; 
-      //    fake_dose_time.reminder_task_id = 1;
-      //    fake_dose_time.interval_unit = 1;
-
-      //    return fake_dose_time
-      // }
-
       // $scope.delete_dose_time = function(id) {
       //    Phonestorage.delete_dose_time(id);
       //    $scope.times.splice($scope.get_time(id).index, 1);
