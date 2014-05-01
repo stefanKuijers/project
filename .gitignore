@@ -5,5 +5,5 @@ platforms/android/CordovaLib/
 platforms/android/ant-build/
 platforms/android/res/xml/
 plugins/
-thesis_project.sublime-project
-thesis_project.sublime-workspace
+*.sublime-workspace
+*.sublime-project
