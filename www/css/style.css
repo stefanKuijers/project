@@ -229,7 +229,7 @@ a.item::after {
 .col-amount   { flex: none; width:15%; min-width: 80px; }
 .col-interval { flex: none; width:22%; min-width: 120px;}
 .col-reminder { flex: none; width:15%; min-width: 110px; }
-.col-delete   { flex: none; width:25%; min-width: 120px;}
+.col-delete   { flex: none; width:22%; min-width: 120px;}
 
 .col-reminder .item-toggle .toggle {
    top: 10px;
@@ -257,6 +257,13 @@ a.item::after {
 
 .col-reminder .item {
    background: none;
+}
+
+.dosis.item {
+   padding: 0;
+}
+.item.header-item {
+   padding: 15px 0 0 0;
 }
 
 /* DIRECTIVES */
