@@ -52,8 +52,14 @@
             <div class="item" ng-if="times.length == false">
                Dit medicijn heeft nog geen inname momenten.
             </div>
-            <div class="item dosis add-item item-icon-right" ng-click="new_dose_click()">
-               Innamemoment Toevoegen<i class="icon ion-plus-round"></i>
+            <div class="item dosis add-item">
+               <div class="row">
+                  <div class="col">
+                  <button class="button button-block button-dark icon-left ion-plus-round" ng-click="new_dose_click()">
+                     <div class="add-dose-button-label">Innamemoment Toevoegen</div>
+                  </button>
+                  </div>
+               </div>    
             </div>
 
             <div class="item item-divider when-to-div">

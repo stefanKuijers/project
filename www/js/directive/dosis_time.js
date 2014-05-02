@@ -2,7 +2,9 @@ angular.module('project.directive.dose_item', [])
    .directive("pjDoseItem", ['$ionicPopup', function($ionicPopup) {
       return {
          link: function($scope, $element, $attrs) {
-            // alert($scope.dose.interval);
+            $element.hide();
+            $element.fadeIn('600');
+
             var actions = {
                cancelled : 1,
                saved     : 2
@@ -35,7 +37,9 @@ angular.module('project.directive.dose_item', [])
             }
 
             $scope.delete = function() {
-               
+               $element.fadeOut('300', function() {
+                  $scope.delete_dose($scope.dose);
+               });
             }
 
             $scope.popup_popup = function(template, title, property) {

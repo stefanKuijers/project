@@ -124,56 +124,7 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             });
          },
 
-
-
-         // add: function(time, caller_scope) {
-         //    var scope = this;
-         //    var event_scope = caller_scope ? caller_scope : this.root_scope;
-
-         //    var added_listener = event_scope.$on(Phonestorage.events.DOSIS_BY_TIME_RETRIEVED, function(e, result) {
-         //       added_listener(); // remove listener
-               
-         //       var meds_string = "";
-         //       var task_id = result.rows.item(0).task_id;
-         //       for (var i = 0; i < result.rows.length; i++){
-         //          meds_string += result.rows.item(i).trade_name + " ";
-         //       }
-               
-         //       var date_time = new Date(),
-         //          parts = time.split(":"),
-         //          hours = parseInt(parts[0], 10),
-         //          minutes = parseInt(parts[1], 10);
-
-         //       date_time.setHours(hours);
-         //       date_time.setMinutes(minutes);
-         //       date_time.setSeconds(0);
-               
-         //       if (window.plugin !== undefined) {
-         //          // alert("passed check");
-         //          // alert("task_id: " + task_id + " date_time: " + date_time + " meds_string: " + meds_string + " title: " + scope.config.default_notification_settings.title);
-         //          window.plugin.notification.local.add({
-         //             id:         "" + task_id,                                       // STRING. Id from the dosis table.
-         //             date:       date_time,                                          // From the dosis table
-         //             message:    meds_string,                                        // Names of the medicin that need to be taken at this time
-         //             title:      scope.config.default_notification_settings.title,   // The title of the message
-         //             repeat:     scope.config.default_notification_settings.repeat,  // Get the interval from the dosis table
-         //             badge:      result.rows.length,                                 // Amount of meds to be taken at this reminder. Get from dosis table
-         //             autoCancel: scope.config.default_notification_settings.ongoing, // Setting this flag and the notification is automatically canceled when the user clicks it
-         //             ongoing:    scope.config.default_notification_settings.ongoing  // Prevent clearing of notification (Android only)
-         //          });
-         //          // alert("added Notification");
-
-         //       } else {
-         //          alert("Notification plugin not available. Probably the app is not running on a mobile device");
-         //       }
-         //       // alert("setting date: " + date_time.toString());
-         //       // alert("Options " + task_id + " " + meds_string);
-         //    });
-         //    Phonestorage.get_dosis_by_time(time, event_scope);
-         // },
-
          cancel: function(id) {
-            Util.log("Cancel Notification", id);
             if (!Util.on_mobile_device) { Util.log("Not on mobile device. Could not cancel notification: " + id); return; }
             if (id == undefined) {Util.log("Could not cancel notification. Id invalid: ", id); return;}
 

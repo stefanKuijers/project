@@ -74,10 +74,16 @@ angular.module(
             dose.reminder_task_id = [];
             switch (dose.interval) {
                case "dagelijks":
+                  if (dose.days)
+                     dose.days = false, dose.special_interval = 'null';
+
                   dose.reminder_task_id.push(Util.hashString(dose.time + dose.interval + "") + "");
                break;
 
                case "weekelijks":
+                  if (!dose.days)
+                     dose.days = JSON.parse(dose.special_interval);
+
                   for (day in dose.days)
                      if (dose.days[day])
                         dose.reminder_task_id.push(Util.hashString(dose.time + day + dose.interval + "") + "");
@@ -92,24 +98,34 @@ angular.module(
          return dose;
       }
 
-      // $scope.insert_dose_time = function(index, med_id) {
-      //    var listenForInsert = $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
-      //       listenForInsert(); // unbind listener
-
-      //       $scope.times[index].id = result.insertId;
+      $scope.new_dose_click = function() {
+         var new_dose = {
+            amount: 1,
+            days: false,
+            interval: "dagelijks",
+            reminder: false,
+            reminder_task_id: null,
+            reoccurence: 1,
+            special_interval: null,
+            time: Date.today().setTimeToNow().toString('HH:mm')
+         };
+         $scope.times.push(new_dose);
             
-      //       $scope.order_times();
-      //       $scope.$apply();
-      //    });
 
-      //    Phonestorage.insert_dose_time(fake_add_properties($scope.times[index]), med_id, $scope);
-      // }
+         var listenForInsert = $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
+            listenForInsert(); // unbind listener
 
-      // $scope.delete_dose_time = function(id) {
-      //    Phonestorage.delete_dose_time(id);
-      //    $scope.times.splice($scope.get_time(id).index, 1);
-      // }
+            new_dose.id = result.insertId;
+            $scope.order_times();
+            $scope.$apply();
+         });
 
-      
+         Phonestorage.insert_dose_time(new_dose, $scope.med.id, $scope);
+      }
+
+      $scope.delete_dose = function(dose) {
+         Phonestorage.delete_dose_time(dose.id);
+         $scope.times.splice($scope.times.indexOf(dose), 1);
+      }
    }])
 ;

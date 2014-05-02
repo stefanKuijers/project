@@ -8,14 +8,13 @@ angular.module('project.directive.time_picker', ['project.service.util'])
                   '<div class="button button-stable button-block hour_holder"><span ng-if="new_time.hour < 10">0</span>{{new_time.hour}}</div>' + 
                   '<button class="button button-dark button-block" data-unit="hour" data-action="substract">-</button>' +
                '</div>' + 
-               // '<div class="col col-seperator">:</div>' + 
+               '<div class="col col-seperator">:</div>' + 
                '<div class="col col-minute">' + 
                   '<button class="button button-dark button-block" data-unit="minute" data-action="add">+</button>' + 
                   '<div class="button button-stable button-block minute_holder"><span ng-if="new_time.minute < 10">0</span>{{new_time.minute}}</div>' + 
                   '<button class="button button-dark button-block" data-unit="minute" data-action="substract">-</button>' +
                '</div>' + 
-            '</div>' + 
-            '<div>{{data.log}}</div>'
+            '</div>'
          ,
          link: function($scope, $elem, $attrs) {
             var hour, minute;

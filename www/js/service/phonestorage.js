@@ -114,9 +114,9 @@ angular.module('project.service.phonestorage', [])
 
             this.table_exists(this.settings.MED_TABLE_NAME);
 
-            var scope = this;
+            var self = this;
             this.event_aggregater.$on(this.events.TABLE_DOES_NOT_EXIST , function(e, result) {
-               scope.setup_storage();
+               self.setup_storage();
             });
          },
 
@@ -125,10 +125,10 @@ angular.module('project.service.phonestorage', [])
          */
          /* GET */
          get_med_overview: function(caller_scope) {
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query(
+                  self.query(
                      "SELECT " + 
                         "Medicin.id, " +
                         "Medicin.prescribed, " +
@@ -144,7 +144,7 @@ angular.module('project.service.phonestorage', [])
                         "INNER JOIN Icon on Medicin.Icon_id = Icon.id" +
                      ";" , 
                      tx, 
-                     scope.events.MED_OVERVIEW_RETRIEVED, 
+                     self.events.MED_OVERVIEW_RETRIEVED, 
                      caller_scope
                   );
                }
@@ -152,10 +152,10 @@ angular.module('project.service.phonestorage', [])
          }, 
 
          get_medicin_and_times: function(caller_scope, med_id) {
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query(
+                  self.query(
                      "SELECT " + 
                         "Medicin.id, " +
                         "Medicin.prescribed, " +
@@ -176,10 +176,10 @@ angular.module('project.service.phonestorage', [])
                         "Medicin.id=" + med_id + " " +
                      ";" , 
                      tx, 
-                     scope.events.MED_RETRIEVED, 
+                     self.events.MED_RETRIEVED, 
                      caller_scope
                   );
-                  scope.query(
+                  self.query(
                      "SELECT " + 
                         "Dosis.id, " +
                         "Dosis.time, " +
@@ -194,38 +194,38 @@ angular.module('project.service.phonestorage', [])
                         "Dosis.Med_id=" + med_id + " " +
                      ";" , 
                      tx, 
-                     scope.events.MED_TIMES_RETRIEVED, 
+                     self.events.MED_TIMES_RETRIEVED, 
                      caller_scope
                   );
                }
             );
          },
          get_settings: function(caller_scope) {
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query("SELECT * FROM " + scope.settings.SETTINGS_TABLE_NAME, tx, scope.events.SETTINGS_RETRIEVED, caller_scope);
+                  self.query("SELECT * FROM " + self.settings.SETTINGS_TABLE_NAME, tx, self.events.SETTINGS_RETRIEVED, caller_scope);
                }
             );
          },
          get_med_names: function(caller_scope) {
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query(
+                  self.query(
                      "SELECT trade_name FROM Medicin;" , 
                      tx, 
-                     scope.events.MED_NAMES_RETRIEVED, 
+                     self.events.MED_NAMES_RETRIEVED, 
                      caller_scope
                   );
                }
             );
          },
          get_dosis_by_time: function(time, caller_scope) {
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query(
+                  self.query(
                      "SELECT " +
                         "Dosis.reminder_task_id, " +
                         "Medicin.trade_name " +
@@ -236,7 +236,7 @@ angular.module('project.service.phonestorage', [])
                         "Dosis.time = '"+ time +"'" +
                      ";" , 
                      tx, 
-                     scope.events.DOSIS_BY_TIME_RETRIEVED, 
+                     self.events.DOSIS_BY_TIME_RETRIEVED, 
                      caller_scope
                   );
                }
@@ -249,12 +249,12 @@ angular.module('project.service.phonestorage', [])
 
          /* ADD */
          add_medicin: function(med, event_scope) {
-            var scope = this;
+            var self = this;
             console.log("insert medicin at storage", med);
             this.connection.transaction(
                function(tx) {
-                  scope.query(
-                     'INSERT INTO ' + scope.settings.MED_TABLE_NAME + ' ' + 
+                  self.query(
+                     'INSERT INTO ' + self.settings.MED_TABLE_NAME + ' ' + 
                         '( prescribed, ' +
                            'description, ' +
                            'trade_name, ' +
@@ -281,24 +281,24 @@ angular.module('project.service.phonestorage', [])
                            '"' + med.active_ingredient + '"' +
                      ');',
                      tx,
-                     scope.events.MED_ADDED,
+                     self.events.MED_ADDED,
                      event_scope
                   );
                }
             );
          },
          insert_dose_time: function(dose_time, med_id, event_scope) {
-            var scope = this;
+            var self = this;
             console.log(dose_time);
             this.connection.transaction(
                function(tx) {
-                  scope.query(
-                     'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + ' ' +
+                  self.query(
+                     'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + ' ' +
                         '(amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id, special_interval) ' + 
-                     'VALUES (' + dose_time.amount +', "' + dose_time.time + '", '+ dose_time.reoccurence +', "'+ dose_time.reminder_task_id +'", '+ dose_time.interval_unit +', '+ med_id + ', "' + dose_time.special_interval + '")' +
+                     'VALUES (' + dose_time.amount +', "' + dose_time.time + '", '+ dose_time.reoccurence +', "'+ dose_time.reminder_task_id +'", (SELECT id FROM Interval_Unit WHERE name="' + dose_time.interval + '"), '+ med_id + ', "' + dose_time.special_interval + '")' +
                      ';',
                      tx,
-                     scope.events.DOSE_INSERTED,
+                     self.events.DOSE_INSERTED,
                      event_scope
                   );
                }
@@ -308,43 +308,33 @@ angular.module('project.service.phonestorage', [])
          /* UPDATE */
          update_medicin: function(attribute, value) {},
          update_setting: function(attribute, value) {
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query(
-                     "UPDATE " + scope.settings.SETTINGS_TABLE_NAME + " SET value='" + value + "' WHERE key='" + attribute + "';", 
+                  self.query(
+                     "UPDATE " + self.settings.SETTINGS_TABLE_NAME + " SET value='" + value + "' WHERE key='" + attribute + "';", 
                      tx, 
-                     scope.events.SETTING_STORED
+                     self.events.SETTING_STORED
                   );
                }
             );
          },
          update_dose_time: function(dose_time, event_scope) {
-            /*
-               SELECT DISTINCT 
-                  reminder_task_id, 
-                  Interval_Unit.name 
-               FROM 
-                  Dosis 
-                  JOIN Interval_Unit on Interval_Unit_id = Interval_Unit.id 
-               WHERE 
-                  time = "08:00" AND 
-                  Interval_Unit.name = "dagelijks"
-            */
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query(
-                     "UPDATE " + scope.settings.DOSIS_TABLE_NAME + " " +
+                  self.query(
+                     "UPDATE " + self.settings.DOSIS_TABLE_NAME + " " +
                         "SET " +
                            "time='" + dose_time.time + "', " + 
                            "special_interval='" + dose_time.special_interval + "', " + 
                            "reminder_task_id='" + (dose_time.reminder ? JSON.stringify(dose_time.reminder_task_id) : null) + "', " +
-                           "amount=" + dose_time.amount + " " + 
+                           "amount=" + dose_time.amount + ", " + 
+                           "Interval_Unit_id= (SELECT id FROM Interval_Unit WHERE name='" + dose_time.interval + "')" + 
                         "WHERE id='" + dose_time.id + "'" +
                      ";", 
                      tx,
-                     scope.events.DOSE_UPDATED,
+                     self.events.DOSE_UPDATED,
                      event_scope
                   );
                }
@@ -353,11 +343,11 @@ angular.module('project.service.phonestorage', [])
 
          /* DELETE */
          delete_dose_time: function(id) {
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query(
-                     "DELETE FROM " + scope.settings.DOSIS_TABLE_NAME + " WHERE id=" + id + ";", 
+                  self.query(
+                     "DELETE FROM " + self.settings.DOSIS_TABLE_NAME + " WHERE id=" + id + ";", 
                      tx
                   );
                }
@@ -373,17 +363,17 @@ angular.module('project.service.phonestorage', [])
          },
 
          table_exists: function(table_name) {
-            var scope = this;
+            var self = this;
             this.connection.transaction(
                function(tx) {
-                  scope.query("SELECT 1 FROM " + table_name, tx, scope.events.STORAGE_INITIALIZED);
+                  self.query("SELECT 1 FROM " + table_name, tx, self.events.STORAGE_INITIALIZED);
                }
             );
          },
 
          query: function(query, tx, success_event, caller_scope) {
             // console.log("exec query", query);
-            var scope = this;
+            var self = this;
             var event_scope = caller_scope ? caller_scope : this.event_aggregater;
             tx.executeSql(
                query, 
@@ -391,15 +381,15 @@ angular.module('project.service.phonestorage', [])
                function(transaction, result) { // a query succeeded
                   // console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
                   
-                  if (success_event === scope.events.STORAGE_INITIALIZED)
-                     scope.initialized = true,
+                  if (success_event === self.events.STORAGE_INITIALIZED)
+                     self.initialized = true,
                      event_scope.$broadcast(success_event, result);
                   else if (success_event)
                      event_scope.$emit(success_event, result);
                }, 
                function(tx, err) { // a query failed
                   if (err.code === 5) 
-                     event_scope.$emit(scope.events.TABLE_DOES_NOT_EXIST, err);
+                     event_scope.$emit(self.events.TABLE_DOES_NOT_EXIST, err);
                   console.log("a query failed", err);
                }
             );
@@ -419,78 +409,79 @@ angular.module('project.service.phonestorage', [])
          },
 
          setup_med_table: function(scope) {
+            var self = this;
             this.connection.transaction(
                function(tx) {
 
                   // creating ENUM tables as it seems ENUM is not supported
-                  scope.setup_enum_table(tx, scope.settings.ICON_TABLE_NAME, 'name', 'VARCHAR(6)', scope.settings.accepted_icons);
-                  scope.setup_enum_table(tx, scope.settings.UNIT_TABLE_NAME, 'unit', 'VARCHAR(2)', scope.settings.accepted_units);
-                  scope.setup_enum_table(tx, scope.settings.ACTIVE_INGREDIENT_TABLE_NAME, 'name', 'VARCHAR(50)', scope.default_values.active_ingredients);
-                  scope.setup_enum_table(tx, scope.settings.INTERACTION_STATUS_TABLE_NAME, 'status', 'VARCHAR(20)', scope.settings.interaction_statusses);
-                  scope.setup_enum_table(tx, scope.settings.INTERVAL_UNIT_TABLE_NAME, 'name', 'VARCHAR(5)', scope.settings.accepted_interval_units);
+                  self.setup_enum_table(tx, self.settings.ICON_TABLE_NAME, 'name', 'VARCHAR(6)', self.settings.accepted_icons);
+                  self.setup_enum_table(tx, self.settings.UNIT_TABLE_NAME, 'unit', 'VARCHAR(2)', self.settings.accepted_units);
+                  self.setup_enum_table(tx, self.settings.ACTIVE_INGREDIENT_TABLE_NAME, 'name', 'VARCHAR(50)', self.default_values.active_ingredients);
+                  self.setup_enum_table(tx, self.settings.INTERACTION_STATUS_TABLE_NAME, 'status', 'VARCHAR(20)', self.settings.interaction_statusses);
+                  self.setup_enum_table(tx, self.settings.INTERVAL_UNIT_TABLE_NAME, 'name', 'VARCHAR(5)', self.settings.accepted_interval_units);
 
-                  tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.INTERACTION_TABLE_NAME);
+                  tx.executeSql('DROP TABLE IF EXISTS ' + self.settings.INTERACTION_TABLE_NAME);
                   tx.executeSql(
-                     'CREATE TABLE IF NOT EXISTS ' + scope.settings.INTERACTION_TABLE_NAME + ' (' +
+                     'CREATE TABLE IF NOT EXISTS ' + self.settings.INTERACTION_TABLE_NAME + ' (' +
                         'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
                         'description VARCHAR(1000), ' +
-                        'Interaction_Status_id INT REFERENCES ' + scope.settings.INTERACTION_STATUS_TABLE_NAME + '(id),' +
-                        'Primary_med_id INT REFERENCES ' + scope.settings.MED_TABLE_NAME + '(id),' +
-                        'Secondary_med_id INT REFERENCES ' + scope.settings.MED_TABLE_NAME + '(id)' +
+                        'Interaction_Status_id INT REFERENCES ' + self.settings.INTERACTION_STATUS_TABLE_NAME + '(id),' +
+                        'Primary_med_id INT REFERENCES ' + self.settings.MED_TABLE_NAME + '(id),' +
+                        'Secondary_med_id INT REFERENCES ' + self.settings.MED_TABLE_NAME + '(id)' +
                      ')'
                   );
                   tx.executeSql(
-                     'INSERT INTO ' + scope.settings.INTERACTION_TABLE_NAME + 
+                     'INSERT INTO ' + self.settings.INTERACTION_TABLE_NAME + 
                      ' (description, Interaction_Status_id, Primary_med_id, Secondary_med_id) ' + 
                      'SELECT "Deze twee medicijnen hebben een gevaarlijke wisselwerking.", 2, 4, 2 UNION ALL ' +
                      'SELECT "Deze medicijnen verslechteren elkaars werking.", 0, 1, 3 ;'
                   );
 
-                  tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.DOSIS_TABLE_NAME);
+                  tx.executeSql('DROP TABLE IF EXISTS ' + self.settings.DOSIS_TABLE_NAME);
                   tx.executeSql(
-                     'CREATE TABLE IF NOT EXISTS ' + scope.settings.DOSIS_TABLE_NAME + ' (' +
+                     'CREATE TABLE IF NOT EXISTS ' + self.settings.DOSIS_TABLE_NAME + ' (' +
                         'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
                         'amount INT, ' +
                         'time TIME, ' +
                         'reoccurence INT, ' +
                         'reminder_task_id INT, ' +
-                        'Interval_Unit_id INT REFERENCES ' + scope.settings.INTERVAL_UNIT_TABLE_NAME + '(id),' +
-                        'Med_id INT REFERENCES ' + scope.settings.MED_TABLE_NAME + '(id),' +
+                        'Interval_Unit_id INT REFERENCES ' + self.settings.INTERVAL_UNIT_TABLE_NAME + '(id),' +
+                        'Med_id INT REFERENCES ' + self.settings.MED_TABLE_NAME + '(id),' +
                         'special_interval VARCHAR(50)' +
                      ')'
                   );
                   tx.executeSql(
-                     'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + 
+                     'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
                      ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
-                     'SELECT 2, "06:00", 1, 1, 0, 0 UNION ALL ' +
-                     'SELECT 1, "08:00", 1, 2, 0, 0 UNION ALL ' +
-                     'SELECT 3, "08:00", 1, 2, 0, 2 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, 3, 0, 0 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, 3, 0, 1 UNION ALL ' +
-                     'SELECT 2, "13:00", 1, 3, 0, 2 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, 3, 0, 3 UNION ALL ' +
-                     'SELECT 1, "16:00", 1, 4, 0, 3 UNION ALL ' +
-                     'SELECT 1, "18:30", 1, 5, 0, 2 UNION ALL ' +
-                     'SELECT 1, "18:30", 1, 5, 0, 0;'
+                     'SELECT 2, "06:00", 1, "null", 0, 0 UNION ALL ' +
+                     'SELECT 1, "08:00", 1, "null", 0, 0 UNION ALL ' +
+                     'SELECT 3, "08:00", 1, "null", 0, 2 UNION ALL ' +
+                     'SELECT 1, "13:00", 1, "null", 0, 0 UNION ALL ' +
+                     'SELECT 1, "13:00", 1, "null", 0, 1 UNION ALL ' +
+                     'SELECT 2, "13:00", 1, "null", 0, 2 UNION ALL ' +
+                     'SELECT 1, "13:00", 1, "null", 0, 3 UNION ALL ' +
+                     'SELECT 1, "16:00", 1, "null", 0, 3 UNION ALL ' +
+                     'SELECT 1, "18:30", 1, "null", 0, 2 UNION ALL ' +
+                     'SELECT 1, "18:30", 1, "null", 0, 0;'
                   );
                   tx.executeSql(
-                     'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + 
-                     ' (amount, time, reoccurence, Interval_Unit_id, Med_id) ' + 
-                     'SELECT 1, "08:00", 1, 0, 2 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, 0, 0 UNION ALL ' +
-                     'SELECT 2, "22:00", 1, 0, 1;'
+                     'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
+                     ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
+                     'SELECT 1, "08:00", 1, "null", 0, 2 UNION ALL ' +
+                     'SELECT 1, "13:00", 1, "null", 0, 0 UNION ALL ' +
+                     'SELECT 2, "22:00", 1, "null", 0, 1;'
                   );
                   tx.executeSql(
-                     'INSERT INTO ' + scope.settings.DOSIS_TABLE_NAME + 
+                     'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
                      ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id, special_interval) ' + 
-                     'SELECT 2, "08:00", 1, 2, 1, 1, \'{"monday":false,"tuesday":false,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\' UNION ALL ' +
-                     'SELECT 2, "22:00", 1, 6, 1, 1, \'{"monday":true,"tuesday":true,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\';'
+                     'SELECT 2, "08:00", 1, "null", 1, 1, \'{"monday":false,"tuesday":false,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\' UNION ALL ' +
+                     'SELECT 2, "22:00", 1, "null", 1, 1, \'{"monday":true,"tuesday":true,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\';'
                   );
 
                   // Create the med table
-                  tx.executeSql('DROP TABLE IF EXISTS ' + scope.settings.MED_TABLE_NAME);
+                  tx.executeSql('DROP TABLE IF EXISTS ' + self.settings.MED_TABLE_NAME);
                   tx.executeSql(
-                     'CREATE TABLE IF NOT EXISTS ' + scope.settings.MED_TABLE_NAME + ' (' +
+                     'CREATE TABLE IF NOT EXISTS ' + self.settings.MED_TABLE_NAME + ' (' +
                         'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
                         'prescribed BOOL, ' +
                         'description VARCHAR(1000), ' +
@@ -502,16 +493,16 @@ angular.module('project.service.phonestorage', [])
                         'when_to_use VARCHAR(1000), ' +
                         'when_not_to_use VARCHAR(1000), ' +
                         'how_to_use VARCHAR(1000), ' +
-                        'Icon_id INT REFERENCES ' + scope.settings.ICON_TABLE_NAME + '(id),' +
-                        'Unit_id INT REFERENCES ' + scope.settings.UNIT_TABLE_NAME + '(id),' +
-                        'Active_Ingredient_id INT REFERENCES ' + scope.settings.ACTIVE_INGREDIENT_TABLE_NAME + '(id)' +
+                        'Icon_id INT REFERENCES ' + self.settings.ICON_TABLE_NAME + '(id),' +
+                        'Unit_id INT REFERENCES ' + self.settings.UNIT_TABLE_NAME + '(id),' +
+                        'Active_Ingredient_id INT REFERENCES ' + self.settings.ACTIVE_INGREDIENT_TABLE_NAME + '(id)' +
                      ')'
                   );
 
                   var med; 
-                  var query_pre_fix = 'INSERT INTO ' + scope.settings.MED_TABLE_NAME + ' (prescribed, description, trade_name, note, dosis_amount, when_to_use, when_not_to_use, how_to_use, Icon_id, Unit_id, Active_Ingredient_id) VALUES ';
-                  for (med_i in scope.default_values.meds) {
-                     med = scope.default_values.meds[med_i];
+                  var query_pre_fix = 'INSERT INTO ' + self.settings.MED_TABLE_NAME + ' (prescribed, description, trade_name, note, dosis_amount, when_to_use, when_not_to_use, how_to_use, Icon_id, Unit_id, Active_Ingredient_id) VALUES ';
+                  for (med_i in self.default_values.meds) {
+                     med = self.default_values.meds[med_i];
                      tx.executeSql(query_pre_fix + '("' + med.prescribed + '", "' + med.description + '", "' + med.trade_name + '", "' + med.note + '", ' + med.dosis_amount + ', "' + med.when_to_use + '", "' + med.when_not_to_use + '", "' + med.how_to_use + '", ' + med.Icon_id + ', ' + med.Unit_id + ', "' + med.active_ingredient + '")');
                   }
                }, 
@@ -560,11 +551,11 @@ angular.module('project.service.phonestorage', [])
             // setup table and inject default data
          },
 
-         setup_user_condition_table: function(scope) {
+         setup_user_condition_table: function() {
             // setup table and inject default data
 
-            scope.initialized = true;
-            scope.event_aggregater.$broadcast(scope.events.STORAGE_INITIALIZED, "got initialized");
+            this.initialized = true;
+            this.event_aggregater.$broadcast(this.events.STORAGE_INITIALIZED, "got initialized");
          }
       }
    }])

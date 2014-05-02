@@ -15,17 +15,20 @@ input[type="week"],
 input[type="number"], 
 input[type="email"],
 input[type="search"],
-.back-button-label {
-   /*font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;*/
+.back-button-label, 
+.button {
    font-size: 15pt;
 }
+
 .back-button-label,
-.settings-button-label {
+.settings-button-label,
+.add-dose-button-label {
    position: absolute;
    top: 0;
    font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
 }
-.back-button-label {
+.back-button-label,
+.add-dose-button-label {
    left: 40px;
 }
 
@@ -102,9 +105,6 @@ a.item::after {
    padding-right: 12px;
 }
 
-
-
-/* global */
 .padding-view {
    padding: 10px;
 }
@@ -225,78 +225,42 @@ a.item::after {
    overflow: visible;
 }
 
-/*.time input {
-   width: 100%;
+.col-time     { flex: none; width:22%; min-width: 90px; }
+.col-amount   { flex: none; width:15%; min-width: 80px; }
+.col-interval { flex: none; width:22%; min-width: 120px;}
+.col-reminder { flex: none; width:15%; min-width: 110px; }
+.col-delete   { flex: none; width:25%; min-width: 120px;}
+
+.col-reminder .item-toggle .toggle {
+   top: 10px;
+   left:5px;
+   right:0;
 }
 
-.dose-amount {
-   width: 20%;
+.col-reminder .item-toggle .track {
+   width: 90px;
+   height: 50px;
+   border-radius: 25px;
 }
 
-.time {
-   width:24%;
+.col-reminder .item-toggle .handle {
+   width: 46px;
+   height: 46px;
+   border-radius: 50px;
 }
 
-.dose-amount span {
-   width: 15%;
-   float:left;
+.col-reminder .toggle input:checked + .track .handle {
+   -webkit-transform: translate3d(40px, 0, 0);
+   -moz-transform: translate3d(40px, 0, 0);
+   transform: translate3d(40px, 0, 0);
 }
 
-.dose-amount div {
-   width: 60%;
-   margin-right: 10%;
-   padding-left: 5px;
-   float:left;
+.col-reminder .item {
+   background: none;
 }
 
-.delete-button .icon {
-   right: 110px;
-}
-
-.item.dosis.add-item {
-   padding: 26px 0;
-}
-
-.item.dosis {
-   padding-top: 26px;
-   padding-bottom: 26px;
-}
-
-.item.dosis.editing {
-   font-weight: bold;
-}
-
-.item.dosis.editing input[type='number'],
-.item.dosis.editing input[type='time'] {
-   font-weight: bold;
-   border: 1px solid rgba(100,100,100,0.6);
-
-}
-
-.item.dosis.editing input[type='number'] {
-   padding-left: 5px;
-}
-
-.item.dosis.editing .dose-amount div {
-   padding-left: 0;
-}
-
-.item.dosis.editing span, 
-.item.dosis.editing .dose {
-   padding-top: 5px;
-}*/
-
-/* new medicin */
-.new-med-container {
-   padding: 10%;
-   text-align: center;
-}
-
-.radio-container {
-   width: 150px;
-   margin: auto;
-}
-
+/* DIRECTIVES */
+/* radio */
 .pj-radio {
    position:relative;
    display:block;
@@ -332,6 +296,50 @@ a.item::after {
 
 .pj-radio.selected i {
    display: block;
+}
+
+/* time-picker */
+div[pj-time-picker] .col-hour,
+div[pj-time-picker] .col-minute { 
+   flex: none; width:47%;
+}
+
+div[pj-time-picker] .col-seperator { 
+   flex: none; width:6%;
+   text-align: center;
+   padding-top: 84px;
+   font-weight:bold;
+}
+
+div[pj-time-picker] .hour_holder,
+div[pj-time-picker] .minute_holder,
+div[pj-time-picker] .col-seperator,
+div[pj-time-picker] button {
+   font-size: 28pt;
+}
+
+/* number-picker */
+div[pj-number-picker] .col{ 
+   flex: none; 
+   width:50%;
+   margin: 0 auto;
+}
+
+div[pj-number-picker] .number_holder,
+div[pj-number-picker] .minute_holder,
+div[pj-number-picker] button {
+   font-size: 28pt;
+}
+
+/* new medicin */
+.new-med-container {
+   padding: 10%;
+   text-align: center;
+}
+
+.radio-container {
+   width: 150px;
+   margin: auto;
 }
 
 .row.med-add-options {
