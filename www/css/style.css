@@ -228,7 +228,7 @@ a.item::after {
 .col-time     { flex: none; width:22%; min-width: 90px; }
 .col-amount   { flex: none; width:15%; min-width: 80px; }
 .col-interval { flex: none; width:22%; min-width: 120px;}
-.col-reminder { flex: none; width:15%; min-width: 110px; }
+.col-reminder { flex: none; width:16%; min-width: 110px; }
 .col-delete   { flex: none; width:22%; min-width: 120px;}
 
 .col-reminder .item-toggle .toggle {
@@ -265,6 +265,8 @@ a.item::after {
 .item.header-item {
    padding: 15px 0 0 0;
 }
+
+.item.header-item .col-reminder { width:25%; }
 
 /* DIRECTIVES */
 /* radio */
