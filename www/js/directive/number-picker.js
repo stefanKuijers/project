@@ -18,21 +18,21 @@ angular.module('project.directive.number_picker', [])
             $scope.action_timeout = false;
             $scope.new_value = $scope.$parent.dose.amount;
 
-            $elem.find('button').on('mousedown touchstart', function() {
+            $elem.find('button').on('mousedown', function() {
                var node = this;
-               $scope.update_value(node);
+               $scope.update_value(node, false);
 
                $scope.clear_interval_and_timeout();
                $scope.action_timeout = setTimeout(
                   function(){
                      $scope.action_interval = setInterval(
                         function() {
-                           $scope.update_value(node);
+                           $scope.update_value(node, true);
                         }, 
-                        100
+                        90
                      );
                   }, 
-                  150
+                  50
                );
                
             });
@@ -47,7 +47,7 @@ angular.module('project.directive.number_picker', [])
                   $scope.action_interval = false;
 
                if ($scope.action_timeout) 
-                  clearInterval($scope.action_timeout),
+                  clearTimeout($scope.action_timeout),
                   $scope.action_timeout = false;
             }
 
@@ -62,7 +62,6 @@ angular.module('project.directive.number_picker', [])
                else 
                   $scope.new_value += (action === 'add') ? step_size : -step_size;
                
-
                $scope.$parent.set_new_value($scope.$parent.dose_keys.amount, $scope.new_value);
                $scope.$apply();
             }

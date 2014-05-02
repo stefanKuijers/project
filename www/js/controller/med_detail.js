@@ -7,9 +7,10 @@ angular.module(
       'project.directive.number_picker',
       'project.directive.interval_picker',
       'project.directive.day_selector',
-      'project.service.notification'
+      'project.service.notification',
+      'project.service.util'
    ])
-   .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', 'Phonestorage', 'Notification', function($scope, $stateParams, $filter, Phonestorage, Notification) {
+   .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', 'Phonestorage', 'Notification', 'Util', function($scope, $stateParams, $filter, Phonestorage, Notification, Util) {
       $scope.events = {
          DOSE_CHANGED: 'DOSE_CHANGED'
       }
@@ -34,8 +35,9 @@ angular.module(
             $scope.times = [];
             for (var i = 0; i < result.rows.length; i++) {
                $scope.times[i] = angular.copy(result.rows.item(i));
-               $scope.times[i].reminder = typeof $scope.times[i].reminder_task_id === 'number';
-
+               $scope.times[i].reminder = $scope.times[i].reminder_task_id != 'null';
+               $scope.times[i].reminder_task_id = JSON.parse($scope.times[i].reminder_task_id);
+               
                if (typeof $scope.times[i].special_interval === 'string')
                   $scope.times[i].days = JSON.parse($scope.times[i].special_interval);
                else
@@ -52,18 +54,43 @@ angular.module(
          $scope.times = $filter('orderBy')($scope.times, 'time', false);
       }
 
-      $scope.$on($scope.events.DOSE_CHANGED, function(e, updated_dose) {
-         console.log("dose_changed", updated_dose);
+      $scope.$on($scope.events.DOSE_CHANGED, function(e, update) {
+         var prepared_dose = prepare_dose(update.dose);
 
          var update_dose_listener = $scope.$on(Phonestorage.events.DOSE_UPDATED, function(e, result) {
              update_dose_listener();
-             console.log("dose saved to storage", result);
-            //Notification.add($scope.times[index].time);
+             
+            Notification.add(prepared_dose);
          });
-         Phonestorage.update_dose_time(updated_dose.dose, $scope);
+// now everytime the whole dose is update in the database. We could only update the property that was updated
+         Phonestorage.update_dose_time(prepared_dose, $scope);
          
          $scope.order_times();
       });
+
+      function prepare_dose(dose) {
+         
+         if (dose.reminder) { // If reminder is set to true // create task_ids
+            dose.reminder_task_id = [];
+            switch (dose.interval) {
+               case "dagelijks":
+                  dose.reminder_task_id.push(Util.hashString(dose.time + dose.interval + "") + "");
+               break;
+
+               case "weekelijks":
+                  for (day in dose.days)
+                     if (dose.days[day])
+                        dose.reminder_task_id.push(Util.hashString(dose.time + day + dose.interval + "") + "");
+               break;
+
+               default:
+                  dose.reminder_task_id = false;
+               break;
+            }
+         }
+
+         return dose;
+      }
 
       // $scope.insert_dose_time = function(index, med_id) {
       //    var listenForInsert = $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
@@ -82,5 +109,7 @@ angular.module(
       //    Phonestorage.delete_dose_time(id);
       //    $scope.times.splice($scope.get_time(id).index, 1);
       // }
+
+      
    }])
 ;

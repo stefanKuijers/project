@@ -112,6 +112,8 @@ C:\dev\project\platforms\android\assets\www\js\service\api.js \
 C:\dev\project\platforms\android\assets\www\js\service\notification.js \
 C:\dev\project\platforms\android\assets\www\js\service\phonestorage.js \
 C:\dev\project\platforms\android\assets\www\js\service\storage.js \
+C:\dev\project\platforms\android\assets\www\js\service\util.js \
+C:\dev\project\platforms\android\assets\www\lib\date.js \
 C:\dev\project\platforms\android\assets\www\lib\fast-click.min.js \
 C:\dev\project\platforms\android\assets\www\lib\ionic \
 C:\dev\project\platforms\android\assets\www\lib\jquery.js \

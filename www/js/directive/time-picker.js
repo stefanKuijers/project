@@ -1,5 +1,5 @@
-angular.module('project.directive.time_picker', [])
-   .directive("pjTimePicker", [function() {
+angular.module('project.directive.time_picker', ['project.service.util'])
+   .directive("pjTimePicker", ['$timeout', '$interval', 'Util', function($timeout, $interval, Util) {
       return {
          template: 
             '<div class="row">' +
@@ -14,52 +14,51 @@ angular.module('project.directive.time_picker', [])
                   '<div class="button button-stable button-block minute_holder"><span ng-if="new_time.minute < 10">0</span>{{new_time.minute}}</div>' + 
                   '<button class="button button-dark button-block" data-unit="minute" data-action="substract">-</button>' +
                '</div>' + 
-            '</div>'
+            '</div>' + 
+            '<div>{{data.log}}</div>'
          ,
          link: function($scope, $elem, $attrs) {
             var hour, minute;
-            $scope.action_interval = false;
-            $scope.action_timeout = false;
+            var action_interval = false;
+            var action_timeout = false;
             $scope.new_time = {
                hour: Number($scope.$parent.dose.time.split(":")[0]),
                minute: Number($scope.$parent.dose.time.split(":")[1])
-            }  
+            }
 
-            $elem.find('button').on('mousedown touchstart', function() {
-               var node = this;
-
-               $scope.update_time(node);
-
+            $elem.find('button').on('mousedown', function(e) {
                $scope.clear_interval_and_timeout();
-               $scope.action_timeout = setTimeout(
+
+               var node = this;
+               $scope.update_time(node, false);
+               $scope.$apply();
+               
+               action_timeout = $timeout(
                   function(){
-                     $scope.action_interval = setInterval(
+                     action_interval = $interval(
                         function() {
-                           $scope.update_time(node);
+                           $scope.update_time(node, true);
                         }, 
-                        100
+                        70
                      );
                   }, 
-                  150
+                  50
                );
-               
-            });
-
-            $elem.find('button').on('mouseup touchend touchmove', function() {
+            }).on('mouseup touchend touchmove', function(e) {
                $scope.clear_interval_and_timeout();
             });
 
             $scope.clear_interval_and_timeout = function() {
-               if ($scope.action_interval) 
-                  clearInterval($scope.action_interval),
-                  $scope.action_interval = false;
+               if (action_interval)
+                  $interval.cancel(action_interval),
+                  action_interval = false;
 
-               if ($scope.action_timeout) 
-                  clearInterval($scope.action_timeout),
-                  $scope.action_timeout = false;
+               if (action_timeout)
+                  $timeout.cancel(action_timeout),
+                  action_timeout = false;
             }
 
-            $scope.update_time = function(node) {
+            $scope.update_time = function(node, interval_call) {
                var el = jQuery(node);
                var unit = el.data('unit');
                var action = el.data('action');
@@ -81,7 +80,7 @@ angular.module('project.directive.time_picker', [])
                ;
 
                $scope.$parent.set_new_value($scope.$parent.dose_keys.time, $scope.parse_time());
-               $scope.$apply();
+               
             }
 
             $scope.parse_time = function() {

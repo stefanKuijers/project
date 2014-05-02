@@ -320,6 +320,17 @@ angular.module('project.service.phonestorage', [])
             );
          },
          update_dose_time: function(dose_time, event_scope) {
+            /*
+               SELECT DISTINCT 
+                  reminder_task_id, 
+                  Interval_Unit.name 
+               FROM 
+                  Dosis 
+                  JOIN Interval_Unit on Interval_Unit_id = Interval_Unit.id 
+               WHERE 
+                  time = "08:00" AND 
+                  Interval_Unit.name = "dagelijks"
+            */
             var scope = this;
             this.connection.transaction(
                function(tx) {
@@ -328,6 +339,7 @@ angular.module('project.service.phonestorage', [])
                         "SET " +
                            "time='" + dose_time.time + "', " + 
                            "special_interval='" + dose_time.special_interval + "', " + 
+                           "reminder_task_id='" + (dose_time.reminder ? JSON.stringify(dose_time.reminder_task_id) : null) + "', " +
                            "amount=" + dose_time.amount + " " + 
                         "WHERE id='" + dose_time.id + "'" +
                      ";", 
@@ -371,7 +383,6 @@ angular.module('project.service.phonestorage', [])
 
          query: function(query, tx, success_event, caller_scope) {
             // console.log("exec query", query);
-            alert(query);
             var scope = this;
             var event_scope = caller_scope ? caller_scope : this.event_aggregater;
             tx.executeSql(
@@ -379,7 +390,6 @@ angular.module('project.service.phonestorage', [])
                [], 
                function(transaction, result) { // a query succeeded
                   // console.log("a query succeeded. Event:", success_event, "transaction:", transaction, "result:", result);
-                  //alert(result);
                   
                   if (success_event === scope.events.STORAGE_INITIALIZED)
                      scope.initialized = true,
