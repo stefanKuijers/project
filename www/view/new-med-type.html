@@ -13,6 +13,17 @@
             {{result}}
             <i class="icon ion-chevron-right placeholder-icon"></i>
          </div>
+         <div class="item" ng-if="search_results.length == 0">
+            <div ng-if="search_string.length > 0">
+               Er zijn geen medicijnen gevonden met<br />
+               '{{search_string}}'<br />
+               in de medicijnnaam.
+            </div>
+            <div ng-if="search_string.length == 0">
+               Voer hier boven een medicijnnaam in.<br />
+               De resultaten zullen hier verschijnen
+            </div>
+         </div>
       </div>
    </ion-content>
 </ion-view>
