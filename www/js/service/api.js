@@ -219,7 +219,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
          },
 
          get_med_interactions: function (medicin, caller_scope) {
-            console.log("search for interactions");
+            // console.log("search for interactions", medicin);
 
             var self = this;
             caller_scope.$on(

@@ -29,11 +29,8 @@ angular.module(
 
             var med_interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
                med_interaction_listener();
-               console.log("interaction detected", result);
+
                $scope.interactions = result.med_interactions;
-               // $scope.int_desc = result.med_interactions[0].description;
-               // $scope.med_a = result.med_interactions[0].primary_med_name;
-               // $scope.med_b = result.med_interactions[0].secondary_med_name;
                $scope.$apply();
             });
             API.get_med_interactions($scope.med, $scope);
@@ -72,8 +69,9 @@ angular.module(
 
          var update_dose_listener = $scope.$on(Phonestorage.events.DOSE_UPDATED, function(e, result) {
              update_dose_listener();
-             
-            Notification.add(prepared_dose);
+            
+            if (prepared_dose.reminder == 'true') 
+               Notification.add(prepared_dose);
          });
 // now everytime the whole dose is update in the database. We could only update the property that was updated
          Phonestorage.update_dose_time(prepared_dose, $scope);
