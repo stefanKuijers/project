@@ -136,7 +136,10 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                               function(e, result) {
                                  var meds_in_use = [];
                                  for (var i = 0; i < result.rows.length; i++){
-                                    meds_in_use[i] = result.rows.item(i).trade_name;
+                                    meds_in_use[i] = {
+                                       name       : result.rows.item(i).trade_name,
+                                       prescribed : result.rows.item(i).prescribed
+                                    }
                                  }
 
                                  scope.check_for_interaction(meds_in_use, interaction_list, medicin, caller_scope);
@@ -215,13 +218,36 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             // );
          },
 
+         get_med_interactions: function (medicin, caller_scope) {
+            console.log("search for interactions");
+
+            var self = this;
+            caller_scope.$on(
+               Phonestorage.events.MED_NAMES_RETRIEVED, 
+               function(e, result) {
+                  var meds_in_use = [];
+                  for (var i = 0; i < result.rows.length; i++) {
+                     meds_in_use[i] = {
+                        name       : result.rows.item(i).trade_name,
+                        prescribed : result.rows.item(i).prescribed
+                     }
+                  }
+
+                  self.check_for_interaction(meds_in_use, self.fake_data.interaction_list, medicin, caller_scope);
+               }
+            );
+            Phonestorage.get_med_names(caller_scope);
+         },
+
          check_for_interaction: function(meds_in_use, interaction_list, medicin, caller_scope) {
             // console.log("check for interactions", meds_in_use, interaction_list, medicin);
             var interactions = [];
             for (var i = 0; i < interaction_list.length; i++) {
                for (var ii = 0; ii < meds_in_use.length; ii++) {
-                  if ((interaction_list[i].primary_med_name === meds_in_use[ii] && interaction_list[i].secondary_med_name === medicin.trade_name) ||
-                      (interaction_list[i].primary_med_name === medicin.trade_name && interaction_list[i].secondary_med_name === meds_in_use[ii])
+                  if (meds_in_use[ii].prescribed == 'true' && medicin.prescribed == 'true') continue; // if both medicins are prescribed: skip because the dokter should check the interactions
+                  
+                  if ((interaction_list[i].primary_med_name === meds_in_use[ii].name && interaction_list[i].secondary_med_name === medicin.trade_name) ||
+                      (interaction_list[i].primary_med_name === medicin.trade_name && interaction_list[i].secondary_med_name === meds_in_use[ii].name) // if both medicins required for the interactions are in use: interaction so push
                   ) {
                      interactions.push(interaction_list[i]);
                   }
@@ -233,6 +259,25 @@ angular.module('project.service.api', ['project.service.phonestorage'])
             else
                caller_scope.$emit(this.events.SAFE_MED_RETRIEVED, medicin);
          },
+
+         // check_for_interaction: function(meds_in_use, interaction_list, medicin, caller_scope) {
+         //    // console.log("check for interactions", meds_in_use, interaction_list, medicin);
+         //    var interactions = [];
+         //    for (var i = 0; i < interaction_list.length; i++) {
+         //       for (var ii = 0; ii < meds_in_use.length; ii++) {
+         //          if ((interaction_list[i].primary_med_name === meds_in_use[ii] && interaction_list[i].secondary_med_name === medicin.trade_name) ||
+         //              (interaction_list[i].primary_med_name === medicin.trade_name && interaction_list[i].secondary_med_name === meds_in_use[ii])
+         //          ) {
+         //             interactions.push(interaction_list[i]);
+         //          }
+         //       }
+         //    }
+
+         //    if (interactions.length > 0)
+         //       caller_scope.$emit(this.events.MED_INTERACTION, {med: medicin, med_interactions: interactions});
+         //    else
+         //       caller_scope.$emit(this.events.SAFE_MED_RETRIEVED, medicin);
+         // },
 
          /**
             PRIVATE FUNCTIONS

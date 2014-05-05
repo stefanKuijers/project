@@ -213,7 +213,7 @@ angular.module('project.service.phonestorage', [])
             this.connection.transaction(
                function(tx) {
                   self.query(
-                     "SELECT trade_name FROM Medicin;" , 
+                     "SELECT id, trade_name, prescribed FROM Medicin;" , 
                      tx, 
                      self.events.MED_NAMES_RETRIEVED, 
                      caller_scope

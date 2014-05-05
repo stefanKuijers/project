@@ -17,7 +17,7 @@ input[type="email"],
 input[type="search"],
 .back-button-label, 
 .button {
-   font-size: 15pt;
+   font-size: 14.5pt;
 }
 
 .back-button-label,
@@ -225,10 +225,10 @@ a.item::after {
    overflow: visible;
 }
 
-.col-time     { flex: none; width:22%; min-width: 90px; }
+.col-time     { flex: none; width:17%; min-width: 90px; }
 .col-amount   { flex: none; width:15%; min-width: 80px; }
-.col-interval { flex: none; width:22%; min-width: 120px;}
-.col-reminder { flex: none; width:16%; min-width: 110px; }
+.col-interval { flex: none; width:26%; min-width: 121px;}
+.col-reminder { flex: none; width:15%; min-width: 110px; }
 .col-delete   { flex: none; width:22%; min-width: 120px;}
 
 .col-reminder .item-toggle .toggle {
@@ -267,6 +267,14 @@ a.item::after {
 }
 
 .item.header-item .col-reminder { width:25%; }
+
+.interaction-med {
+   font-weight: bold;
+}
+
+.interaction-status {
+   float: right;
+}
 
 /* DIRECTIVES */
 /* radio */

@@ -10,7 +10,7 @@ angular.module(
       'project.service.notification',
       'project.service.util'
    ])
-   .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', 'Phonestorage', 'Notification', 'Util', function($scope, $stateParams, $filter, Phonestorage, Notification, Util) {
+   .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', 'Phonestorage', 'Notification', 'Util', 'API', function($scope, $stateParams, $filter, Phonestorage, Notification, Util, API) {
       $scope.events = {
          DOSE_CHANGED: 'DOSE_CHANGED'
       }
@@ -26,7 +26,18 @@ angular.module(
             get_med_listener();
 
             $scope.med = result.rows.item(0);
-            $scope.$apply();
+
+            var med_interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
+               med_interaction_listener();
+               console.log("interaction detected", result);
+               $scope.interactions = result.med_interactions;
+               // $scope.int_desc = result.med_interactions[0].description;
+               // $scope.med_a = result.med_interactions[0].primary_med_name;
+               // $scope.med_b = result.med_interactions[0].secondary_med_name;
+               $scope.$apply();
+            });
+            API.get_med_interactions($scope.med, $scope);
+
          });
 
          var get_dosis_listener = $scope.$on(Phonestorage.events.MED_TIMES_RETRIEVED, function(e, result) {
@@ -48,6 +59,8 @@ angular.module(
             $scope.$apply();
          });
          Phonestorage.get_medicin_and_times($scope, $stateParams.id);
+
+         
       }
 
       $scope.order_times = function() {
