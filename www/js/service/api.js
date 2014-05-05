@@ -18,7 +18,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   when_not_to_use: "U word afgeraden dit medicijn te gebruiken wanneer u diabetes of vast gestelde nierproblemen heeft. ",
                   how_to_use: "Bij het ontbijt innemen met water. Blijf gedurende de dag een gewone hoeveelheid drinken.",
                   active_ingredient: 4,
-                  code: 3524555018862
+                  code: 8711555018762
                },
                1: { 
                   id: 6, 

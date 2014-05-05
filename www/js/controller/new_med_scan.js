@@ -1,6 +1,7 @@
 angular.module('project.controller.new_med_scan', ['project.service.api', 'project.service.phonestorage'])
    .controller('NewMedScanCtrl', ['$scope', '$ionicPopup', 'API', 'Phonestorage', function($scope, $ionicPopup, API, Phonestorage) {
- 
+      var interaction_index = 0;
+
       function scan_failure(error) {
          // alert("Failed: " + error);
          window.location = "#/nieuw";
@@ -60,11 +61,10 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
                return;
             }
          }
-
+         
          $scope.int_desc = $scope.interactions[interaction_index].description;
          $scope.med_a = $scope.interactions[interaction_index].primary_med_name;
          $scope.med_b = $scope.interactions[interaction_index].secondary_med_name;
-
          $ionicPopup.show({
             templateUrl: 'view/dialog/med_interaction.html',
             title: "Medicijn Interactie",
@@ -92,7 +92,7 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
                window.location.hash = "";
          });
       }
-
+      
       scan();
    }])
 ;
