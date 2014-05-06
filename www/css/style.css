@@ -32,6 +32,14 @@ input[type="search"],
    left: 40px;
 }
 
+.back-button-label.back-home {
+   padding: 15px 0px;
+}
+
+.back-home {
+   color: rgb(68,68,68);
+}
+
 .settings-button-label {
    right: 45px;
 }

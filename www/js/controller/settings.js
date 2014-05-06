@@ -40,6 +40,7 @@ angular.module('project.controller.settings', ['project.service.phonestorage', '
             Persistencejs.set_default_settings($scope);
             $ionicSideMenuDelegate.toggleRight();
          }
+
       }
    ])
 ;

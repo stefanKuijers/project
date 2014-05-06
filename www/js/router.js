@@ -49,6 +49,7 @@ angular.module(
             templateUrl:             'view/history.html'
          })
       ;
+
       $urlRouterProvider.otherwise('/');
    }])
 ;
