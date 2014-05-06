@@ -12,6 +12,9 @@ angular.module('project.service.phonestorage', [])
                vibration_input:        { type: "bool", value: "false"},
                sound_input:            { type: "bool", value: "true"}
             },
+            user_data: {
+               show_scan_explanation: 'true'
+            },
             meds: {
                0: { 
                   id: 0, 
@@ -86,6 +89,7 @@ angular.module('project.service.phonestorage', [])
             INTERACTION_STATUS_TABLE_NAME: "Interaction_Status",
             DOSIS_TABLE_NAME:              "Dosis",
             INTERVAL_UNIT_TABLE_NAME:      "Interval_Unit", 
+            USER_DATA_TABLE_NAME:          "User_Data", 
             accepted_units:                ["ml", "cl", "dl", "mg", "g", "pch", "sachet"],
             accepted_interval_units:       ["dagelijks", "weekelijks", "geen"],
             accepted_icons:                ["tablet_1", "tablet_2", "tablet_3", "liquid", "powder", "injection"],
@@ -105,7 +109,8 @@ angular.module('project.service.phonestorage', [])
             MED_NAMES_RETRIEVED:        "MED_NAMES_RETRIEVED",
             MED_ADDED:                  "MED_ADDED",
             DOSIS_BY_TIME_RETRIEVED:    "DOSIS_BY_TIME_RETRIEVED",
-            DOSE_UPDATED:               "DOSE_UPDATED"
+            DOSE_UPDATED:               "DOSE_UPDATED",
+            USER_DATA_RETRIEVED:        "USER_DATA_RETRIEVED"
          },
 
          init: function(event_scope) {
@@ -242,6 +247,14 @@ angular.module('project.service.phonestorage', [])
                }
             );
          },
+         get_user_data: function(event_scope) {
+            var self = this;
+            this.connection.transaction(
+               function(tx) {
+                  self.query("SELECT * FROM " + self.settings.USER_DATA_TABLE_NAME, tx, self.events.USER_DATA_RETRIEVED, event_scope);
+               }
+            );
+         },
 
          get_reminders: function() {},
          get_history: function() {},
@@ -340,6 +353,19 @@ angular.module('project.service.phonestorage', [])
                }
             );
          },
+         update_user_data: function(attribute, value) {
+            var self = this;
+            this.connection.transaction(
+               function(tx) {
+                  self.query(
+                     "UPDATE " + self.settings.USER_DATA_TABLE_NAME + " SET value='" + value + "' WHERE key='" + attribute + "';", 
+                     tx, 
+                     self.events.USER_DATA_STORED
+                  );
+               }
+            );
+         },
+
 
          /* DELETE */
          delete_dose_time: function(id) {
@@ -406,6 +432,7 @@ angular.module('project.service.phonestorage', [])
             this.setup_history_table(this);
             this.setup_reminder_table(this);
             this.setup_user_condition_table(this);
+            this.setup_user_data_table(this, this.settings.USER_DATA_TABLE_NAME)
          },
 
          setup_med_table: function(scope) {
@@ -534,6 +561,24 @@ angular.module('project.service.phonestorage', [])
                   var query_pre_fix = 'INSERT INTO ' + table_name + ' (key, value, type) VALUES ';
                   for (var key in scope.default_values.settings) {
                      tx.executeSql(query_pre_fix + '("' + key + '", "' + scope.default_values.settings[key].value + '", "' + scope.default_values.settings[key].type + '")');
+                  }
+               }, 
+               this.query_failed, 
+               function() {
+                  // console.log("setting table created");
+               }
+            );
+         },
+
+         setup_user_data_table: function(scope, table_name) {
+            this.connection.transaction(
+               function(tx) {
+                  tx.executeSql('DROP TABLE IF EXISTS ' + table_name);
+                  tx.executeSql('CREATE TABLE IF NOT EXISTS ' + table_name + ' (id INTEGER PRIMARY KEY AUTOINCREMENT, key VARCHAR(50), value VARCHAR(50))');
+                  
+                  var query_pre_fix = 'INSERT INTO ' + table_name + ' (key, value) VALUES ';
+                  for (var key in scope.default_values.user_data) {
+                     tx.executeSql(query_pre_fix + '("' + key + '", "' + scope.default_values.user_data[key] + '")');
                   }
                }, 
                this.query_failed, 

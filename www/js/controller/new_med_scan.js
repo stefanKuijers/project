@@ -19,7 +19,8 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
                ]
             );
          else
-            alert("The camera of this device is not available");
+            alert("The camera of this device is not available"),
+            window.location.hash = "/nieuw";
       }
 
       scan_success = function(scan_result) {
@@ -93,6 +94,40 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
          });
       }
       
-      scan();
+
+      
+      $scope.$on(Phonestorage.events.USER_DATA_RETRIEVED, function(e, result) {
+         $scope.user_data = {};
+         for (var i = 0; i < result.rows.length; i++) {
+            $scope.user_data[result.rows.item(i).key] = result.rows.item(i).value;
+         }
+
+         $scope.user_data.hide_scan_explanation = $scope.user_data.show_scan_explanation != 'true';
+         $scope.$watch('user_data.hide_scan_explanation', function(new_value, old_value) {
+            if (new_value !== old_value)
+               Phonestorage.update_user_data('show_scan_explanation', !new_value);
+         });
+
+         if ($scope.user_data.show_scan_explanation == 'true')
+            $ionicPopup.show({
+               templateUrl: 'view/dialog/scan_explanation.html',
+               title: "Uitleg Medicijn Scannen",
+               scope: $scope,
+               buttons: [
+                 { 
+                    text: 'Begrepen', 
+                    type: 'button-positive',
+                    onTap: function(e) { return 'proceed'; } 
+                 }
+               ]
+            }).then(function(res) {
+               scan();
+            });
+         else 
+            scan();
+      });
+      Phonestorage.get_user_data($scope);
+
+
    }])
 ;

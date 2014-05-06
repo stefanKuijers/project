@@ -13,6 +13,7 @@ angular.module('project.controller.settings', ['project.service.phonestorage', '
                   
                   if (setting_key === 'screen_contrast' || setting_key === 'sound_volume') {
                      if (update_timeout) clearTimeout(update_timeout); // these four lines are to prevent a constant flow of database updates while sliders are slid
+                     
                      update_timeout = setTimeout(function() {
                         Persistencejs.update(setting_key_exp, new_value);
                      }, 200);

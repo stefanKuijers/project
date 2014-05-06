@@ -374,17 +374,15 @@ div[pj-number-picker] button {
 }
 
 /* new med scan */
-.scan-cam-placeholder {
-   width: 80%;
-   margin:auto;
-   padding-bottom: 100%;
+.explanation-dialog ol {
+   list-style: disc outside none;
+   list-style-type: decimal;
+   margin: 20px 0px;
+   margin-left: 30px;
 }
 
-.scanned-it-button {
-   position:absolute;
-   left: 0;
-   right: 0;
-   bottom: 0;
+.explanation-dialog ol li {
+   padding: 5px 0;
 }
 
 /* history */
