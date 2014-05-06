@@ -208,4 +208,5 @@ C:\dev\project\platforms\android\assets\www\view\overzicht.html \
 C:\dev\project\platforms\android\assets\www\view\settings.html \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_interaction.html \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_reminder.html \
+C:\dev\project\platforms\android\assets\www\view\dialog\scan_explanation.html \
 C:\dev\project\platforms\android\ant-build\AndroidManifest.xml \

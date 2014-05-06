@@ -12,7 +12,7 @@ angular.module('project.controller.nav_control', [])
             $scope.data.show_home_button = $state.is('med-info'); 
             console.log($scope.data);
             if ($state.current.name) $state.reload();
-         }, 300);
+         }, 400);
       });
 
       $scope.go_home = function() {

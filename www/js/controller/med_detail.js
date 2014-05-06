@@ -56,8 +56,6 @@ angular.module(
             $scope.$apply();
          });
          Phonestorage.get_medicin_and_times($scope, $stateParams.id);
-
-         
       }
 
       $scope.order_times = function() {
@@ -69,8 +67,8 @@ angular.module(
 
          var update_dose_listener = $scope.$on(Phonestorage.events.DOSE_UPDATED, function(e, result) {
              update_dose_listener();
-            
-            if (prepared_dose.reminder == 'true') 
+
+            if (prepared_dose.reminder === true) 
                Notification.add(prepared_dose);
          });
 // now everytime the whole dose is update in the database. We could only update the property that was updated
