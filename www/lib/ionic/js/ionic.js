@@ -2,7 +2,7 @@
  * Copyright 2014 Drifty Co.
  * http://drifty.com/
  *
- * Ionic, v1.0.0-beta.1-nightly-1576
+ * Ionic, v1.0.0-beta.4-nightly-2042
  * A powerful HTML5 mobile app framework.
  * http://ionicframework.com/
  *
@@ -19,7 +19,7 @@
 window.ionic = {
   controllers: {},
   views: {},
-  version: '1.0.0-beta.1-nightly-1576'
+  version: '1.0.0-beta.4-nightly-2042'
 };
 
 (function(ionic) {
@@ -317,6 +317,25 @@ window.ionic = {
     swapNodes: function(src, dest) {
       dest.parentNode.insertBefore(src, dest);
     },
+
+    /**
+     * @private
+     */
+    centerElementByMargin: function(el) {
+      el.style.marginLeft = (-el.offsetWidth) / 2 + 'px';
+      el.style.marginTop = (-el.offsetHeight) / 2 + 'px';
+    },
+    //Center twice, after raf, to fix a bug with ios and showing elements
+    //that have just been attached to the DOM.
+    centerElementByMarginTwice: function(el) {
+      ionic.requestAnimationFrame(function() {
+        ionic.DomUtil.centerElementByMargin(el);
+        ionic.requestAnimationFrame(function() {
+          ionic.DomUtil.centerElementByMargin(el);
+        });
+      });
+    },
+
     /**
      * @ngdoc method
      * @name ionic.DomUtil#getParentWithClass
@@ -376,7 +395,7 @@ window.ionic = {
   //Shortcuts
   ionic.requestAnimationFrame = ionic.DomUtil.requestAnimationFrame;
   ionic.animationFrameThrottle = ionic.DomUtil.animationFrameThrottle;
-})(this, document, ionic);
+})(window, document, ionic);
 
 /**
  * ion-events.js
@@ -393,36 +412,32 @@ window.ionic = {
 (function(ionic) {
 
   // Custom event polyfill
-  if(!window.CustomEvent) {
-    (function() {
-      var CustomEvent;
+  ionic.CustomEvent = (function() {
+    if( typeof window.CustomEvent === 'function' ) return CustomEvent;
 
-      CustomEvent = function(event, params) {
-        var evt;
-        params = params || {
-          bubbles: false,
-          cancelable: false,
-          detail: undefined
-        };
-        try {
-          evt = document.createEvent("CustomEvent");
-          evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-        } catch (error) {
-          // fallback for browsers that don't support createEvent('CustomEvent')
-          evt = document.createEvent("Event");
-          for (var param in params) {
-            evt[param] = params[param];
-          }
-          evt.initEvent(event, params.bubbles, params.cancelable);
-        }
-        return evt;
+    var customEvent = function(event, params) {
+      var evt;
+      params = params || {
+        bubbles: false,
+        cancelable: false,
+        detail: undefined
       };
-
-      CustomEvent.prototype = window.Event.prototype;
-
-      window.CustomEvent = CustomEvent;
-    })();
-  }
+      try {
+        evt = document.createEvent("CustomEvent");
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+      } catch (error) {
+        // fallback for browsers that don't support createEvent('CustomEvent')
+        evt = document.createEvent("Event");
+        for (var param in params) {
+          evt[param] = params[param];
+        }
+        evt.initEvent(event, params.bubbles, params.cancelable);
+      }
+      return evt;
+    };
+    customEvent.prototype = window.Event.prototype;
+    return customEvent;
+  })();
 
 
   /**
@@ -445,7 +460,7 @@ window.ionic = {
      */
     // Trigger a new event
     trigger: function(eventType, data, bubbles, cancelable) {
-      var event = new CustomEvent(eventType, {
+      var event = new ionic.CustomEvent(eventType, {
         detail: data,
         bubbles: !!bubbles,
         cancelable: !!cancelable
@@ -453,7 +468,7 @@ window.ionic = {
 
       // Make sure to trigger the event on the given target, or dispatch it from
       // the window if we don't have an event target
-      data && data.target && data.target.dispatchEvent(event) || window.dispatchEvent(event);
+      data && data.target && data.target.dispatchEvent && data.target.dispatchEvent(event) || window.dispatchEvent(event);
     },
 
     /**
@@ -531,8 +546,7 @@ window.ionic = {
       gesture.off(type, callback);
     },
 
-    handlePopState: function(event) {
-    },
+    handlePopState: function(event) {}
   };
 
 
@@ -1944,6 +1958,10 @@ window.ionic = {
 
 (function(window, document, ionic) {
 
+  var IOS = 'ios';
+  var ANDROID = 'android';
+  var WINDOWS_PHONE = 'windowsphone';
+
   /**
    * @ngdoc utility
    * @name ionic.Platform
@@ -2023,7 +2041,7 @@ window.ionic = {
      */
     device: function() {
       if(window.device) return window.device;
-      if(this.isCordova()) void 0;
+      if(this.isWebView()) void 0;
       return {};
     },
 
@@ -2031,7 +2049,12 @@ window.ionic = {
       this.platforms = [];
       this.grade = 'a';
 
-      if(this.isCordova()) this.platforms.push('cordova');
+      if(this.isWebView()) {
+        this.platforms.push('webview');
+        this.platforms.push('cordova');
+      } else {
+        this.platforms.push('browser');
+      }
       if(this.isIPad()) this.platforms.push('ipad');
 
       var platform = this.platform();
@@ -2051,6 +2074,8 @@ window.ionic = {
 
           if(this.isAndroid() && version < 4.4) {
             this.grade = (version < 4 ? 'c' : 'b');
+          } else if(this.isWindowsPhone()) {
+            this.grade = 'b';
           }
         }
       }
@@ -2058,10 +2083,10 @@ window.ionic = {
 
     /**
      * @ngdoc method
-     * @name ionic.Platform#isCordova
-     * @returns {boolean} Whether we are running on Cordova.
+     * @name ionic.Platform#isWebView
+     * @returns {boolean} Check if we are running within a WebView (such as Cordova).
      */
-    isCordova: function() {
+    isWebView: function() {
       return !(!window.cordova && !window.PhoneGap && !window.phonegap);
     },
     /**
@@ -2070,7 +2095,10 @@ window.ionic = {
      * @returns {boolean} Whether we are running on iPad.
      */
     isIPad: function() {
-      return this.ua.toLowerCase().indexOf('ipad') >= 0;
+      if( /iPad/i.test(window.navigator.platform) ) {
+        return true;
+      }
+      return /iPad/i.test(this.ua);
     },
     /**
      * @ngdoc method
@@ -2078,7 +2106,7 @@ window.ionic = {
      * @returns {boolean} Whether we are running on iOS.
      */
     isIOS: function() {
-      return this.is('ios');
+      return this.is(IOS);
     },
     /**
      * @ngdoc method
@@ -2086,7 +2114,15 @@ window.ionic = {
      * @returns {boolean} Whether we are running on Android.
      */
     isAndroid: function() {
-      return this.is('android');
+      return this.is(ANDROID);
+    },
+    /**
+     * @ngdoc method
+     * @name ionic.Platform#isWindowsPhone
+     * @returns {boolean} Whether we are running on Windows Phone.
+     */
+    isWindowsPhone: function() {
+      return this.is(WINDOWS_PHONE);
     },
 
     /**
@@ -2107,11 +2143,13 @@ window.ionic = {
       if(typeof n != 'undefined' && n !== null && n.length) {
         platformName = n.toLowerCase();
       } else if(this.ua.indexOf('Android') > 0) {
-        platformName = 'android';
+        platformName = ANDROID;
       } else if(this.ua.indexOf('iPhone') > -1 || this.ua.indexOf('iPad') > -1 || this.ua.indexOf('iPod') > -1) {
-        platformName = 'ios';
+        platformName = IOS;
+      } else if(this.ua.indexOf('Windows Phone') > -1) {
+        platformName = WINDOWS_PHONE;
       } else {
-        platformName = '';
+        platformName = window.navigator.platform && navigator.platform.toLowerCase().split(' ')[0] || '';
       }
     },
 
@@ -2145,7 +2183,8 @@ window.ionic = {
       var pName = this.platform();
       var versionMatch = {
         'android': /Android (\d+).(\d+)?/,
-        'ios': /OS (\d+)_(\d+)?/
+        'ios': /OS (\d+)_(\d+)?/,
+        'windowsphone': /Windows Phone (\d+).(\d+)?/
       };
       if(versionMatch[pName]) {
         v = this.ua.match( versionMatch[pName] );
@@ -2245,7 +2284,7 @@ window.ionic = {
 
   // setup listeners to know when the device is ready to go
   function onWindowLoad() {
-    if(ionic.Platform.isCordova()) {
+    if(ionic.Platform.isWebView()) {
       // the window and scripts are fully loaded, and a cordova/phonegap
       // object exists then let's listen for the deviceready
       document.addEventListener("deviceready", onPlatformReady, false);
@@ -2286,7 +2325,7 @@ window.ionic = {
 
     // transform
     var i, keys = ['webkitTransform', 'transform', '-webkit-transform', 'webkit-transform',
-                '-moz-transform', 'moz-transform', 'MozTransform', 'mozTransform'];
+                   '-moz-transform', 'moz-transform', 'MozTransform', 'mozTransform', 'msTransform'];
 
     for(i = 0; i < keys.length; i++) {
       if(document.documentElement.style[keys[i]] !== undefined) {
@@ -2296,7 +2335,7 @@ window.ionic = {
     }
 
     // transition
-    keys = ['webkitTransition', 'mozTransition', 'transition'];
+    keys = ['webkitTransition', 'mozTransition', 'msTransition', 'transition'];
     for(i = 0; i < keys.length; i++) {
       if(document.documentElement.style[keys[i]] !== undefined) {
         ionic.CSS.TRANSITION = keys[i];
@@ -2352,255 +2391,515 @@ window.ionic = {
 
 })(document, ionic);
 
-(function(window, document, ionic) {
-  'use strict';
 
-  var CLICK_PREVENT_DURATION = 1500; // max milliseconds ghostclicks in the same area should be prevented
-  var REMOVE_PREVENT_DELAY = 380; // delay after a touchend/mouseup before removing the ghostclick prevent
-  var REMOVE_PREVENT_DELAY_GRADE_C = 800; // same as REMOVE_PREVENT_DELAY, but for grade c devices
-  var HIT_RADIUS = 15; // surrounding area of a click that if a ghostclick happens it would get ignored
-  var TOUCH_TOLERANCE_X = 10; // how much the X coordinates can be off between start/end, but still a click
-  var TOUCH_TOLERANCE_Y = 6; // how much the Y coordinates can be off between start/end, but still a click
-  var tapCoordinates = {}; // used to remember coordinates to ignore if they happen again quickly
-  var startCoordinates = {}; // used to remember where the coordinates of the start of a touch
-  var clickPreventTimerId;
-  var _hasTouchScrolled = false; // if the touchmove already exceeded the touchmove tolerance
+/**
+ * @ngdoc page
+ * @name tap
+ * @module ionic
+ * @description
+ * On touch devices such as a phone or tablet, some browsers implement a 300ms delay between
+ * the time the user stops touching the display and the moment the browser executes the
+ * click. This delay was initially introduced so the browser can know whether the user wants to
+ * double-tap to zoom in on the webpage.  Basically, the browser waits roughly 300ms to see if
+ * the user is double-tapping, or just tapping on the display once.
+ *
+ * Out of the box, Ionic automatically removes the 300ms delay in order to make Ionic apps
+ * feel more "native" like. Resultingly, other solutions such as
+ * [fastclick](https://github.com/ftlabs/fastclick) and Angular's
+ * [ngTouch](https://docs.angularjs.org/api/ngTouch) should not be included, to avoid conflicts.
+ *
+ * In some cases, third-party libraries may also be working with touch events which can interfere
+ * with the tap system. For example, mapping libraries like Google or Leaflet Maps often implement
+ * a touch detection system which conflicts with Ionic's tap system.
+ *
+ * ### Disabling the tap system
+ *
+ * To disable the tap for an element and all of its children elements,
+ * add the attribute `data-tap-disabled="true"`.
+ *
+ * ```html
+ * <div data-tap-disabled="true">
+ *     <div id="google-map"></div>
+ * </div>
+ * ```
+ *
+ * ### Additional Notes:
+ *
+ * - Ionic tap  works with Ionic's JavaScript scrolling
+ * - Elements can come and go from the DOM and Ionic tap doesn't keep adding and removing
+ *   listeners
+ * - No "tap delay" after the first "tap" (you can tap as fast as you want, they all click)
+ * - Minimal events listeners, only being added to document
+ * - Correct focus in/out on each input type (select, textearea, range) on each platform/device
+ * - Shows and hides virtual keyboard correctly for each platform/device
+ * - Works with labels surrounding inputs
+ * - Does not fire off a click if the user moves the pointer too far
+ * - Adds and removes an 'activated' css class
+ * - Multiple [unit tests](https://github.com/driftyco/ionic/blob/master/test/unit/utils/tap.unit.js) for each scenario
+ *
+ */
+/*
 
+ IONIC TAP
+ ---------------
+ - Both touch and mouse events are added to the document.body on DOM ready
+ - If a touch event happens, it does not use mouse event listeners
+ - On touchend, if the distance between start and end was small, trigger a click
+ - In the triggered click event, add a 'isIonicTap' property
+ - The triggered click receives the same x,y coordinates as as the end event
+ - On document.body click listener (with useCapture=true), only allow clicks with 'isIonicTap'
+ - Triggering clicks with mouse events work the same as touch, except with mousedown/mouseup
+ - Tapping inputs is disabled during scrolling
+*/
 
-  ionic.tap = {
+var tapDoc; // the element which the listeners are on (document.body)
+var tapActiveEle; // the element which is active (probably has focus)
+var tapEnabledTouchEvents;
+var tapMouseResetTimer;
+var tapPointerMoved;
+var tapPointerStart;
+var tapTouchFocusedInput;
+var tapLastTouchTarget;
 
-    tapInspect: function(orgEvent) {
-      // if the event doesn't have a gesture then don't continue
-      if(!orgEvent.gesture || !orgEvent.gesture.srcEvent) return;
+var TAP_RELEASE_TOLERANCE = 6; // how much the coordinates can be off between start/end, but still a click
 
-      var e = orgEvent.gesture.srcEvent; // evaluate the actual source event, not the created event by gestures.js
-      var ele = e.target; // get the target element that was actually tapped
+var tapEventListeners = {
+  'click': tapClickGateKeeper,
 
-      if( ionic.tap.isRecentTap(e) || ionic.tap.hasTouchScrolled(e) || e.type === 'touchcancel') {
-        // if a tap in the same area just happened,
-        // or it was a touchcanel event, don't continue
-        void 0;
-        return stopEvent(e);
+  'mousedown': tapMouseDown,
+  'mouseup': tapMouseUp,
+  'mousemove': tapMouseMove,
+
+  'touchstart': tapTouchStart,
+  'touchend': tapTouchEnd,
+  'touchcancel': tapTouchCancel,
+  'touchmove': tapTouchMove,
+
+  'focusin': tapFocusIn,
+  'focusout': tapFocusOut
+};
+
+ionic.tap = {
+
+  register: function(ele) {
+    tapDoc = ele;
+
+    tapEventListener('click', true, true);
+    tapEventListener('mouseup');
+    tapEventListener('mousedown');
+    tapEventListener('touchstart');
+    tapEventListener('touchend');
+    tapEventListener('touchcancel');
+    tapEventListener('focusin');
+    tapEventListener('focusout');
+
+    return function() {
+      for(var type in tapEventListeners) {
+        tapEventListener(type, false);
       }
+      tapDoc = null;
+      tapActiveEle = null;
+      tapEnabledTouchEvents = false;
+      tapPointerMoved = false;
+      tapPointerStart = null;
+    };
+  },
 
-      for(var x=0; x<5; x++) {
-        // climb up the DOM looking to see if the tapped element is, or has a parent, of one of these
-        // only climb up a max of 5 parents, anything more probably isn't beneficial
-        if(!ele) break;
+  ignoreScrollStart: function(e) {
+    return (e.defaultPrevented) ||  // defaultPrevented has been assigned by another component handling the event
+           (e.target.isContentEditable) ||
+           (/file|range/i).test(e.target.type) ||
+           (e.target.dataset ? e.target.dataset.preventScroll : e.target.getAttribute('data-prevent-default')) == 'true' || // manually set within an elements attributes
+           (!!(/object|embed/i).test(e.target.tagName));  // flash/movie/object touches should not try to scroll
+  },
 
-        if( ele.tagName.match(/a|input|button|label|textarea|select/i) ) {
-          return ionic.tap.simulateClick(ele, e);
-        }
-        ele = ele.parentElement;
-      }
+  isTextInput: function(ele) {
+    return !!ele &&
+           (ele.tagName == 'TEXTAREA' ||
+            ele.contentEditable === 'true' ||
+            (ele.tagName == 'INPUT' && !(/radio|checkbox|range|file|submit|reset/i).test(ele.type)) );
+  },
 
-      // they didn't tap one of the above elements
-      // if the currently active element is an input, and they tapped outside
-      // of the current input, then unset its focus (blur) so the keyboard goes away
-      ionic.tap.blurActive();
-    },
+  isLabelWithTextInput: function(ele) {
+    var container = tapContainingElement(ele, false);
 
-    simulateClick: function(target, e) {
-      // simulate a normal click by running the element's click method then focus on it
+    return !!container &&
+           ionic.tap.isTextInput( tapTargetElement( container ) );
+  },
 
-      var ele = target.control || target;
+  containsOrIsTextInput: function(ele) {
+    return ionic.tap.isTextInput(ele) || ionic.tap.isLabelWithTextInput(ele);
+  },
 
-      if(ele.disabled || ele.type === 'file' || ele.type === 'range') {
-        e.tapIgnored = true;
-        return;
-      }
+  cloneFocusedInput: function(container, scrollIntance) {
+    if(ionic.tap.hasCheckedClone) return;
+    ionic.tap.hasCheckedClone = true;
 
-      void 0;
-
-      var c = ionic.tap.getCoordinates(e);
-
-      // using initMouseEvent instead of MouseEvent for our Android friends
-      var clickEvent = document.createEvent("MouseEvents");
-      clickEvent.initMouseEvent('click', true, true, window,
-                                1, 0, 0, c.x, c.y,
-                                false, false, false, false, 0, null);
-
-      ele.dispatchEvent(clickEvent);
-
-      if( ele.tagName.match(/input|textarea/i) ) {
-        ele.focus();
-        e.preventDefault();
-      } else if( ele.tagName == 'SELECT' ) {
-        // select simulateClick should not preventDefault or else no options dialog
-        ele.focus();
-      } else {
-        ionic.tap.blurActive();
-      }
-
-      // remember the coordinates of this tap so if it happens again we can ignore it
-      // but only if the coordinates are not already being actively disabled
-      if( !ionic.tap.isRecentTap(e) ) {
-        ionic.tap.recordCoordinates(e);
-      }
-
-      if(target.control) {
-        void 0;
-        return stopEvent(e);
-      }
-
-    },
-
-    preventGhostClick: function(e) {
-
-      void 0;
-
-
-      if(e.target.control || ionic.tap.isRecentTap(e) || ionic.tap.hasTouchScrolled(e)) {
-        return stopEvent(e);
-      }
-
-      // remember the coordinates of this click so if a tap or click in the
-      // same area quickly happened again we can ignore it
-      ionic.tap.recordCoordinates(e);
-    },
-
-    getCoordinates: function(event) {
-      // This method can get coordinates for both a mouse click
-      // or a touch depending on the given event
-      var gesture = (event.gesture ? event.gesture : event);
-
-      if(gesture) {
-        var touches = gesture.touches && gesture.touches.length ? gesture.touches : [gesture];
-        var e = (gesture.changedTouches && gesture.changedTouches[0]) ||
-            (gesture.originalEvent && gesture.originalEvent.changedTouches &&
-                gesture.originalEvent.changedTouches[0]) ||
-            touches[0].originalEvent || touches[0];
-
-        if(e) return { x: e.clientX || e.pageX || 0, y: e.clientY || e.pageY || 0 };
-      }
-      return { x:0, y:0 };
-    },
-
-    hasTouchScrolled: function(event) {
-      if(_hasTouchScrolled) return true;
-
-      // check if this click's coordinates are different than its touchstart/mousedown
-      var c = ionic.tap.getCoordinates(event);
-
-      // Quick check for 0,0 which could be simulated mouse click for form submission
-      if(c.x === 0 && c.y === 0) {
-        return false;
-      }
-
-      // the allowed distance between touchstart/mousedown and
-      return (c.x > startCoordinates.x + TOUCH_TOLERANCE_X ||
-              c.x < startCoordinates.x - TOUCH_TOLERANCE_X ||
-              c.y > startCoordinates.y + TOUCH_TOLERANCE_Y ||
-              c.y < startCoordinates.y - TOUCH_TOLERANCE_Y);
-    },
-
-    recordCoordinates: function(event) {
-      // get the coordinates of this event and remember them for later
-      var c = ionic.tap.getCoordinates(event);
-      if(c.x && c.y) {
-        var tapId = Date.now();
-
-        // only record tap coordinates if we have valid ones
-        tapCoordinates[tapId] = { x: c.x, y: c.y, id: tapId };
-
-        setTimeout(function() {
-          // delete the tap coordinates after X milliseconds, basically allowing
-          // it so a tap can happen again in the same area in the future
-          // this is only a fallback, most tap coordinates will be removed
-          // from the removeClickPrevent event fired by touchend/mouseup
-          delete tapCoordinates[tapId];
-        }, CLICK_PREVENT_DURATION);
-      }
-    },
-
-    removeClickPrevent: function(e) {
-      // fired by touchend/mouseup
-      // after X milliseconds, remove tap coordinates
-      clearTimeout(clickPreventTimerId);
-      clickPreventTimerId = setTimeout(function(){
-        var tap = ionic.tap.isRecentTap(e);
-        if(tap) delete tapCoordinates[tap.id];
-      }, REMOVE_PREVENT_DELAY);
-    },
-
-    isRecentTap: function(event) {
-      // loop through the tap coordinates and see if the same area has been tapped recently
-      var tapId, existingCoordinates, currentCoordinates;
-
-      for(tapId in tapCoordinates) {
-        existingCoordinates = tapCoordinates[tapId];
-        if(!currentCoordinates) currentCoordinates = ionic.tap.getCoordinates(event); // lazy load it when needed
-
-        if(currentCoordinates.x > existingCoordinates.x - HIT_RADIUS &&
-           currentCoordinates.x < existingCoordinates.x + HIT_RADIUS &&
-           currentCoordinates.y > existingCoordinates.y - HIT_RADIUS &&
-           currentCoordinates.y < existingCoordinates.y + HIT_RADIUS) {
-          // the current tap coordinates are in the same area as a recent tap
-          return existingCoordinates;
+    ionic.requestAnimationFrame(function(){
+      var focusInput = container.querySelector(':focus');
+      if( ionic.tap.isTextInput(focusInput) ) {
+        var clonedInput = focusInput.parentElement.querySelector('.cloned-text-input');
+        if(!clonedInput) {
+          clonedInput = document.createElement(focusInput.tagName);
+          clonedInput.type = focusInput.type;
+          clonedInput.value = focusInput.value;
+          clonedInput.className = 'cloned-text-input';
+          clonedInput.readOnly = true;
+          focusInput.parentElement.insertBefore(clonedInput, focusInput);
+          focusInput.style.top = focusInput.offsetTop;
+          focusInput.classList.add('previous-input-focus');
         }
       }
-    },
+    });
+  },
 
-    blurActive: function() {
-      var ele = document.activeElement;
-      if(ele && (ele.tagName === "INPUT" ||
-                 ele.tagName === "TEXTAREA")) {
-        // using a timeout to prevent funky scrolling while a keyboard hides
-        setTimeout(function(){
-          ele.blur();
-        }, 400);
+  hasCheckedClone: false,
+
+  removeClonedInputs: function(container, scrollIntance) {
+    ionic.tap.hasCheckedClone = false;
+
+    ionic.requestAnimationFrame(function(){
+      var clonedInputs = container.querySelectorAll('.cloned-text-input');
+      var previousInputFocus = container.querySelectorAll('.previous-input-focus');
+      var x;
+
+      for(x=0; x<clonedInputs.length; x++) {
+        clonedInputs[x].parentElement.removeChild( clonedInputs[x] );
       }
-    },
 
-    setTouchStart: function(e) {
-      _hasTouchScrolled = false;
-      startCoordinates = ionic.tap.getCoordinates(e);
-      document.body.addEventListener('touchmove', ionic.tap.onTouchMove, false);
-    },
-
-    onTouchMove: function(e) {
-      if( ionic.tap.hasTouchScrolled(e) ) {
-        _hasTouchScrolled = true;
-        document.body.removeEventListener('touchmove', ionic.tap.onTouchMove);
-        void 0;
+      for(x=0; x<previousInputFocus.length; x++) {
+        previousInputFocus[x].classList.remove('previous-input-focus');
+        previousInputFocus[x].style.top = '';
+        previousInputFocus[x].focus();
       }
-    },
+    });
+  },
 
-    reset: function() {
-      tapCoordinates = {};
-      startCoordinates = {};
+  requiresNativeClick: function(ele) {
+    if(!ele || ele.disabled || (/file|range/i).test(ele.type) || (/object|video/i).test(ele.tagName) ) {
+      return true;
+    }
+    if(ele.nodeType === 1) {
+      var element = ele;
+      while(element) {
+        if( (element.dataset ? element.dataset.tapDisabled : element.getAttribute('data-tap-disabled')) == 'true' ) {
+          return true;
+        }
+        element = element.parentElement;
+      }
+    }
+    return false;
+  }
+
+};
+
+function tapEventListener(type, enable, useCapture) {
+  if(enable !== false) {
+    tapDoc.addEventListener(type, tapEventListeners[type], useCapture);
+  } else {
+    tapDoc.removeEventListener(type, tapEventListeners[type]);
+  }
+}
+
+function tapClick(e) {
+  // simulate a normal click by running the element's click method then focus on it
+  var container = tapContainingElement(e.target);
+  var ele = tapTargetElement(container);
+
+  if( ionic.tap.requiresNativeClick(ele) || tapPointerMoved ) return false;
+
+  var c = getPointerCoordinates(e);
+
+  void 0;
+  triggerMouseEvent('click', ele, c.x, c.y);
+
+  // if it's an input, focus in on the target, otherwise blur
+  tapHandleFocus(ele);
+}
+
+function triggerMouseEvent(type, ele, x, y) {
+  // using initMouseEvent instead of MouseEvent for our Android friends
+  var clickEvent = document.createEvent("MouseEvents");
+  clickEvent.initMouseEvent(type, true, true, window, 1, 0, 0, x, y, false, false, false, false, 0, null);
+  clickEvent.isIonicTap = true;
+  ele.dispatchEvent(clickEvent);
+}
+
+function tapClickGateKeeper(e) {
+  if(e.target.type == 'submit' && e.detail === 0) {
+    // do not prevent click if it came from an "Enter" or "Go" keypress submit
+    return;
+  }
+
+  // do not allow through any click events that were not created by ionic.tap
+  if( (ionic.scroll.isScrolling && ionic.tap.containsOrIsTextInput(e.target) ) ||
+      (!e.isIonicTap && !ionic.tap.requiresNativeClick(e.target)) ) {
+    void 0;
+    e.stopPropagation();
+
+    if( !ionic.tap.isLabelWithTextInput(e.target) ) {
+      // labels clicks from native should not preventDefault othersize keyboard will not show on input focus
+      e.preventDefault();
+    }
+    return false;
+  }
+}
+
+// MOUSE
+function tapMouseDown(e) {
+  if(e.isIonicTap || tapIgnoreEvent(e)) return;
+
+  if(tapEnabledTouchEvents) {
+    void 0;
+    e.stopPropagation();
+
+    if( !ionic.tap.isTextInput(e.target) || tapLastTouchTarget !== e.target ) {
+      // If you preventDefault on a text input then you cannot move its text caret/cursor.
+      // Allow through only the text input default. However, without preventDefault on an
+      // input the 300ms delay can change focus on inputs after the keyboard shows up.
+      // The focusin event handles the chance of focus changing after the keyboard shows.
+      e.preventDefault();
     }
 
-  };
+    return false;
+  }
 
-  function stopEvent(e){
+  tapPointerMoved = false;
+  tapPointerStart = getPointerCoordinates(e);
+
+  tapEventListener('mousemove');
+  ionic.activator.start(e);
+}
+
+function tapMouseUp(e) {
+  if(tapEnabledTouchEvents) {
     e.stopPropagation();
     e.preventDefault();
     return false;
   }
 
-  ionic.Platform.ready(function(){
-    if(ionic.Platform.grade === 'c') {
-      // low performing devices should have a longer ghostclick prevent
-      REMOVE_PREVENT_DELAY = REMOVE_PREVENT_DELAY_GRADE_C;
+  if( tapIgnoreEvent(e) || e.target.tagName === 'SELECT' ) return false;
+
+  if( !tapHasPointerMoved(e) ) {
+    tapClick(e);
+  }
+  tapEventListener('mousemove', false);
+  ionic.activator.end();
+  tapPointerMoved = false;
+}
+
+function tapMouseMove(e) {
+  if( tapHasPointerMoved(e) ) {
+    tapEventListener('mousemove', false);
+    ionic.activator.end();
+    tapPointerMoved = true;
+    return false;
+  }
+}
+
+
+// TOUCH
+function tapTouchStart(e) {
+  if( tapIgnoreEvent(e) ) return;
+
+  tapPointerMoved = false;
+
+  tapEnableTouchEvents();
+  tapPointerStart = getPointerCoordinates(e);
+
+  tapEventListener('touchmove');
+  ionic.activator.start(e);
+
+  if( ionic.Platform.isIOS() && ionic.tap.isLabelWithTextInput(e.target) ) {
+    // if the tapped element is a label, which has a child input
+    // then preventDefault so iOS doesn't ugly auto scroll to the input
+    // but do not prevent default on Android or else you cannot move the text caret
+    // and do not prevent default on Android or else no virtual keyboard shows up
+
+    var textInput = tapTargetElement( tapContainingElement(e.target) );
+    if( textInput !== tapActiveEle ) {
+      // don't preventDefault on an already focused input or else iOS's text caret isn't usable
+      e.preventDefault();
     }
-  });
+  }
+}
 
-  // set click handler and check if the event should be stopped or not
-  document.addEventListener('click', ionic.tap.preventGhostClick, true);
+function tapTouchEnd(e) {
+  if( tapIgnoreEvent(e) ) return;
 
-  // set release event listener for HTML elements that were tapped or held
-  ionic.on("release", ionic.tap.tapInspect, document);
+  tapEnableTouchEvents();
+  if( !tapHasPointerMoved(e) ) {
+    tapClick(e);
 
-  // listeners used to clear out active taps which are used to prevention ghostclicks
-  document.addEventListener('touchend', ionic.tap.removeClickPrevent, false);
-  document.addEventListener('mouseup', ionic.tap.removeClickPrevent, false);
+    if( e.target.tagName === 'SELECT' ) {
+      e.preventDefault();
+    }
+  }
 
-  // remember where the user first started touching the screen
-  // so that if they scrolled, it shouldn't fire the click
-  document.addEventListener('touchstart', ionic.tap.setTouchStart, false);
+  tapLastTouchTarget = e.target;
+  tapTouchCancel();
+}
 
-})(this, document, ionic);
+function tapTouchMove(e) {
+  if( tapHasPointerMoved(e) ) {
+    tapPointerMoved = true;
+    tapEventListener('touchmove', false);
+    ionic.activator.end();
+    return false;
+  }
+}
+
+function tapTouchCancel(e) {
+  tapEventListener('touchmove', false);
+  ionic.activator.end();
+  tapPointerMoved = false;
+}
+
+function tapEnableTouchEvents() {
+  tapEnabledTouchEvents = true;
+  clearTimeout(tapMouseResetTimer);
+  tapMouseResetTimer = setTimeout(function(){
+    tapEnabledTouchEvents = false;
+  }, 2000);
+}
+
+function tapIgnoreEvent(e) {
+  if(e.isTapHandled) return true;
+  e.isTapHandled = true;
+
+  if( ionic.scroll.isScrolling && ionic.tap.containsOrIsTextInput(e.target) ) {
+    e.preventDefault();
+    return true;
+  }
+}
+
+function tapHandleFocus(ele) {
+  tapTouchFocusedInput = null;
+
+  var triggerFocusIn = false;
+
+  if(ele.tagName == 'SELECT') {
+    // trick to force Android options to show up
+    triggerMouseEvent('mousedown', ele, 0, 0);
+    ele.focus && ele.focus();
+    triggerFocusIn = true;
+
+  } else if(tapActiveElement() === ele) {
+    // already is the active element and has focus
+    triggerFocusIn = true;
+
+  } else if( (/input|textarea/i).test(ele.tagName) ) {
+    triggerFocusIn = true;
+    ele.focus && ele.focus();
+    ele.value = ele.value;
+    if( tapEnabledTouchEvents ) {
+      tapTouchFocusedInput = ele;
+    }
+
+  } else {
+    tapFocusOutActive();
+  }
+
+  if(triggerFocusIn) {
+    tapActiveElement(ele);
+    ionic.trigger('ionic.focusin', {
+      target: ele
+    }, true);
+  }
+}
+
+function tapFocusOutActive() {
+  var ele = tapActiveElement();
+  if(ele && (/input|textarea|select/i).test(ele.tagName) ) {
+    void 0;
+    ele.blur();
+  }
+  tapActiveElement(null);
+}
+
+function tapFocusIn(e) {
+  // Because a text input doesn't preventDefault (so the caret still works) there's a chance
+  // that it's mousedown event 300ms later will change the focus to another element after
+  // the keyboard shows up.
+
+  if( tapEnabledTouchEvents &&
+      ionic.tap.isTextInput( tapActiveElement() ) &&
+      ionic.tap.isTextInput(tapTouchFocusedInput) &&
+      tapTouchFocusedInput !== e.target ) {
+
+    // 1) The pointer is from touch events
+    // 2) There is an active element which is a text input
+    // 3) A text input was just set to be focused on by a touch event
+    // 4) A new focus has been set, however the target isn't the one the touch event wanted
+    void 0;
+    tapTouchFocusedInput.focus();
+    tapTouchFocusedInput = null;
+  }
+  ionic.scroll.isScrolling = false;
+}
+
+function tapFocusOut() {
+  tapActiveElement(null);
+}
+
+function tapActiveElement(ele) {
+  if(arguments.length) {
+    tapActiveEle = ele;
+  }
+  return tapActiveEle || document.activeElement;
+}
+
+function tapHasPointerMoved(endEvent) {
+  if(!endEvent || !tapPointerStart || ( tapPointerStart.x === 0 && tapPointerStart.y === 0 )) {
+    return false;
+  }
+  var endCoordinates = getPointerCoordinates(endEvent);
+
+  return Math.abs(tapPointerStart.x - endCoordinates.x) > TAP_RELEASE_TOLERANCE ||
+         Math.abs(tapPointerStart.y - endCoordinates.y) > TAP_RELEASE_TOLERANCE;
+}
+
+function getPointerCoordinates(event) {
+  // This method can get coordinates for both a mouse click
+  // or a touch depending on the given event
+  var c = { x:0, y:0 };
+  if(event) {
+    var touches = event.touches && event.touches.length ? event.touches : [event];
+    var e = (event.changedTouches && event.changedTouches[0]) || touches[0];
+    if(e) {
+      c.x = e.clientX || e.pageX || 0;
+      c.y = e.clientY || e.pageY || 0;
+    }
+  }
+  return c;
+}
+
+function tapContainingElement(ele, allowSelf) {
+  var climbEle = ele;
+  for(var x=0; x<6; x++) {
+    if(!climbEle) break;
+    if(climbEle.tagName === 'LABEL') return climbEle;
+    climbEle = ele.parentElement;
+  }
+  if(allowSelf !== false) return ele;
+}
+
+function tapTargetElement(ele) {
+  if(ele && ele.tagName === 'LABEL') {
+    if(ele.control) return ele.control;
+
+    // older devices do not support the "control" property
+    if(ele.querySelector) {
+      var control = ele.querySelector('input,textarea,select');
+      if(control) return control;
+    }
+  }
+  return ele;
+}
+
+ionic.DomUtil.ready(function(){
+  ionic.tap.register(document);
+});
 
 (function(document, ionic) {
   'use strict';
@@ -2609,26 +2908,26 @@ window.ionic = {
   var activeElements = {};  // elements that are currently active
   var keyId = 0;            // a counter for unique keys for the above ojects
   var ACTIVATED_CLASS = 'activated';
-  var touchMoveClearTimer;
 
   ionic.activator = {
 
     start: function(e) {
-      clearTimeout(touchMoveClearTimer);
+      var self = this;
 
       // when an element is touched/clicked, it climbs up a few
       // parents to see if it is an .item or .button element
       ionic.requestAnimationFrame(function(){
+        if ( ionic.tap.requiresNativeClick(e.target) ) return;
         var ele = e.target;
         var eleToActivate;
 
         for(var x=0; x<4; x++) {
-          if(!ele) break;
+          if(!ele || ele.nodeType !== 1) break;
           if(eleToActivate && ele.classList.contains('item')) {
             eleToActivate = ele;
             break;
           }
-          if( ele.tagName == 'A' || ele.tagName == 'BUTTON' || ele.getAttribute('ng-click') ) {
+          if( ele.tagName == 'A' || ele.tagName == 'BUTTON' || ele.hasAttribute('ng-click') ) {
             eleToActivate = ele;
           }
           if( ele.classList.contains('button') ) {
@@ -2643,15 +2942,9 @@ window.ionic = {
           queueElements[keyId] = eleToActivate;
 
           // in XX milliseconds, set the queued elements to active
-          // add listeners to clear all queued/active elements onMove
           if(e.type === 'touchstart') {
-            document.body.removeEventListener('mousedown', ionic.activator.start);
-            touchMoveClearTimer = setTimeout(function(){
-              document.body.addEventListener('touchmove', onTouchMove, false);
-            }, 80);
-            setTimeout(activateElements, 80);
+            self._activateTimeout = setTimeout(activateElements, 80);
           } else {
-            document.body.addEventListener('mousemove', clear, false);
             ionic.requestAnimationFrame(activateElements);
           }
 
@@ -2659,8 +2952,23 @@ window.ionic = {
         }
 
       });
+    },
+
+    end: function() {
+      // clear out any active/queued elements after XX milliseconds
+      clearTimeout(this._activateTimeout);
+      setTimeout(clear, 200);
     }
+
   };
+
+  function clear() {
+    // clear out any elements that are queued to be set to active
+    queueElements = {};
+
+    // in the next frame, remove the active class from all active elements
+    ionic.requestAnimationFrame(deactivateElements);
+  }
 
   function activateElements() {
     // activate all elements in the queue
@@ -2681,43 +2989,6 @@ window.ionic = {
       }
     }
   }
-
-  function onTouchMove(e) {
-    if( ionic.tap.hasTouchScrolled(e) ) {
-      clear();
-    }
-  }
-
-  function onEnd(e) {
-    // clear out any active/queued elements after XX milliseconds
-    setTimeout(clear, 200);
-  }
-
-  function clear() {
-    clearTimeout(touchMoveClearTimer);
-
-    // clear out any elements that are queued to be set to active
-    queueElements = {};
-
-    // in the next frame, remove the active class from all active elements
-    ionic.requestAnimationFrame(deactivateElements);
-
-    // remove onMove listeners that clear out active elements
-    document.body.removeEventListener('mousemove', clear);
-    document.body.removeEventListener('touchmove', clear);
-  }
-
-  // use window.onload because this doesn't need to run immediately
-  window.addEventListener('load', function(){
-    // start an active element
-    document.body.addEventListener('touchstart', ionic.activator.start, false);
-    document.body.addEventListener('mousedown', ionic.activator.start, false);
-
-    // clear all active elements after XX milliseconds
-    document.body.addEventListener('touchend', onEnd, false);
-    document.body.addEventListener('mouseup', onEnd, false);
-    document.body.addEventListener('touchcancel', onEnd, false);
-  }, false);
 
 })(document, ionic);
 
@@ -2840,7 +3111,7 @@ window.ionic = {
       // `parent`'s constructor function.
       var Surrogate = function(){ this.constructor = child; };
       Surrogate.prototype = parent.prototype;
-      child.prototype = new Surrogate;
+      child.prototype = new Surrogate();
 
       // Add prototype properties (instance properties) to the subclass,
       // if supplied.
@@ -2907,57 +3178,410 @@ window.ionic = {
 
 })(window.ionic);
 
-(function(ionic) {
 
-ionic.Platform.ready(function() {
-  if (ionic.Platform.is('android')) {
-    androidKeyboardFix();
+/*
+IONIC KEYBOARD
+---------------
+
+*/
+
+var keyboardViewportHeight = window.innerHeight;
+var keyboardIsOpen;
+var keyboardActiveElement;
+var keyboardFocusOutTimer;
+var keyboardFocusInTimer;
+var keyboardLastShow = 0;
+
+var KEYBOARD_OPEN_CSS = 'keyboard-open';
+var SCROLL_CONTAINER_CSS = 'scroll';
+
+ionic.keyboard = {
+  isOpen: false,
+  height: null,
+  landscape: false,
+};
+
+function keyboardInit() {
+  if( keyboardHasPlugin() ) {
+    window.addEventListener('native.showkeyboard', keyboardNativeShow);
+    window.addEventListener('native.hidekeyboard', keyboardFocusOut);
   }
-});
+  else {
+    document.body.addEventListener('focusout', keyboardFocusOut);
+  }
 
-function androidKeyboardFix() {
-  var rememberedDeviceWidth = window.innerWidth;
-  var rememberedDeviceHeight = window.innerHeight;
-  var keyboardHeight;
+  document.body.addEventListener('ionic.focusin', keyboardBrowserFocusIn);
+  document.body.addEventListener('focusin', keyboardBrowserFocusIn);
 
-  window.addEventListener('resize', resize);
+  document.body.addEventListener('orientationchange', keyboardOrientationChange);
 
-  function resize() {
+  document.removeEventListener('touchstart', keyboardInit);
+}
 
-    //If the width of the window changes, we have an orientation change
-    if (rememberedDeviceWidth !== window.innerWidth) {
-      rememberedDeviceWidth = window.innerWidth;
-      rememberedDeviceHeight = window.innerHeight;
-      void 0;
+function keyboardNativeShow(e) {
+  clearTimeout(keyboardFocusOutTimer);
+  ionic.keyboard.height = e.keyboardHeight;
+}
 
-    //If the height changes, and it's less than before, we have a keyboard open
-    } else if (rememberedDeviceHeight !== window.innerHeight &&
-               window.innerHeight < rememberedDeviceHeight) {
-      document.body.classList.add('footer-hide');
-      //Wait for next frame so document.activeElement is set
-      ionic.requestAnimationFrame(handleKeyboardChange);
-    } else {
-      //Otherwise we have a keyboard close or a *really* weird resize
-      document.body.classList.remove('footer-hide');
-    }
+function keyboardBrowserFocusIn(e) {
+  if( !e.target || !ionic.tap.isTextInput(e.target) || !keyboardIsWithinScroll(e.target) ) return;
 
-    function handleKeyboardChange() {
-      //keyboard opens
-      keyboardHeight = rememberedDeviceHeight - window.innerHeight;
-      var activeEl = document.activeElement;
-      if (activeEl) {
-        //This event is caught by the nearest parent scrollView
-        //of the activeElement
-        ionic.trigger('scrollChildIntoView', {
-          target: activeEl
-        }, true);
+  document.addEventListener('keydown', keyboardOnKeyDown, false);
+
+  document.body.scrollTop = 0;
+  document.body.querySelector('.scroll-content').scrollTop = 0;
+
+  keyboardActiveElement = e.target;
+
+  keyboardSetShow(e);
+}
+
+function keyboardSetShow(e) {
+  clearTimeout(keyboardFocusInTimer);
+  clearTimeout(keyboardFocusOutTimer);
+
+  keyboardFocusInTimer = setTimeout(function(){
+    if ( keyboardLastShow + 350 > Date.now() ) return;
+    keyboardLastShow = Date.now();
+    var keyboardHeight;
+    var elementBounds = keyboardActiveElement.getBoundingClientRect();
+    var count = 0;
+
+    var pollKeyboardHeight = setInterval(function(){
+
+      keyboardHeight = keyboardGetHeight();
+      if (count > 10){
+        clearInterval(pollKeyboardHeight);
+        //waited long enough, just guess
+        keyboardHeight = 275;
       }
+      if (keyboardHeight){
+        keyboardShow(e.target, elementBounds.top, elementBounds.bottom, keyboardViewportHeight, keyboardHeight);
+        clearInterval(pollKeyboardHeight);
+      }
+      count++;
 
-    }
+    }, 100);
+  }, 32);
+}
+
+function keyboardShow(element, elementTop, elementBottom, viewportHeight, keyboardHeight) {
+  var details = {
+    target: element,
+    elementTop: Math.round(elementTop),
+    elementBottom: Math.round(elementBottom),
+    keyboardHeight: keyboardHeight
+  };
+
+  details.hasPlugin = keyboardHasPlugin();
+
+  details.contentHeight = viewportHeight - keyboardHeight;
+
+  void 0;
+
+  // distance from top of input to the top of the keyboard
+  details.keyboardTopOffset = details.elementTop - details.contentHeight;
+
+  void 0;
+
+  // figure out if the element is under the keyboard
+  details.isElementUnderKeyboard = (details.elementBottom > details.contentHeight);
+
+  ionic.keyboard.isOpen = true;
+
+  // send event so the scroll view adjusts
+  keyboardActiveElement = element;
+  ionic.trigger('scrollChildIntoView', details, true);
+
+  ionic.requestAnimationFrame(function(){
+    document.body.classList.add(KEYBOARD_OPEN_CSS);
+  });
+
+  // any showing part of the document that isn't within the scroll the user
+  // could touchmove and cause some ugly changes to the app, so disable
+  // any touchmove events while the keyboard is open using e.preventDefault()
+  document.addEventListener('touchmove', keyboardPreventDefault, false);
+
+  return details;
+}
+
+function keyboardFocusOut(e) {
+  clearTimeout(keyboardFocusOutTimer);
+
+  keyboardFocusOutTimer = setTimeout(keyboardHide, 350);
+}
+
+function keyboardHide() {
+  void 0;
+  ionic.keyboard.isOpen = false;
+
+  ionic.trigger('resetScrollView', {
+    target: keyboardActiveElement
+  }, true);
+
+  ionic.requestAnimationFrame(function(){
+    document.body.classList.remove(KEYBOARD_OPEN_CSS);
+  });
+
+  // the keyboard is gone now, remove the touchmove that disables native scroll
+  document.removeEventListener('touchmove', keyboardPreventDefault);
+  document.removeEventListener('keydown', keyboardOnKeyDown);
+}
+
+function keyboardUpdateViewportHeight() {
+  if( window.innerHeight > keyboardViewportHeight ) {
+    keyboardViewportHeight = window.innerHeight;
   }
 }
 
-})(window.ionic);
+function keyboardOnKeyDown(e) {
+  if( ionic.scroll.isScrolling ) {
+    keyboardPreventDefault(e);
+  }
+}
+
+function keyboardPreventDefault(e) {
+  if( e.target.tagName !== 'TEXTAREA' ) {
+    e.preventDefault();
+  }
+}
+
+function keyboardOrientationChange() {
+  var updatedViewportHeight = window.innerHeight;
+
+  //too slow, have to wait for updated height
+  if (updatedViewportHeight === keyboardViewportHeight){
+    var count = 0;
+    var pollViewportHeight = setInterval(function(){
+      //give up
+      if (count > 10){
+        clearInterval(pollViewportHeight);
+      }
+
+      updatedViewportHeight = window.innerHeight;
+
+      if (updatedViewportHeight !== keyboardViewportHeight){
+        if (updatedViewportHeight < keyboardViewportHeight){
+          ionic.keyboard.landscape = true;
+        }
+        else {
+          ionic.keyboard.landscape = false;
+        }
+        keyboardViewportHeight = updatedViewportHeight;
+        clearInterval(pollViewportHeight);
+      }
+      count++;
+
+    }, 50);
+  }
+  else {
+    keyboardViewportHeight = updatedViewportHeight;
+  }
+}
+
+function keyboardGetHeight() {
+  // check if we are already have a keyboard height from the plugin
+  if ( ionic.keyboard.height ) {
+    return ionic.keyboard.height;
+  }
+
+  if ( ionic.Platform.isAndroid() ){
+    //should be using the plugin, no way to know how big the keyboard is, so guess
+    if ( ionic.Platform.isFullScreen ){
+      return 275;
+    }
+    //otherwise, wait for the screen to resize
+    if ( window.innerHeight < keyboardViewportHeight ){
+      return keyboardViewportHeight - window.innerHeight;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  // fallback for when its the webview without the plugin
+  // or for just the standard web browser
+  if( ionic.Platform.isIOS() ) {
+    if ( ionic.keyboard.landscape ){
+      return 206;
+    }
+
+    if (!ionic.Platform.isWebView()){
+      return 216;
+    }
+
+    return 260;
+  }
+
+  // safe guess
+  return 275;
+}
+
+function keyboardIsWithinScroll(ele) {
+  while(ele) {
+    if(ele.classList.contains(SCROLL_CONTAINER_CSS)) {
+      return true;
+    }
+    ele = ele.parentElement;
+  }
+  return false;
+}
+
+function keyboardHasPlugin() {
+  return !!(window.cordova && cordova.plugins && cordova.plugins.Keyboard);
+}
+
+ionic.Platform.ready(function() {
+  keyboardUpdateViewportHeight();
+
+  // Android sometimes reports bad innerHeight on window.load
+  // try it again in a lil bit to play it safe
+  setTimeout(keyboardUpdateViewportHeight, 999);
+
+  // only initialize the adjustments for the virtual keyboard
+  // if a touchstart event happens
+  document.addEventListener('touchstart', keyboardInit, false);
+});
+
+
+
+var viewportTag;
+var viewportProperties = {};
+
+ionic.viewport = {
+  orientation: function() {
+    // 0 = Portrait
+    // 90 = Landscape
+    // not using window.orientation because each device has a different implementation
+    return (window.innerWidth > window.innerHeight ? 90 : 0);
+  }
+};
+
+function viewportLoadTag() {
+  var x;
+
+  for(x=0; x<document.head.children.length; x++) {
+    if(document.head.children[x].name == 'viewport') {
+      viewportTag = document.head.children[x];
+      break;
+    }
+  }
+
+  if(viewportTag) {
+    var props = viewportTag.content.toLowerCase().replace(/\s+/g, '').split(',');
+    var keyValue;
+    for(x=0; x<props.length; x++) {
+      if(props[x]) {
+        keyValue = props[x].split('=');
+        viewportProperties[ keyValue[0] ] = (keyValue.length > 1 ? keyValue[1] : '_');
+      }
+    }
+    viewportUpdate();
+  }
+}
+
+function viewportUpdate() {
+  // unit tests in viewport.unit.js
+
+  var initWidth = viewportProperties.width;
+  var initHeight = viewportProperties.height;
+  var p = ionic.Platform;
+  var version = p.version();
+  var DEVICE_WIDTH = 'device-width';
+  var DEVICE_HEIGHT = 'device-height';
+  var orientation = ionic.viewport.orientation();
+
+  // Most times we're removing the height and adding the width
+  // So this is the default to start with, then modify per platform/version/oreintation
+  delete viewportProperties.height;
+  viewportProperties.width = DEVICE_WIDTH;
+
+  if( p.isIPad() ) {
+    // iPad
+
+    if( version > 7 ) {
+      // iPad >= 7.1
+      // https://issues.apache.org/jira/browse/CB-4323
+      delete viewportProperties.width;
+
+    } else {
+      // iPad <= 7.0
+
+      if( p.isWebView() ) {
+        // iPad <= 7.0 WebView
+
+        if( orientation == 90 ) {
+          // iPad <= 7.0 WebView Landscape
+          viewportProperties.height = '0';
+
+        } else if(version == 7) {
+          // iPad <= 7.0 WebView Portait
+          viewportProperties.height = DEVICE_HEIGHT;
+        }
+      } else {
+        // iPad <= 6.1 Browser
+        if(version < 7) {
+          viewportProperties.height = '0';
+        }
+      }
+    }
+
+  } else if( p.isIOS() ) {
+    // iPhone
+
+    if( p.isWebView() ) {
+      // iPhone WebView
+
+      if(version > 7) {
+        // iPhone >= 7.1 WebView
+        delete viewportProperties.width;
+
+      } else if(version < 7) {
+        // iPhone <= 6.1 WebView
+        // if height was set it needs to get removed with this hack for <= 6.1
+        if( initHeight ) viewportProperties.height = '0';
+
+      } else if(version == 7) {
+        //iPhone == 7.0 WebView
+        viewportProperties.height = DEVICE_HEIGHT;
+      }
+
+    } else {
+      // iPhone Browser
+
+      if (version < 7) {
+        // iPhone <= 6.1 Browser
+        // if height was set it needs to get removed with this hack for <= 6.1
+        if( initHeight ) viewportProperties.height = '0';
+      }
+    }
+
+  }
+
+  // only update the viewport tag if there was a change
+  if(initWidth !== viewportProperties.width || initHeight !== viewportProperties.height) {
+    viewportTagUpdate();
+  }
+}
+
+function viewportTagUpdate() {
+  var key, props = [];
+  for(key in viewportProperties) {
+    if( viewportProperties[key] ) {
+      props.push(key + (viewportProperties[key] == '_' ? '' : '=' + viewportProperties[key]) );
+    }
+  }
+
+  viewportTag.content = props.join(', ');
+}
+
+ionic.Platform.ready(function() {
+  viewportLoadTag();
+
+  window.addEventListener("orientationchange", function(){
+    setTimeout(viewportUpdate, 1000);
+  }, false);
+});
 
 (function(ionic) {
 'use strict';
@@ -2987,6 +3611,8 @@ function androidKeyboardFix() {
  * License: MIT + Apache (V2)
  */
 
+/* jshint eqnull: true */
+
 /**
  * Generic animation class with support for dropped frames both optional easing and duration.
  *
@@ -2997,219 +3623,212 @@ function androidKeyboardFix() {
  * rendering. This eases a lot of cases where it might be pretty complex to break down a state
  * based on the pure time difference.
  */
+var zyngaCore = { effect: {} };
 (function(global) {
-	var time = Date.now || function() {
-		return +new Date();
-	};
-	var desiredFrames = 60;
-	var millisecondsPerSecond = 1000;
-	var running = {};
-	var counter = 1;
+  var time = Date.now || function() {
+    return +new Date();
+  };
+  var desiredFrames = 60;
+  var millisecondsPerSecond = 1000;
+  var running = {};
+  var counter = 1;
 
-	// Create namespaces
-	if (!global.core) {
-		var core = global.core = { effect : {} };
+  zyngaCore.effect.Animate = {
 
-	} else if (!core.effect) {
-		core.effect = {};
-	}
+    /**
+     * A requestAnimationFrame wrapper / polyfill.
+     *
+     * @param callback {Function} The callback to be invoked before the next repaint.
+     * @param root {HTMLElement} The root element for the repaint
+     */
+    requestAnimationFrame: (function() {
 
-	core.effect.Animate = {
+      // Check for request animation Frame support
+      var requestFrame = global.requestAnimationFrame || global.webkitRequestAnimationFrame || global.mozRequestAnimationFrame || global.oRequestAnimationFrame;
+      var isNative = !!requestFrame;
 
-		/**
-		 * A requestAnimationFrame wrapper / polyfill.
-		 *
-		 * @param callback {Function} The callback to be invoked before the next repaint.
-		 * @param root {HTMLElement} The root element for the repaint
-		 */
-		requestAnimationFrame: (function() {
+      if (requestFrame && !/requestAnimationFrame\(\)\s*\{\s*\[native code\]\s*\}/i.test(requestFrame.toString())) {
+        isNative = false;
+      }
 
-			// Check for request animation Frame support
-			var requestFrame = global.requestAnimationFrame || global.webkitRequestAnimationFrame || global.mozRequestAnimationFrame || global.oRequestAnimationFrame;
-			var isNative = !!requestFrame;
+      if (isNative) {
+        return function(callback, root) {
+          requestFrame(callback, root);
+        };
+      }
 
-			if (requestFrame && !/requestAnimationFrame\(\)\s*\{\s*\[native code\]\s*\}/i.test(requestFrame.toString())) {
-				isNative = false;
-			}
+      var TARGET_FPS = 60;
+      var requests = {};
+      var requestCount = 0;
+      var rafHandle = 1;
+      var intervalHandle = null;
+      var lastActive = +new Date();
 
-			if (isNative) {
-				return function(callback, root) {
-					requestFrame(callback, root)
-				};
-			}
+      return function(callback, root) {
+        var callbackHandle = rafHandle++;
 
-			var TARGET_FPS = 60;
-			var requests = {};
-			var requestCount = 0;
-			var rafHandle = 1;
-			var intervalHandle = null;
-			var lastActive = +new Date();
+        // Store callback
+        requests[callbackHandle] = callback;
+        requestCount++;
 
-			return function(callback, root) {
-				var callbackHandle = rafHandle++;
+        // Create timeout at first request
+        if (intervalHandle === null) {
 
-				// Store callback
-				requests[callbackHandle] = callback;
-				requestCount++;
+          intervalHandle = setInterval(function() {
 
-				// Create timeout at first request
-				if (intervalHandle === null) {
+            var time = +new Date();
+            var currentRequests = requests;
 
-					intervalHandle = setInterval(function() {
+            // Reset data structure before executing callbacks
+            requests = {};
+            requestCount = 0;
 
-						var time = +new Date();
-						var currentRequests = requests;
+            for(var key in currentRequests) {
+              if (currentRequests.hasOwnProperty(key)) {
+                currentRequests[key](time);
+                lastActive = time;
+              }
+            }
 
-						// Reset data structure before executing callbacks
-						requests = {};
-						requestCount = 0;
+            // Disable the timeout when nothing happens for a certain
+            // period of time
+            if (time - lastActive > 2500) {
+              clearInterval(intervalHandle);
+              intervalHandle = null;
+            }
 
-						for(var key in currentRequests) {
-							if (currentRequests.hasOwnProperty(key)) {
-								currentRequests[key](time);
-								lastActive = time;
-							}
-						}
+          }, 1000 / TARGET_FPS);
+        }
 
-						// Disable the timeout when nothing happens for a certain
-						// period of time
-						if (time - lastActive > 2500) {
-							clearInterval(intervalHandle);
-							intervalHandle = null;
-						}
+        return callbackHandle;
+      };
 
-					}, 1000 / TARGET_FPS);
-				}
-
-				return callbackHandle;
-			};
-
-		})(),
+    })(),
 
 
-		/**
-		 * Stops the given animation.
-		 *
-		 * @param id {Integer} Unique animation ID
-		 * @return {Boolean} Whether the animation was stopped (aka, was running before)
-		 */
-		stop: function(id) {
-			var cleared = running[id] != null;
-			if (cleared) {
-				running[id] = null;
-			}
+    /**
+     * Stops the given animation.
+     *
+     * @param id {Integer} Unique animation ID
+     * @return {Boolean} Whether the animation was stopped (aka, was running before)
+     */
+    stop: function(id) {
+      var cleared = running[id] != null;
+      if (cleared) {
+        running[id] = null;
+      }
 
-			return cleared;
-		},
-
-
-		/**
-		 * Whether the given animation is still running.
-		 *
-		 * @param id {Integer} Unique animation ID
-		 * @return {Boolean} Whether the animation is still running
-		 */
-		isRunning: function(id) {
-			return running[id] != null;
-		},
+      return cleared;
+    },
 
 
-		/**
-		 * Start the animation.
-		 *
-		 * @param stepCallback {Function} Pointer to function which is executed on every step.
-		 *   Signature of the method should be `function(percent, now, virtual) { return continueWithAnimation; }`
-		 * @param verifyCallback {Function} Executed before every animation step.
-		 *   Signature of the method should be `function() { return continueWithAnimation; }`
-		 * @param completedCallback {Function}
-		 *   Signature of the method should be `function(droppedFrames, finishedAnimation) {}`
-		 * @param duration {Integer} Milliseconds to run the animation
-		 * @param easingMethod {Function} Pointer to easing function
-		 *   Signature of the method should be `function(percent) { return modifiedValue; }`
-		 * @param root {Element} Render root, when available. Used for internal
-		 *   usage of requestAnimationFrame.
-		 * @return {Integer} Identifier of animation. Can be used to stop it any time.
-		 */
-		start: function(stepCallback, verifyCallback, completedCallback, duration, easingMethod, root) {
+    /**
+     * Whether the given animation is still running.
+     *
+     * @param id {Integer} Unique animation ID
+     * @return {Boolean} Whether the animation is still running
+     */
+    isRunning: function(id) {
+      return running[id] != null;
+    },
 
-			var start = time();
-			var lastFrame = start;
-			var percent = 0;
-			var dropCounter = 0;
-			var id = counter++;
 
-			if (!root) {
-				root = document.body;
-			}
+    /**
+     * Start the animation.
+     *
+     * @param stepCallback {Function} Pointer to function which is executed on every step.
+     *   Signature of the method should be `function(percent, now, virtual) { return continueWithAnimation; }`
+     * @param verifyCallback {Function} Executed before every animation step.
+     *   Signature of the method should be `function() { return continueWithAnimation; }`
+     * @param completedCallback {Function}
+     *   Signature of the method should be `function(droppedFrames, finishedAnimation) {}`
+     * @param duration {Integer} Milliseconds to run the animation
+     * @param easingMethod {Function} Pointer to easing function
+     *   Signature of the method should be `function(percent) { return modifiedValue; }`
+     * @param root {Element} Render root, when available. Used for internal
+     *   usage of requestAnimationFrame.
+     * @return {Integer} Identifier of animation. Can be used to stop it any time.
+     */
+    start: function(stepCallback, verifyCallback, completedCallback, duration, easingMethod, root) {
 
-			// Compacting running db automatically every few new animations
-			if (id % 20 === 0) {
-				var newRunning = {};
-				for (var usedId in running) {
-					newRunning[usedId] = true;
-				}
-				running = newRunning;
-			}
+      var start = time();
+      var lastFrame = start;
+      var percent = 0;
+      var dropCounter = 0;
+      var id = counter++;
 
-			// This is the internal step method which is called every few milliseconds
-			var step = function(virtual) {
+      if (!root) {
+        root = document.body;
+      }
 
-				// Normalize virtual value
-				var render = virtual !== true;
+      // Compacting running db automatically every few new animations
+      if (id % 20 === 0) {
+        var newRunning = {};
+        for (var usedId in running) {
+          newRunning[usedId] = true;
+        }
+        running = newRunning;
+      }
 
-				// Get current time
-				var now = time();
+      // This is the internal step method which is called every few milliseconds
+      var step = function(virtual) {
 
-				// Verification is executed before next animation step
-				if (!running[id] || (verifyCallback && !verifyCallback(id))) {
+        // Normalize virtual value
+        var render = virtual !== true;
 
-					running[id] = null;
-					completedCallback && completedCallback(desiredFrames - (dropCounter / ((now - start) / millisecondsPerSecond)), id, false);
-					return;
+        // Get current time
+        var now = time();
 
-				}
+        // Verification is executed before next animation step
+        if (!running[id] || (verifyCallback && !verifyCallback(id))) {
 
-				// For the current rendering to apply let's update omitted steps in memory.
-				// This is important to bring internal state variables up-to-date with progress in time.
-				if (render) {
+          running[id] = null;
+          completedCallback && completedCallback(desiredFrames - (dropCounter / ((now - start) / millisecondsPerSecond)), id, false);
+          return;
 
-					var droppedFrames = Math.round((now - lastFrame) / (millisecondsPerSecond / desiredFrames)) - 1;
-					for (var j = 0; j < Math.min(droppedFrames, 4); j++) {
-						step(true);
-						dropCounter++;
-					}
+        }
 
-				}
+        // For the current rendering to apply let's update omitted steps in memory.
+        // This is important to bring internal state variables up-to-date with progress in time.
+        if (render) {
 
-				// Compute percent value
-				if (duration) {
-					percent = (now - start) / duration;
-					if (percent > 1) {
-						percent = 1;
-					}
-				}
+          var droppedFrames = Math.round((now - lastFrame) / (millisecondsPerSecond / desiredFrames)) - 1;
+          for (var j = 0; j < Math.min(droppedFrames, 4); j++) {
+            step(true);
+            dropCounter++;
+          }
 
-				// Execute step callback, then...
-				var value = easingMethod ? easingMethod(percent) : percent;
-				if ((stepCallback(value, now, render) === false || percent === 1) && render) {
-					running[id] = null;
-					completedCallback && completedCallback(desiredFrames - (dropCounter / ((now - start) / millisecondsPerSecond)), id, percent === 1 || duration == null);
-				} else if (render) {
-					lastFrame = now;
-					core.effect.Animate.requestAnimationFrame(step, root);
-				}
-			};
+        }
 
-			// Mark as running
-			running[id] = true;
+        // Compute percent value
+        if (duration) {
+          percent = (now - start) / duration;
+          if (percent > 1) {
+            percent = 1;
+          }
+        }
 
-			// Init first step
-			core.effect.Animate.requestAnimationFrame(step, root);
+        // Execute step callback, then...
+        var value = easingMethod ? easingMethod(percent) : percent;
+        if ((stepCallback(value, now, render) === false || percent === 1) && render) {
+          running[id] = null;
+          completedCallback && completedCallback(desiredFrames - (dropCounter / ((now - start) / millisecondsPerSecond)), id, percent === 1 || duration == null);
+        } else if (render) {
+          lastFrame = now;
+          zyngaCore.effect.Animate.requestAnimationFrame(step, root);
+        }
+      };
 
-			// Return unique animation ID
-			return id;
-		}
-	};
+      // Mark as running
+      running[id] = true;
+
+      // Init first step
+      zyngaCore.effect.Animate.requestAnimationFrame(step, root);
+
+      // Return unique animation ID
+      return id;
+    }
+  };
 })(this);
 
 /*
@@ -3229,28 +3848,28 @@ function androidKeyboardFix() {
 var Scroller;
 
 (function(ionic) {
-	var NOOP = function(){};
+  var NOOP = function(){};
 
-	// Easing Equations (c) 2003 Robert Penner, all rights reserved.
-	// Open source under the BSD License.
+  // Easing Equations (c) 2003 Robert Penner, all rights reserved.
+  // Open source under the BSD License.
 
-	/**
-	 * @param pos {Number} position between 0 (start of effect) and 1 (end of effect)
-	**/
-	var easeOutCubic = function(pos) {
-		return (Math.pow((pos - 1), 3) + 1);
-	};
+  /**
+   * @param pos {Number} position between 0 (start of effect) and 1 (end of effect)
+  **/
+  var easeOutCubic = function(pos) {
+    return (Math.pow((pos - 1), 3) + 1);
+  };
 
-	/**
-	 * @param pos {Number} position between 0 (start of effect) and 1 (end of effect)
-	**/
-	var easeInOutCubic = function(pos) {
-		if ((pos /= 0.5) < 1) {
-			return 0.5 * Math.pow(pos, 3);
-		}
+  /**
+   * @param pos {Number} position between 0 (start of effect) and 1 (end of effect)
+  **/
+  var easeInOutCubic = function(pos) {
+    if ((pos /= 0.5) < 1) {
+      return 0.5 * Math.pow(pos, 3);
+    }
 
-		return 0.5 * (Math.pow((pos - 2), 3) + 2);
-	};
+    return 0.5 * (Math.pow((pos - 2), 3) + 2);
+  };
 
 
 /**
@@ -3276,7 +3895,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
       }
     });
 
-		this.options = {
+    this.options = {
 
       /** Disable scrolling on x-axis by default */
       scrollingX: false,
@@ -3344,18 +3963,48 @@ ionic.views.Scroll = ionic.views.View.inherit({
       penetrationAcceleration : 0.08,
 
       // The ms interval for triggering scroll events
-      scrollEventInterval: 50
+      scrollEventInterval: 10,
+
+      getContentWidth: function() {
+        return Math.max(self.__content.scrollWidth, self.__content.offsetWidth);
+      },
+      getContentHeight: function() {
+        return Math.max(self.__content.scrollHeight, self.__content.offsetHeight);
+      }
 		};
 
-		for (var key in options) {
-			this.options[key] = options[key];
-		}
+    for (var key in options) {
+      this.options[key] = options[key];
+    }
 
     this.hintResize = ionic.debounce(function() {
       self.resize();
     }, 1000, true);
 
+    this.onScroll = function() {
+
+      if(!ionic.scroll.isScrolling) {
+        setTimeout(self.setScrollStart, 50);
+      } else {
+        clearTimeout(self.scrollTimer);
+        self.scrollTimer = setTimeout(self.setScrollStop, 80);
+      }
+
+    };
+
+    this.setScrollStart = function() {
+      ionic.scroll.isScrolling = Math.abs(ionic.scroll.lastTop - self.__scrollTop) > 1;
+      clearTimeout(self.scrollTimer);
+      self.scrollTimer = setTimeout(self.setScrollStop, 80);
+    };
+
+    this.setScrollStop = function() {
+      ionic.scroll.isScrolling = false;
+      ionic.scroll.lastTop = self.__scrollTop;
+    };
+
     this.triggerScrollEvent = ionic.throttle(function() {
+      self.onScroll();
       ionic.trigger('scroll', {
         scrollTop: self.__scrollTop,
         scrollLeft: self.__scrollLeft,
@@ -3376,7 +4025,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
     // Get the render update function, initialize event handlers,
     // and calculate the size of the scroll container
-		this.__callback = this.getRenderFn();
+    this.__callback = this.getRenderFn();
     this.__initEventHandlers();
     this.__createScrollbars();
 
@@ -3387,7 +4036,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
     // Fade them out
     this.__fadeScrollbars('out', this.options.scrollbarResizeFadeDelay);
-	},
+  },
 
 
 
@@ -3572,18 +4221,41 @@ ionic.views.Scroll = ionic.views.View.inherit({
     //Broadcasted when keyboard is shown on some platforms.
     //See js/utils/keyboard.js
     container.addEventListener('scrollChildIntoView', function(e) {
-      var deviceHeight = window.innerHeight;
-      var element = e.target;
-      var elementHeight = e.target.offsetHeight;
-
-      //getBoundingClientRect() will actually give us position relative to the viewport
-      var elementDeviceTop = element.getBoundingClientRect().top;
-      var elementScrollTop = ionic.DomUtil.getPositionInParent(element, container).top;
+      if( !self.isScrolledIntoView ) {
+        // shrink scrollview so we can actually scroll if the input is hidden
+        // if it isn't shrink so we can scroll to inputs under the keyboard
+        if (ionic.Platform.isIOS() || ionic.Platform.isFullScreen){
+          container.style.height = (container.clientHeight - e.detail.keyboardHeight) + "px";
+          container.style.overflow = "visible";
+          //update scroll view
+          self.resize();
+        }
+        self.isScrolledIntoView = true;
+      }
 
       //If the element is positioned under the keyboard...
-      if (elementDeviceTop + elementHeight > deviceHeight) {
+      if( e.detail.isElementUnderKeyboard ) {
+        var delay;
+        // Wait on android for scroll view to resize
+        if ( !ionic.Platform.isFullScreen && e.detail.hasPlugin ) {
+          delay = 350;
+        }
+        else {
+          delay = 80;
+        }
+
         //Put element in middle of visible screen
-        self.scrollTo(0, elementScrollTop + elementHeight - (deviceHeight * 0.5), true);
+        //Wait for resize() to reset scroll position
+        ionic.scroll.isScrolling = true;
+        setTimeout(function(){
+          //middle of the scrollview, where we want to scroll to
+          var scrollViewMidpointOffset = container.clientHeight * 0.5;
+          var scrollTop = e.detail.keyboardTopOffset + scrollViewMidpointOffset;
+          void 0;
+          ionic.tap.cloneFocusedInput(container, self);
+          self.scrollBy(0, scrollTop, true);
+          self.onScroll();
+        }, delay);
       }
 
       //Only the first scrollView parent of the element that broadcasted this event
@@ -3591,39 +4263,106 @@ ionic.views.Scroll = ionic.views.View.inherit({
       e.stopPropagation();
     });
 
-    function shouldIgnorePress(e) {
-      return e.target.tagName.match(/input|textarea|select|object|embed/i) ||
-             e.target.isContentEditable ||
-             (e.target.dataset ? e.target.dataset.preventScroll : e.target.getAttribute('data-prevent-default') == 'true');
-    }
+    container.addEventListener('resetScrollView', function(e) {
+      //return scrollview to original height once keyboard has hidden
+      self.isScrolledIntoView = false;
+      container.style.height = "";
+      container.style.overflow = "";
+      self.resize();
+      ionic.scroll.isScrolling = false;
+    });
 
-    if ('ontouchstart' in window) {
 
-      container.addEventListener("touchstart", function(e) {
-        if (e.defaultPrevented || shouldIgnorePress(e)) {
-          return;
-        }
+    self.touchStart = function(e) {
+      self.startCoordinates = getPointerCoordinates(e);
+
+      if ( ionic.tap.ignoreScrollStart(e) ) {
+        return;
+      }
+
+      if( ionic.tap.containsOrIsTextInput(e.target) || e.target.tagName === 'SELECT' ) {
+        // do not start if the target is a text input
+        // if there is a touchmove on this input, then we can start the scroll
+        self.__hasStarted = false;
+        return;
+      }
+
+      self.__isSelectable = true;
+      self.__enableScrollY = true;
+      self.__hasStarted = true;
+      self.doTouchStart(e.touches, e.timeStamp);
+      e.preventDefault();
+    };
+
+    self.touchMove = function(e) {
+      if(e.defaultPrevented ||
+        (e.target.tagName === 'TEXTAREA' && e.target.parentElement.querySelector(':focus')) ) {
+        return;
+      }
+
+      if( !self.__hasStarted && ( ionic.tap.containsOrIsTextInput(e.target) || e.target.tagName === 'SELECT' ) ) {
+        // the target is a text input and scroll has started
+        // since the text input doesn't start on touchStart, do it here
+        self.__hasStarted = true;
         self.doTouchStart(e.touches, e.timeStamp);
         e.preventDefault();
-      }, false);
+        return;
+      }
 
-      document.addEventListener("touchmove", function(e) {
-        if(e.defaultPrevented) {
-          return;
+      if(self.startCoordinates) {
+        // we have start coordinates, so get this touch move's current coordinates
+        var currentCoordinates = getPointerCoordinates(e);
+
+        if( self.__isSelectable &&
+            ionic.tap.isTextInput(e.target) &&
+            Math.abs(self.startCoordinates.x - currentCoordinates.x) > 20 ) {
+          // user slid the text input's caret on its x axis, disable any future y scrolling
+          self.__enableScrollY = false;
+          self.__isSelectable = true;
         }
-        self.doTouchMove(e.touches, e.timeStamp);
-      }, false);
 
-      document.addEventListener("touchend", function(e) {
-        self.doTouchEnd(e.timeStamp);
-      }, false);
+        if( self.__enableScrollY && Math.abs(self.startCoordinates.y - currentCoordinates.y) > 10 ) {
+          // user scrolled the entire view on the y axis
+          // disabled being able to select text on an input
+          // hide the input which has focus, and show a cloned one that doesn't have focus
+          self.__isSelectable = false;
+          ionic.tap.cloneFocusedInput(container, self);
+        }
+      }
+
+      self.doTouchMove(e.touches, e.timeStamp, e.scale);
+    };
+
+    self.touchEnd = function(e) {
+      self.doTouchEnd(e.timeStamp);
+      self.__hasStarted = false;
+      self.__isSelectable = true;
+      self.__enableScrollY = true;
+
+      if( !self.__isDragging && !self.__isDecelerating && !self.__isAnimating ) {
+        ionic.tap.removeClonedInputs(container, self);
+      }
+    };
+
+    self.options.orgScrollingComplete = self.options.scrollingComplete;
+    self.options.scrollingComplete = function() {
+      ionic.tap.removeClonedInputs(container, self);
+      self.options.orgScrollingComplete();
+    };
+
+
+    if ('ontouchstart' in window) {
+      container.addEventListener("touchstart", self.touchStart, false);
+      document.addEventListener("touchmove", self.touchMove, false);
+      document.addEventListener("touchend", self.touchEnd, false);
+      document.addEventListener("touchcancel", self.touchEnd, false);
 
     } else {
 
       var mousedown = false;
 
       container.addEventListener("mousedown", function(e) {
-        if (e.defaultPrevented || shouldIgnorePress(e)) {
+        if ( ionic.tap.ignoreScrollStart(e) || e.target.tagName === 'SELECT' ) {
           return;
         }
         self.doTouchStart([{
@@ -3666,11 +4405,14 @@ ionic.views.Scroll = ionic.views.View.inherit({
         self.__fadeScrollbars('out');
       }, 100, false);
 
-      document.addEventListener("mousewheel", function(e) {
-        wheelShowBarFn();
-        self.scrollBy(e.wheelDeltaX/self.options.wheelDampen, -e.wheelDeltaY/self.options.wheelDampen);
-        wheelHideBarFn();
-      });
+      //For Firefox
+      document.addEventListener('mousewheel', onMouseWheel);
+    }
+    function onMouseWheel(e) {
+      self.hintResize();
+      wheelShowBarFn();
+      self.scrollBy(e.wheelDeltaX/self.options.wheelDampen, -e.wheelDeltaY/self.options.wheelDampen);
+      wheelHideBarFn();
     }
   },
 
@@ -3881,8 +4623,8 @@ ionic.views.Scroll = ionic.views.View.inherit({
     this.setDimensions(
     	this.__container.clientWidth,
     	this.__container.clientHeight,
-    	Math.max(this.__content.scrollWidth, this.__content.offsetWidth),
-      Math.max(this.__content.scrollHeight, this.__content.offsetHeight)
+      this.options.getContentWidth(),
+      this.options.getContentHeight()
     );
   },
   /*
@@ -3896,7 +4638,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
     var content = this.__content;
 
-	  var docStyle = document.documentElement.style;
+    var docStyle = document.documentElement.style;
 
     var engine;
     if ('MozAppearance' in docStyle) {
@@ -3927,28 +4669,34 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
     if (helperElem.style[perspectiveProperty] !== undef) {
 
-      return function(left, top, zoom) {
-        content.style[transformProperty] = 'translate3d(' + (-left) + 'px,' + (-top) + 'px,0)';
+      return function(left, top, zoom, wasResize) {
+        content.style[transformProperty] = 'translate3d(' + (-left) + 'px,' + (-top) + 'px,0) scale(' + zoom + ')';
         self.__repositionScrollbars();
-        self.triggerScrollEvent();
+        if(!wasResize) {
+          self.triggerScrollEvent();
+        }
       };
 
     } else if (helperElem.style[transformProperty] !== undef) {
 
-      return function(left, top, zoom) {
-        content.style[transformProperty] = 'translate(' + (-left) + 'px,' + (-top) + 'px)';
+      return function(left, top, zoom, wasResize) {
+        content.style[transformProperty] = 'translate(' + (-left) + 'px,' + (-top) + 'px) scale(' + zoom + ')';
         self.__repositionScrollbars();
-        self.triggerScrollEvent();
+        if(!wasResize) {
+          self.triggerScrollEvent();
+        }
       };
 
     } else {
 
-      return function(left, top, zoom) {
+      return function(left, top, zoom, wasResize) {
         content.style.marginLeft = left ? (-left/zoom) + 'px' : '';
         content.style.marginTop = top ? (-top/zoom) + 'px' : '';
         content.style.zoom = zoom || '';
         self.__repositionScrollbars();
-        self.triggerScrollEvent();
+        if(!wasResize) {
+          self.triggerScrollEvent();
+        }
       };
 
     }
@@ -3966,7 +4714,6 @@ ionic.views.Scroll = ionic.views.View.inherit({
    * @param contentHeight {Integer} Outer height of inner element
    */
   setDimensions: function(clientWidth, clientHeight, contentWidth, contentHeight) {
-
     var self = this;
 
     // Only update values which are defined
@@ -3991,7 +4738,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
     self.__resizeScrollbars();
 
     // Refresh scroll position
-    self.scrollTo(self.__scrollLeft, self.__scrollTop, true);
+    self.scrollTo(self.__scrollLeft, self.__scrollTop, true, null, true);
 
   },
 
@@ -4135,7 +4882,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
     // Stop deceleration
     if (self.__isDecelerating) {
-      core.effect.Animate.stop(self.__isDecelerating);
+      zyngaCore.effect.Animate.stop(self.__isDecelerating);
       self.__isDecelerating = false;
     }
 
@@ -4205,13 +4952,12 @@ ionic.views.Scroll = ionic.views.View.inherit({
    * @param animate {Boolean} Whether the scrolling should happen using an animation
    * @param zoom {Number} Zoom level to go to
    */
-  scrollTo: function(left, top, animate, zoom) {
-
+  scrollTo: function(left, top, animate, zoom, wasResize) {
     var self = this;
 
     // Stop deceleration
     if (self.__isDecelerating) {
-      core.effect.Animate.stop(self.__isDecelerating);
+      zyngaCore.effect.Animate.stop(self.__isDecelerating);
       self.__isDecelerating = false;
     }
 
@@ -4274,7 +5020,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
     }
 
     // Publish new values
-    self.__publish(left, top, zoom, animate);
+    self.__publish(left, top, zoom, animate, wasResize);
 
   },
 
@@ -4343,14 +5089,14 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
     // Stop deceleration
     if (self.__isDecelerating) {
-      core.effect.Animate.stop(self.__isDecelerating);
+      zyngaCore.effect.Animate.stop(self.__isDecelerating);
       self.__isDecelerating = false;
       self.__interruptedAnimation = true;
     }
 
     // Stop animation
     if (self.__isAnimating) {
-      core.effect.Animate.stop(self.__isAnimating);
+      zyngaCore.effect.Animate.stop(self.__isAnimating);
       self.__isAnimating = false;
       self.__interruptedAnimation = true;
     }
@@ -4726,14 +5472,14 @@ ionic.views.Scroll = ionic.views.View.inherit({
    * @param top {Number} Top scroll position
    * @param animate {Boolean} Whether animation should be used to move to the new coordinates
    */
-  __publish: function(left, top, zoom, animate) {
+  __publish: function(left, top, zoom, animate, wasResize) {
 
     var self = this;
 
     // Remember whether we had an animation, then we try to continue based on the current "drive" of the animation
     var wasAnimating = self.__isAnimating;
     if (wasAnimating) {
-      core.effect.Animate.stop(wasAnimating);
+      zyngaCore.effect.Animate.stop(wasAnimating);
       self.__isAnimating = false;
     }
 
@@ -4762,7 +5508,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
           // Push values out
           if (self.__callback) {
-            self.__callback(self.__scrollLeft, self.__scrollTop, self.__zoomLevel);
+            self.__callback(self.__scrollLeft, self.__scrollTop, self.__zoomLevel, wasResize);
           }
 
         }
@@ -4786,7 +5532,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
       };
 
       // When continuing based on previous animation we choose an ease-out animation instead of ease-in-out
-      self.__isAnimating = core.effect.Animate.start(step, verify, completed, self.options.animationDuration, wasAnimating ? easeOutCubic : easeInOutCubic);
+      self.__isAnimating = zyngaCore.effect.Animate.start(step, verify, completed, self.options.animationDuration, wasAnimating ? easeOutCubic : easeInOutCubic);
 
     } else {
 
@@ -4796,7 +5542,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
       // Push values out
       if (self.__callback) {
-        self.__callback(left, top, zoom);
+        self.__callback(left, top, zoom, wasResize);
       }
 
       // Fix max scroll ranges
@@ -4821,7 +5567,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
     self.__maxScrollLeft = Math.max((self.__contentWidth * zoomLevel) - self.__clientWidth, 0);
     self.__maxScrollTop = Math.max((self.__contentHeight * zoomLevel) - self.__clientHeight, 0);
 
-    if(!self.__didWaitForSize && self.__maxScrollLeft == 0 && self.__maxScrollTop == 0) {
+    if(!self.__didWaitForSize && !self.__maxScrollLeft && !self.__maxScrollTop) {
       self.__didWaitForSize = true;
       self.__waitForSize();
     }
@@ -4840,7 +5586,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
     var sizer = function() {
       self.resize();
 
-      if((self.options.scrollingX && self.__maxScrollLeft == 0) || (self.options.scrollingY && self.__maxScrollTop == 0)) {
+      if((self.options.scrollingX && !self.__maxScrollLeft) || (self.options.scrollingY && !self.__maxScrollTop)) {
         //self.__sizerTimeout = setTimeout(sizer, 1000);
       }
     };
@@ -4918,7 +5664,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
     };
 
     // Start animation and switch on flag
-    self.__isDecelerating = core.effect.Animate.start(step, verify, completed);
+    self.__isDecelerating = zyngaCore.effect.Animate.start(step, verify, completed);
 
   },
 
@@ -5051,6 +5797,11 @@ ionic.views.Scroll = ionic.views.View.inherit({
   }
 });
 
+ionic.scroll = {
+  isScrolling: false,
+  lastTop: 0
+};
+
 })(ionic);
 
 (function(ionic) {
@@ -5104,40 +5855,44 @@ ionic.views.Scroll = ionic.views.View.inherit({
         return;
       }
 
-      var i, c, childSize;
-      var childNodes = this.el.childNodes;
-      var leftWidth = 0;
-      var rightWidth = 0;
-      var isCountingRightWidth = false;
+      var self = this;
+      //We have to rAF here so all of the elements have time to initialize
+      ionic.requestAnimationFrame(function() {
+        var i, c, childSize;
+        var childNodes = self.el.childNodes;
+        var leftWidth = 0;
+        var rightWidth = 0;
+        var isCountingRightWidth = false;
 
-      // Compute how wide the left children are
-      // Skip all titles (there may still be two titles, one leaving the dom)
-      // Once we encounter a titleEl, realize we are now counting the right-buttons, not left
-      for(i = 0; i < childNodes.length; i++) {
-        c = childNodes[i];
-        if (c.tagName && c.tagName.toLowerCase() == 'h1') {
-          isCountingRightWidth = true;
-          continue;
-        }
+        // Compute how wide the left children are
+        // Skip all titles (there may still be two titles, one leaving the dom)
+        // Once we encounter a titleEl, realize we are now counting the right-buttons, not left
+        for(i = 0; i < childNodes.length; i++) {
+          c = childNodes[i];
+          if (c.tagName && c.tagName.toLowerCase() == 'h1') {
+            isCountingRightWidth = true;
+            continue;
+          }
 
-        childSize = null;
-        if(c.nodeType == 3) {
-          childSize = ionic.DomUtil.getTextBounds(c);
-        } else if(c.nodeType == 1) {
-          childSize = c.getBoundingClientRect();
-        }
-        if(childSize) {
-          if (isCountingRightWidth) {
-            rightWidth += childSize.width;
-          } else {
-            leftWidth += childSize.width;
+          childSize = null;
+          if(c.nodeType == 3) {
+            childSize = ionic.DomUtil.getTextBounds(c).width;
+          } else if(c.nodeType == 1) {
+            childSize = c.offsetWidth;
+          }
+          if(childSize) {
+            if (isCountingRightWidth) {
+              rightWidth += childSize;
+            } else {
+              leftWidth += childSize;
+            }
           }
         }
-      }
 
-      var self = this;
-      ionic.requestAnimationFrame(function() {
         var margin = Math.max(leftWidth, rightWidth) + 10;
+
+        //Reset left and right before setting again
+        titleEl.style.left = titleEl.style.right = '';
 
         // Size and align the header titleEl based on the sizes of the left and
         // right children, and the desired alignment mode
@@ -5352,6 +6107,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
   var ReorderDrag = function(opts) {
     this.dragThresholdY = opts.dragThresholdY || 0;
     this.onReorder = opts.onReorder;
+    this.listEl = opts.listEl;
     this.el = opts.el;
     this.scrollEl = opts.scrollEl;
     this.scrollView = opts.scrollView;
@@ -5360,7 +6116,10 @@ ionic.views.Scroll = ionic.views.View.inherit({
   ReorderDrag.prototype = new DragOp();
 
   ReorderDrag.prototype._moveElement = function(e) {
-    var y = e.gesture.center.pageY - this._currentDrag.elementHeight + this._currentDrag.scrollDelta;
+    var y = e.gesture.center.pageY -
+      this._currentDrag.elementHeight +
+      this.scrollView.getValues().top -
+      this.listEl.offsetTop;
     this.el.style[ionic.CSS.TRANSFORM] = 'translate3d(0, '+y+'px, 0)';
   };
 
@@ -5381,8 +6140,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
       startIndex: startIndex,
       placeholder: placeholder,
       scrollHeight: scroll,
-      list: placeholder.parentNode,
-      scrollDelta: 0
+      list: placeholder.parentNode
     };
 
     this._moveElement(e);
@@ -5409,12 +6167,10 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
       if (e.gesture.deltaY < 0 && pixelsPastTop > 0 && scrollY > 0) {
         this.scrollView.scrollBy(null, -pixelsPastTop);
-        this._currentDrag.scrollDelta -= pixelsPastTop;
       }
       if (e.gesture.deltaY > 0 && pixelsPastBottom > 0) {
         if (scrollY < this.scrollView.getScrollMax().top) {
           this.scrollView.scrollBy(null, pixelsPastBottom);
-          this._currentDrag.scrollDelta += pixelsPastBottom;
         }
       }
     }
@@ -5609,7 +6365,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
     // Return the list item from the given target
     _getItem: function(target) {
       while(target) {
-        if(target.classList.contains(ITEM_CLASS)) {
+        if(target.classList && target.classList.contains(ITEM_CLASS)) {
           return target;
         }
         target = target.parentNode;
@@ -5626,13 +6382,15 @@ ionic.views.Scroll = ionic.views.View.inherit({
       this._isDragging = false;
 
       var lastDragOp = this._lastDragOp;
+      var item;
 
       // Check if this is a reorder drag
       if(ionic.DomUtil.getParentOrSelfWithClass(e.target, ITEM_REORDER_BTN_CLASS) && (e.gesture.direction == 'up' || e.gesture.direction == 'down')) {
-        var item = this._getItem(e.target);
+        item = this._getItem(e.target);
 
         if(item) {
           this._dragOp = new ReorderDrag({
+            listEl: this.el,
             el: item,
             scrollEl: this.scrollEl,
             scrollView: this.scrollView,
@@ -5649,7 +6407,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
       else if(!this._didDragUpOrDown && (e.gesture.direction == 'left' || e.gesture.direction == 'right') && Math.abs(e.gesture.deltaX) > 5) {
 
         // Make sure this is an item with buttons
-        var item = this._getItem(e.target);
+        item = this._getItem(e.target);
         if(item && item.querySelector('.item-options')) {
           this._dragOp = new SlideDrag({ el: this.el, canSwipe: this.canSwipe });
           this._dragOp.start(e);
@@ -5711,63 +6469,6 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
 (function(ionic) {
 'use strict';
-  /**
-   * Loading
-   *
-   * The Loading is an overlay that can be used to indicate
-   * activity while blocking user interaction.
-   */
-  ionic.views.Loading = ionic.views.View.inherit({
-    initialize: function(opts) {
-      var _this = this;
-
-      this.el = opts.el;
-
-      this.maxWidth = opts.maxWidth || 200;
-
-      this.showDelay = opts.showDelay || 0;
-
-      this._loadingBox = this.el.querySelector('.loading') || this.el;
-    },
-    show: function() {
-      var _this = this;
-
-      if(this._loadingBox) {
-        var lb = _this._loadingBox;
-
-        var width = Math.min(_this.maxWidth, Math.max(window.outerWidth - 40, lb.offsetWidth));
-
-        lb.style.width = width + 'px';
-
-        lb.style.marginLeft = (-lb.offsetWidth) / 2 + 'px';
-        lb.style.marginTop = (-lb.offsetHeight) / 2 + 'px';
-
-        // Wait 'showDelay' ms before showing the loading screen
-        this._showDelayTimeout = window.setTimeout(function() {
-          _this.el.classList.add('active');
-        }, _this.showDelay);
-      }
-    },
-    hide: function() {
-      // Force a reflow so the animation will actually run
-      this.el.offsetWidth;
-
-      // Prevent unnecessary 'show' after 'hide' has already been called
-      window.clearTimeout(this._showDelayTimeout);
-
-      this.el.classList.remove('active');
-    },
-    setContent: function(html) {
-      if (this._loadingBox) {
-        this._loadingBox.innerHTML = html || '';
-      }
-    }
-  });
-
-})(ionic);
-
-(function(ionic) {
-'use strict';
 
   ionic.views.Modal = ionic.views.View.inherit({
     initialize: function(opts) {
@@ -5802,60 +6503,6 @@ ionic.views.Scroll = ionic.views.View.inherit({
             inputs[i].blur && inputs[i].blur();
           }
         });
-      }
-    }
-  });
-
-})(ionic);
-
-(function(ionic) {
-'use strict';
-
-  ionic.views.NavBar = ionic.views.View.inherit({
-    initialize: function(opts) {
-      this.el = opts.el;
-
-      this._titleEl = this.el.querySelector('.title');
-
-      if(opts.hidden) {
-        this.hide();
-      }
-    },
-    hide: function() {
-      this.el.classList.add('hidden');
-    },
-    show: function() {
-      this.el.classList.remove('hidden');
-    },
-    shouldGoBack: function() {},
-
-    setTitle: function(title) {
-      if(!this._titleEl) {
-        return;
-      }
-      this._titleEl.innerHTML = title;
-    },
-
-    showBackButton: function(shouldShow) {
-      var _this = this;
-
-      if(!this._currentBackButton) {
-        var back = document.createElement('a');
-        back.className = 'button back';
-        back.innerHTML = 'Back';
-
-        this._currentBackButton = back;
-        this._currentBackButton.onclick = function(event) {
-          _this.shouldGoBack && _this.shouldGoBack();
-        };
-      }
-
-      if(shouldShow && !this._currentBackButton.parentNode) {
-        // Prepend the back button
-        this.el.insertBefore(this._currentBackButton, this.el.firstChild);
-      } else if(!shouldShow && this._currentBackButton.parentNode) {
-        // Remove the back button if it's there
-        this._currentBackButton.parentNode.removeChild(this._currentBackButton);
       }
     }
   });
@@ -5947,9 +6594,11 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
 ionic.views.Slider = ionic.views.View.inherit({
   initialize: function (options) {
+    var slider = this;
+
     // utilities
     var noop = function() {}; // simple no operation function
-    var offloadFn = function(fn) { setTimeout(fn || noop, 0) }; // offload a functions execution
+    var offloadFn = function(fn) { setTimeout(fn || noop, 0); }; // offload a functions execution
 
     // check browser capabilities
     var browser = {
@@ -6128,11 +6777,11 @@ ionic.views.Slider = ionic.views.View.inherit({
 
       }
 
-      var start = +new Date;
+      var start = +new Date();
 
       var timer = setInterval(function() {
 
-        var timeElap = +new Date - start;
+        var timeElap = +new Date() - start;
 
         if (timeElap > speed) {
 
@@ -6190,8 +6839,8 @@ ionic.views.Slider = ionic.views.View.inherit({
         switch (event.type) {
           case 'mousedown': this.start(event); break;
           case 'touchstart': this.start(event); break;
-          case 'touchmove': this.move(event); break;
-          case 'mousemove': this.move(event); break;
+          case 'touchmove': this.touchmove(event); break;
+          case 'mousemove': this.touchmove(event); break;
           case 'touchend': offloadFn(this.end(event)); break;
           case 'mouseup': offloadFn(this.end(event)); break;
           case 'webkitTransitionEnd':
@@ -6217,7 +6866,7 @@ ionic.views.Slider = ionic.views.View.inherit({
           y: touches.pageY,
 
           // store time to determine touch duration
-          time: +new Date
+          time: +new Date()
 
         };
 
@@ -6237,10 +6886,15 @@ ionic.views.Slider = ionic.views.View.inherit({
           document.addEventListener('mouseup', this, false);
         }
       },
-      move: function(event) {
+      touchmove: function(event) {
 
         // ensure swiping with one touch and not pinching
-        if ( event.touches.length > 1 || event.scale && event.scale !== 1) return
+        // ensure sliding is enabled
+        if (event.touches.length > 1 ||
+            event.scale && event.scale !== 1 ||
+            slider.slideIsDisabled) {
+          return;
+        }
 
         if (options.disableScroll) event.preventDefault();
 
@@ -6250,7 +6904,7 @@ ionic.views.Slider = ionic.views.View.inherit({
         delta = {
           x: touches.pageX - start.x,
           y: touches.pageY - start.y
-        }
+        };
 
         // determine if scrolling test has run - one time test
         if ( typeof isScrolling == 'undefined') {
@@ -6277,9 +6931,9 @@ ionic.views.Slider = ionic.views.View.inherit({
 
             delta.x =
               delta.x /
-                ( (!index && delta.x > 0               // if first slide and sliding left
-                  || index == slides.length - 1        // or if last slide and sliding right
-                  && delta.x < 0                       // and if sliding at all
+                ( (!index && delta.x > 0 ||         // if first slide and sliding left
+                  index == slides.length - 1 &&     // or if last slide and sliding right
+                  delta.x < 0                       // and if sliding at all
                 ) ?
                 ( Math.abs(delta.x) / width + 1 )      // determine resistance level
                 : 1 );                                 // no resistance if false
@@ -6296,18 +6950,18 @@ ionic.views.Slider = ionic.views.View.inherit({
       end: function(event) {
 
         // measure duration
-        var duration = +new Date - start.time;
+        var duration = +new Date() - start.time;
 
         // determine if slide attempt triggers next/prev slide
         var isValidSlide =
-              Number(duration) < 250               // if slide duration is less than 250ms
-              && Math.abs(delta.x) > 20            // and if slide amt is greater than 20px
-              || Math.abs(delta.x) > width/2;      // or if slide amt is greater than half the width
+              Number(duration) < 250 &&         // if slide duration is less than 250ms
+              Math.abs(delta.x) > 20 ||         // and if slide amt is greater than 20px
+              Math.abs(delta.x) > width/2;      // or if slide amt is greater than half the width
 
         // determine if slide attempt is past start and end
         var isPastBounds =
-              !index && delta.x > 0                            // if first slide and slide amt is greater than 0
-              || index == slides.length - 1 && delta.x < 0;    // or if last slide and slide amt is less than 0
+              !index && delta.x > 0 |                    // if first slide and slide amt is greater than 0
+              index == slides.length - 1 && delta.x < 0; // or if last slide and slide amt is less than 0
 
         if (options.continuous) isPastBounds = false;
 
@@ -6373,11 +7027,11 @@ ionic.views.Slider = ionic.views.View.inherit({
 
         // kill touchmove and touchend event listeners until touchstart called again
         if(browser.touch) {
-          element.removeEventListener('touchmove', events, false)
-          element.removeEventListener('touchend', events, false)
+          element.removeEventListener('touchmove', events, false);
+          element.removeEventListener('touchend', events, false);
         } else {
-          element.removeEventListener('mousemove', events, false)
-          element.removeEventListener('mouseup', events, false)
+          element.removeEventListener('mousemove', events, false);
+          element.removeEventListener('mouseup', events, false);
           document.removeEventListener('mouseup', events, false);
         }
 
@@ -6394,7 +7048,7 @@ ionic.views.Slider = ionic.views.View.inherit({
 
       }
 
-    }
+    };
 
     // Public API
     this.update = function() {
@@ -6404,6 +7058,12 @@ ionic.views.Slider = ionic.views.View.inherit({
       setup();
     };
 
+    this.enableSlide = function(shouldEnable) {
+      if (arguments.length) {
+        this.slideIsDisabled = !shouldEnable;
+      }
+      return !this.slideIsDisabled;
+    },
     this.slide = function(to, speed) {
       // cancel slideshow
       stop();
@@ -6511,240 +7171,15 @@ ionic.views.Slider = ionic.views.View.inherit({
 
       } else {
 
-        window.onresize = function () { setup() }; // to play nice with old IE
+        window.onresize = function () { setup(); }; // to play nice with old IE
 
       }
-    }
+    };
 
   }
 });
 
 })(ionic);
-
-(function(ionic) {
-'use strict';
-
-ionic.views.TabBarItem = ionic.views.View.inherit({
-  initialize: function(el) {
-    this.el = el;
-
-    this._buildItem();
-  },
-
-  // Factory for creating an item from a given javascript object
-  create: function(itemData) {
-    var item = document.createElement('a');
-    item.className = 'tab-item';
-
-    // If there is an icon, add the icon element
-    if(itemData.icon) {
-      var icon = document.createElement('i');
-      icon.className = itemData.icon;
-      item.appendChild(icon);
-    }
-
-    // If there is a badge, add the badge element
-    if(itemData.badge) {
-      var badge = document.createElement('i');
-      badge.className = 'badge';
-      badge.innerHTML = itemData.badge;
-      item.appendChild(badge);
-      item.className = 'tab-item has-badge';
-    }
-
-    item.appendChild(document.createTextNode(itemData.title));
-
-    return new ionic.views.TabBarItem(item);
-  },
-
-  _buildItem: function() {
-    var _this = this, child, children = Array.prototype.slice.call(this.el.children);
-
-    for(var i = 0, j = children.length; i < j; i++) {
-      child = children[i];
-
-      // Test if this is a "i" tag with icon in the class name
-      // TODO: This heuristic might not be sufficient
-      if(child.tagName.toLowerCase() == 'i' && /icon/.test(child.className)) {
-        this.icon = child.className;
-      }
-
-      // Test if this is a "i" tag with badge in the class name
-      // TODO: This heuristic might not be sufficient
-      if(child.tagName.toLowerCase() == 'i' && /badge/.test(child.className)) {
-        this.badge = child.textContent.trim();
-      }
-    }
-
-    this.title = '';
-    for(i = 0, j = this.el.childNodes.length; i < j; i++) {
-      child = this.el.childNodes[i];
-
-      if (child.nodeName === "#text") {
-        this.title += child.nodeValue.trim();
-      }
-    }
-
-    this._tapHandler = function(e) {
-      _this.onTap && _this.onTap(e);
-    };
-
-    ionic.on('tap', this._tapHandler, this.el);
-  },
-  onTap: function(e) {
-  },
-
-  // Remove the event listeners from this object
-  destroy: function() {
-    ionic.off('tap', this._tapHandler, this.el);
-  },
-
-  getIcon: function() {
-    return this.icon;
-  },
-
-  getTitle: function() {
-    return this.title;
-  },
-
-  getBadge: function() {
-    return this.badge;
-  },
-
-  setSelected: function(isSelected) {
-    this.isSelected = isSelected;
-    if(isSelected) {
-      this.el.classList.add('active');
-    } else {
-      this.el.classList.remove('active');
-    }
-  }
-});
-
-ionic.views.TabBar = ionic.views.View.inherit({
-  initialize: function(opts) {
-    this.el = opts.el;
-     
-    this.items = [];
-
-    this._buildItems();
-  },
-  // get all the items for the TabBar
-  getItems: function() {
-    return this.items;
-  },
-
-  // Add an item to the tab bar
-  addItem: function(item) {
-    // Create a new TabItem
-    var tabItem = ionic.views.TabBarItem.prototype.create(item);
-
-    this.appendItemElement(tabItem);
-
-    this.items.push(tabItem);
-    this._bindEventsOnItem(tabItem);
-  },
-
-  appendItemElement: function(item) {
-    if(!this.el) {
-      return;
-    }
-    this.el.appendChild(item.el);
-  },
-
-  // Remove an item from the tab bar
-  removeItem: function(index) {
-    var item = this.items[index];
-    if(!item) {
-      return;
-    }
-    item.onTap = undefined;
-    item.destroy();
-  },
-
-  _bindEventsOnItem: function(item) {
-    var _this = this;
-
-    if(!this._itemTapHandler) {
-      this._itemTapHandler = function(e) {
-        //_this.selectItem(this);
-        _this.trySelectItem(this);
-      };
-    }
-    item.onTap = this._itemTapHandler;
-  },
-
-  // Get the currently selected item
-  getSelectedItem: function() {
-    return this.selectedItem;
-  },
-
-  // Set the currently selected item by index
-  setSelectedItem: function(index) {
-    this.selectedItem = this.items[index];
-
-    // Deselect all
-    for(var i = 0, j = this.items.length; i < j; i += 1) {
-      this.items[i].setSelected(false);
-    }
-
-    // Select the new item
-    if(this.selectedItem) {
-      this.selectedItem.setSelected(true);
-      //this.onTabSelected && this.onTabSelected(this.selectedItem, index);
-    }
-  },
-
-  // Select the given item assuming we can find it in our
-  // item list.
-  selectItem: function(item) {
-    for(var i = 0, j = this.items.length; i < j; i += 1) {
-      if(this.items[i] == item) {
-        this.setSelectedItem(i);
-        return;
-      }
-    }
-  },
-
-  // Try to select a given item. This triggers an event such
-  // that the view controller managing this tab bar can decide
-  // whether to select the item or cancel it.
-  trySelectItem: function(item) {
-    for(var i = 0, j = this.items.length; i < j; i += 1) {
-      if(this.items[i] == item) {
-        this.tryTabSelect && this.tryTabSelect(i);
-        return;
-      }
-    }
-  },
-
-  // Build the initial items list from the given DOM node.
-  _buildItems: function() {
-
-    var item, items = Array.prototype.slice.call(this.el.children);
-
-    for(var i = 0, j = items.length; i < j; i += 1) {
-      item =  new ionic.views.TabBarItem(items[i]);
-      this.items[i] = item;
-      this._bindEventsOnItem(item);
-    }
-  
-    if(this.items.length > 0) {
-      this.selectedItem = this.items[0];
-    }
-
-  },
-
-  // Destroy this tab bar
-  destroy: function() {
-    for(var i = 0, j = this.items.length; i < j; i += 1) {
-      this.items[i].destroy();
-    }
-    this.items.length = 0;
-  }
-});
-
-})(window.ionic);
 
 (function(ionic) {
 'use strict';
@@ -6820,6 +7255,7 @@ ionic.views.TabBar = ionic.views.View.inherit({
       e.gesture.srcEvent.preventDefault();
 
       ionic.requestAnimationFrame(function(amount) {
+        if (!self._dragInfo) { return; }
 
         var slidePageLeft = self.track.offsetLeft + (self.handle.offsetWidth / 2);
         var slidePageRight = self.track.offsetLeft + self.track.offsetWidth - (self.handle.offsetWidth / 2);
@@ -6906,159 +7342,6 @@ ionic.views.TabBar = ionic.views.View.inherit({
     destroy: function() {
     }
   });
-
-})(window.ionic);
-
-(function(ionic) {
-'use strict';
-
-/**
- * The NavController makes it easy to have a stack
- * of views or screens that can be pushed and popped
- * for a dynamic navigation flow. This API is modelled
- * off of the UINavigationController in iOS.
- *
- * The NavController can drive a nav bar to show a back button
- * if the stack can be poppped to go back to the last view, and
- * it will handle updating the title of the nav bar and processing animations.
- */
-ionic.controllers.NavController = ionic.controllers.ViewController.inherit({
-  initialize: function(opts) {
-    var _this = this;
-
-    this.navBar = opts.navBar;
-    this.content = opts.content;
-    this.controllers = opts.controllers || [];
-
-    this._updateNavBar();
-
-    // TODO: Is this the best way?
-    this.navBar.shouldGoBack = function() {
-      _this.pop();
-    };
-  },
-
-  /**
-   * @return {array} the array of controllers on the stack.
-   */
-  getControllers: function() {
-    return this.controllers;
-  },
-
-  /**
-   * @return {object} the controller at the top of the stack.
-   */
-  getTopController: function() {
-    return this.controllers[this.controllers.length-1];
-  },
-
-  /**
-   * Push a new controller onto the navigation stack. The new controller
-   * will automatically become the new visible view.
-   *
-   * @param {object} controller the controller to push on the stack.
-   */
-  push: function(controller) {
-    var last = this.controllers[this.controllers.length - 1];
-
-    this.controllers.push(controller);
-
-    // Indicate we are switching controllers
-    var shouldSwitch = this.switchingController && this.switchingController(controller) || true;
-
-    // Return if navigation cancelled
-    if(shouldSwitch === false)
-      return;
-
-    // Actually switch the active controllers
-    if(last) {
-      last.isVisible = false;
-      last.visibilityChanged && last.visibilityChanged('push');
-    }
-
-    // Grab the top controller on the stack
-    var next = this.controllers[this.controllers.length - 1];
-
-    next.isVisible = true;
-    // Trigger visibility change, but send 'first' if this is the first page
-    next.visibilityChanged && next.visibilityChanged(last ? 'push' : 'first');
-
-    this._updateNavBar();
-
-    return controller;
-  },
-
-  /**
-   * Pop the top controller off the stack, and show the last one. This is the
-   * "back" operation.
-   *
-   * @return {object} the last popped controller
-   */
-  pop: function() {
-    var next, last;
-
-    // Make sure we keep one on the stack at all times
-    if(this.controllers.length < 2) {
-      return;
-    }
-
-    // Grab the controller behind the top one on the stack
-    last = this.controllers.pop();
-    if(last) {
-      last.isVisible = false;
-      last.visibilityChanged && last.visibilityChanged('pop');
-    }
-    
-    // Remove the old one
-    //last && last.detach();
-
-    next = this.controllers[this.controllers.length - 1];
-
-    // TODO: No DOM stuff here
-    //this.content.el.appendChild(next.el);
-    next.isVisible = true;
-    next.visibilityChanged && next.visibilityChanged('pop');
-
-    // Switch to it (TODO: Animate or such things here)
-
-    this._updateNavBar();
-
-    return last;
-  },
-
-  /**
-   * Show the NavBar (if any)
-   */
-  showNavBar: function() {
-    if(this.navBar) {
-      this.navBar.show();
-    }
-  },
-
-  /**
-   * Hide the NavBar (if any)
-   */
-  hideNavBar: function() {
-    if(this.navBar) {
-      this.navBar.hide();
-    }
-  },
-
-  // Update the nav bar after a push or pop
-  _updateNavBar: function() {
-    if(!this.getTopController() || !this.navBar) {
-      return;
-    }
-
-    this.navBar.setTitle(this.getTopController().title);
-
-    if(this.controllers.length > 1) {
-      this.navBar.showBackButton(true);
-    } else {
-      this.navBar.showBackButton(false);
-    }
-  }
-});
 
 })(window.ionic);
 
@@ -7181,7 +7464,7 @@ ionic.controllers.NavController = ionic.controllers.ViewController.inherit({
     },
 
     isOpen: function() {
-      return this.getOpenRatio() == 1;
+      return this.getOpenAmount() !== 0;
     },
 
     /**
@@ -7369,148 +7652,5044 @@ ionic.controllers.NavController = ionic.controllers.ViewController.inherit({
 
 })(ionic);
 
+(function(window) {
+  var time = Date.now || function() {
+    return +new Date();
+  };
+  var desiredFrames = 60;
+  var millisecondsPerSecond = 1000;
+  var running = {};
+  var counter = 1;
+
+  // Namespace
+  ionic.Animation = {};
+
+  /**
+   * The main animation system manager. Treated as a singleton.
+   */
+  ionic.Animation = {
+    create: function(opts) {
+      return new ionic.Animation.Animation(opts);
+    },
+
+    animationStarted: function(instance) {
+      var id = counter++;
+
+      // Compacting running db automatically every few new animations
+      if (id % 20 === 0) {
+        var newRunning = {};
+        for (var usedId in running) {
+          newRunning[usedId] = true;
+        }
+        running = newRunning;
+      }
+
+      // Mark as running
+      running[id] = true;
+
+      instance.isRunning = true;
+      instance._animationId = id;
+
+      // Return unique animation ID
+      return id;
+    },
+
+    animationStopped: function(instance) {
+      instance.isRunning = false;
+    }
+
+    /* TODO: Move animation set management here instead of instance
+    anims: [],
+    add: function(animation) {
+      this.anims.push(animation);
+    },
+    remove: function(animation) {
+      var i, j;
+      for(i = 0, j = this.anims.length; i < j; i++) {
+        if(this.anims[i] === animation) {
+          return this.anims.splice(i, 1);
+        }
+      }
+    },
+    clear: function(shouldStop) {
+      while(this.anims.length) {
+        var anim = this.anims.pop();
+        if(shouldStop === true) {
+          anim.stop();
+        }
+      }
+    },
+    */
+
+    /**
+     * Stops the given animation.
+     *
+     * @param id {Integer} Unique animation ID
+     * @return {Boolean} Whether the animation was stopped (aka, was running before)
+     * TODO: Requires above fix
+    stop: function(id) {
+      var cleared = running[id] != null;
+      if (cleared) {
+        running[id] = null;
+      }
+
+      return cleared;
+    },
+     */
+
+
+    /**
+     * Whether the given animation is still running.
+     *
+     * @param id {Integer} Unique animation ID
+     * @return {Boolean} Whether the animation is still running
+    isRunning: function(id) {
+      return running[id] != null;
+    },
+     */
+
+  };
+
+  /**
+   * Animation instance
+   */
+  ionic.Animation.Animation = function(opts) {
+    ionic.extend(this, opts);
+
+    if(opts.useSlowAnimations) {
+      void 0;
+      this.delay *= 3;
+      this.duration *= 3;
+    }
+  };
+
+  ionic.Animation.Animation.prototype = {
+    el: null,
+    curve: 'linear',
+    duration: 500,
+    delay: 0,
+    repeat: -1,
+    reverse: false,
+    autoReverse: false,
+
+    step: function(percent) {},
+
+    stop: function() {
+      this.isRunning = false;
+      this.shouldEnd = true;
+    },
+    play: function() {
+      this.isPaused = false;
+      this.start();
+    },
+    pause: function() {
+      this.isPaused = true;
+    },
+    _saveState: function(percent, iteration, reverse) {
+      this._pauseState = {
+        percent: percent,
+        iteration: iteration,
+        reverse: reverse
+      };
+    },
+    restart: function() {
+    },
+
+    start: function() {
+      var self = this;
+
+      var tf;
+
+      void 0;
+
+
+      // Grab the timing function
+      if(typeof this.curve === 'string') {
+        tf = ionic.Animation.TimingFn[this.curve] || ionic.Animation.TimingFn.linear;
+      } else {
+        tf = this.curve;
+      }
+
+      // Get back a timing function for the given duration (used for precision)
+      tf = tf(this.duration);
+
+      // Set up the initial animation state
+      var animState = {
+        startPercent: this.reverse === true ? 1 : 0,
+        endPercent: this.reverse === true ? 0 : 1,
+        duration: this.duration,
+        easingMethod: tf,
+        delay: this.delay,
+        reverse: this.reverse,
+        repeat: this.repeat,
+        autoReverse: this.autoReverse
+      };
+
+
+      if(this._pauseState) {
+        // We were paused, so update the fields
+        ionic.extend(animState, this._pauseState);
+        this._pauseState = null;
+      }
+
+      ionic.Animation.animationStarted(this);
+
+      return this._run(function(percent, now, render) {
+        if(render) {
+          self.step(percent);
+        }
+      }, function(droppedFrames, finishedAnimation) {
+        ionic.Animation.animationStopped(self);
+        void 0;
+      }, animState);
+    },
+
+    /**
+     * Start the animation.
+     *
+     * @param stepCallback {Function} Pointer to function which is executed on every step.
+    *   Signature of the method should be `function(percent, now, virtual) { return continueWithAnimation; }`
+     * @param completedCallback {Function}
+     *   Signature of the method should be `function(droppedFrames, finishedAnimation) {}`
+     * @param duration {Integer} Milliseconds to run the animation
+     * @param easingMethod {Function} Pointer to easing function
+     *   Signature of the method should be `function(percent) { return modifiedValue; }`
+     * @return {Integer} Identifier of animation. Can be used to stop it any time.
+     */
+    _run: function(stepCallback, completedCallback, state) {
+
+      var self = this;
+      var start = time();
+      var lastFrame = start;
+      var startTime = start + state.delay;
+      var percent = state.startPercent;
+      var startPercent = state.startPercent;
+      var endPercent = state.endPercent;
+      var autoReverse = state.autoReverse;
+      var delay = state.delay;
+      var duration = state.duration;
+      var easingMethod = state.easingMethod;
+      var repeat = state.repeat;
+      var reverse = state.reverse;
+
+      var dropCounter = 0;
+      var iteration = 0;
+
+      var perhapsAutoreverse = function() {
+        // Check if we hit the end and should auto reverse
+        if(percent === endPercent && autoReverse) {
+          // Flip the start and end values
+          var sp = endPercent;
+          reverse = !reverse;
+          endPercent = startPercent;
+          startPercent = sp;
+
+          if(repeat === 0) {
+            autoReverse = false;
+          }
+        } else {
+          // Otherwise, just start over
+          percent = startPercent;
+        }
+        // Start fresh either way
+        start = time();
+        ionic.requestAnimationFrame(step);
+      };
+
+
+      // This is the internal step method which is called every few milliseconds
+      var step = function(virtual) {
+
+        // Normalize virtual value
+        var render = virtual !== true;
+
+        // Get current time
+        var now = time();
+        var diff = now - start;
+
+        // Verification is executed before next animation step
+        if(self.isPaused) {
+          self._saveState(percent, iteration, reverse);
+          return;
+        }
+
+        if (!self.isRunning) {// || (verifyCallback && !verifyCallback(id))) {
+
+          completedCallback && completedCallback(desiredFrames - (dropCounter / ((now - start) / millisecondsPerSecond)), self._animationId, false);
+          return;
+
+        }
+
+
+        // For the current rendering to apply let's update omitted steps in memory.
+        // This is important to bring internal state variables up-to-date with progress in time.
+        if (render) {
+
+          var droppedFrames = Math.round((now - lastFrame) / (millisecondsPerSecond / desiredFrames)) - 1;
+          for (var j = 0; j < Math.min(droppedFrames, 4); j++) {
+            step(true);
+            dropCounter++;
+          }
+
+        }
+
+        // Compute percent value
+        if (diff > delay && duration) {
+          percent = (diff - delay) / duration;
+          if(reverse === true) {
+            percent = 1 - percent;
+            if (percent < 0) {
+              percent = 0;
+            }
+          } else {
+            if (percent > 1) {
+              percent = 1;
+            }
+          }
+        }
+
+        // Execute step callback, then...
+        var value = easingMethod ? easingMethod(percent) : percent;
+        if ((stepCallback(value, now, render) === false || percent === endPercent) && render) {
+          if(repeat === -1) {
+            perhapsAutoreverse();
+          } else if(iteration < repeat) {
+            // Track iterations
+            iteration++;
+            perhapsAutoreverse();
+          } else if(repeat === 0 && autoReverse) {
+            perhapsAutoreverse();
+          } else {
+            completedCallback && completedCallback(desiredFrames - (dropCounter / ((now - start) / millisecondsPerSecond)), self._animationId, percent === endPercent || duration === null);
+          }
+        } else if (render) {
+          lastFrame = now;
+          ionic.requestAnimationFrame(step);
+        }
+      };
+
+
+      // Init first step
+      ionic.requestAnimationFrame(step);
+
+    }
+  };
+
+
+})(window);
+
+/*
+ * Copyright (C) 2008 Apple Inc. All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY APPLE INC. ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE INC. OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 (function(ionic) {
-'use strict';
+
+  var bezierCoord = function (x,y) {
+    if(!x) x=0;
+    if(!y) y=0;
+    return {x: x, y: y};
+  };
+
+  function B1(t) { return t*t*t; }
+  function B2(t) { return 3*t*t*(1-t); }
+  function B3(t) { return 3*t*(1-t)*(1-t); }
+  function B4(t) { return (1-t)*(1-t)*(1-t); }
+
+  ionic.Animation = ionic.Animation || {};
+
+
+  /**
+   * JavaScript port of Webkit implementation of CSS cubic-bezier(p1x.p1y,p2x,p2y) by http://mck.me
+   * http://svn.webkit.org/repository/webkit/trunk/Source/WebCore/platform/graphics/UnitBezier.h
+   */
+  ionic.Animation.Bezier = (function(){
+    'use strict';
+
+    /**
+     * Duration value to use when one is not specified (400ms is a common value).
+     * @const
+     * @type {number}
+     */
+    var DEFAULT_DURATION = 400;//ms
+
+    /**
+     * The epsilon value we pass to UnitBezier::solve given that the animation is going to run over |dur| seconds.
+     * The longer the animation, the more precision we need in the timing function result to avoid ugly discontinuities.
+     * http://svn.webkit.org/repository/webkit/trunk/Source/WebCore/page/animation/AnimationBase.cpp
+     */
+    var solveEpsilon = function(duration) {
+      return 1.0 / (200.0 * duration);
+    };
+
+    /**
+     * Defines a cubic-bezier curve given the middle two control points.
+     * NOTE: first and last control points are implicitly (0,0) and (1,1).
+     * @param p1x {number} X component of control point 1
+     * @param p1y {number} Y component of control point 1
+     * @param p2x {number} X component of control point 2
+     * @param p2y {number} Y component of control point 2
+     */
+    var unitBezier = function(p1x, p1y, p2x, p2y) {
+
+      // private members --------------------------------------------
+
+      // Calculate the polynomial coefficients, implicit first and last control points are (0,0) and (1,1).
+
+      /**
+       * X component of Bezier coefficient C
+       * @const
+       * @type {number}
+       */
+      var cx = 3.0 * p1x;
+
+      /**
+       * X component of Bezier coefficient B
+       * @const
+       * @type {number}
+       */
+      var bx = 3.0 * (p2x - p1x) - cx;
+
+      /**
+       * X component of Bezier coefficient A
+       * @const
+       * @type {number}
+       */
+      var ax = 1.0 - cx -bx;
+
+      /**
+       * Y component of Bezier coefficient C
+       * @const
+       * @type {number}
+       */
+      var cy = 3.0 * p1y;
+
+      /**
+       * Y component of Bezier coefficient B
+       * @const
+       * @type {number}
+       */
+      var by = 3.0 * (p2y - p1y) - cy;
+
+      /**
+       * Y component of Bezier coefficient A
+       * @const
+       * @type {number}
+       */
+      var ay = 1.0 - cy - by;
+
+      /**
+       * @param t {number} parametric timing value
+       * @return {number}
+       */
+      var sampleCurveX = function(t) {
+        // `ax t^3 + bx t^2 + cx t' expanded using Horner's rule.
+        return ((ax * t + bx) * t + cx) * t;
+      };
+
+      /**
+       * @param t {number} parametric timing value
+       * @return {number}
+       */
+      var sampleCurveY = function(t) {
+        return ((ay * t + by) * t + cy) * t;
+      };
+
+      /**
+       * @param t {number} parametric timing value
+       * @return {number}
+       */
+      var sampleCurveDerivativeX = function(t) {
+        return (3.0 * ax * t + 2.0 * bx) * t + cx;
+      };
+
+      /**
+       * Given an x value, find a parametric value it came from.
+       * @param x {number} value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param epsilon {number} accuracy limit of t for the given x
+       * @return {number} the t value corresponding to x
+       */
+      var solveCurveX = function(x, epsilon) {
+        var t0;
+        var t1;
+        var t2;
+        var x2;
+        var d2;
+        var i;
+
+        // First try a few iterations of Newton's method -- normally very fast.
+        for (t2 = x, i = 0; i < 8; i++) {
+          x2 = sampleCurveX(t2) - x;
+          if (Math.abs (x2) < epsilon) {
+            return t2;
+          }
+          d2 = sampleCurveDerivativeX(t2);
+          if (Math.abs(d2) < 1e-6) {
+            break;
+          }
+          t2 = t2 - x2 / d2;
+        }
+
+        // Fall back to the bisection method for reliability.
+        t0 = 0.0;
+        t1 = 1.0;
+        t2 = x;
+
+        if (t2 < t0) {
+          return t0;
+        }
+        if (t2 > t1) {
+          return t1;
+        }
+
+        while (t0 < t1) {
+          x2 = sampleCurveX(t2);
+          if (Math.abs(x2 - x) < epsilon) {
+            return t2;
+          }
+          if (x > x2) {
+            t0 = t2;
+          } else {
+            t1 = t2;
+          }
+          t2 = (t1 - t0) * 0.5 + t0;
+        }
+
+        // Failure.
+        return t2;
+      };
+
+      /**
+       * @param x {number} the value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param epsilon {number} the accuracy of t for the given x
+       * @return {number} the y value along the bezier curve
+       */
+      var solve = function(x, epsilon) {
+        return sampleCurveY(solveCurveX(x, epsilon));
+      };
+
+      // public interface --------------------------------------------
+
+      /**
+       * Find the y of the cubic-bezier for a given x with accuracy determined by the animation duration.
+       * @param x {number} the value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param duration {number} the duration of the animation in milliseconds
+       * @return {number} the y value along the bezier curve
+       */
+      return function(x, duration) {
+        return solve(x, solveEpsilon(+duration || DEFAULT_DURATION));
+      };
+    };
+
+    // http://www.w3.org/TR/css3-transitions/#transition-timing-function
+    return {
+      /**
+       * @param x {number} the value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param duration {number} the duration of the animation in milliseconds
+       * @return {number} the y value along the bezier curve
+       */
+      linear: unitBezier(0.0, 0.0, 1.0, 1.0),
+
+      /**
+       * @param x {number} the value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param duration {number} the duration of the animation in milliseconds
+       * @return {number} the y value along the bezier curve
+       */
+      ease: unitBezier(0.25, 0.1, 0.25, 1.0),
+
+      /**
+       * @param x {number} the value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param duration {number} the duration of the animation in milliseconds
+       * @return {number} the y value along the bezier curve
+       */
+      easeIn: unitBezier(0.42, 0, 1.0, 1.0),
+
+      /**
+       * @param x {number} the value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param duration {number} the duration of the animation in milliseconds
+       * @return {number} the y value along the bezier curve
+       */
+      easeOut: unitBezier(0, 0, 0.58, 1.0),
+
+      /**
+       * @param x {number} the value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param duration {number} the duration of the animation in milliseconds
+       * @return {number} the y value along the bezier curve
+       */
+      easeInOut: unitBezier(0.42, 0, 0.58, 1.0),
+
+      /**
+       * @param p1x {number} X component of control point 1
+       * @param p1y {number} Y component of control point 1
+       * @param p2x {number} X component of control point 2
+       * @param p2y {number} Y component of control point 2
+       * @param x {number} the value of x along the bezier curve, 0.0 <= x <= 1.0
+       * @param duration {number} the duration of the animation in milliseconds
+       * @return {number} the y value along the bezier curve
+       */
+      cubicBezier: function(p1x, p1y, p2x, p2y, x, duration) {
+        return unitBezier(p1x, p1y, p2x, p2y)(x, duration);
+      }
+    };
+  })();
 
 /**
- * The TabBarController handles a set of view controllers powered by a tab strip
- * at the bottom (or possibly top) of a screen.
- *
- * The API here is somewhat modelled off of UITabController in the sense that the
- * controllers actually define what the tab will look like (title, icon, etc.).
- *
- * Tabs shouldn't be interacted with through your own code. Instead, use the controller
- * methods which will power the tab bar.
+ * Various fast approximations and alternates to cubic-bezier easing functions.
+ * http://www.w3.org/TR/css3-transitions/#transition-timing-function
  */
-ionic.controllers.TabBarController = ionic.controllers.ViewController.inherit({
-  initialize: function(options) {
-    this.tabBar = options.tabBar;
+var Easing = (function(){
+	'use strict';
 
-    this._bindEvents();
+	/**
+	 * @const
+	 */
+	var EASE_IN_OUT_CONST = 0.5 * Math.pow(0.5, 1.925);
 
-    this.controllers = [];
+	return {
 
-    var controllers = options.controllers || [];
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		linear: function(x) {
+			return x;
+		},
 
-    for(var i = 0; i < controllers.length; i++) {
-      this.addController(controllers[i]);
+//		/**
+//		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+//		 * @return {number} the y value along the curve
+//		 */
+//		ease: function(x) {
+//			// TODO: find fast approximations
+//			return x;
+//		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeInApprox: function(x) {
+			// very close approximation to cubic-bezier(0.42, 0, 1.0, 1.0)
+			return Math.pow(x, 1.685);
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeInQuadratic: function(x) {
+			return (x * x);
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeInCubic: function(x) {
+			return (x * x * x);
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeOutApprox: function(x) {
+			// very close approximation to cubic-bezier(0, 0, 0.58, 1.0)
+			return 1 - Math.pow(1-x, 1.685);
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeOutQuadratic: function(x) {
+			x -= 1;
+			return 1 - (x * x);
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeOutCubic: function(x) {
+			x -= 1;
+			return 1 + (x * x * x);
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeInOutApprox: function(x) {
+			// very close approximation to cubic-bezier(0.42, 0, 0.58, 1.0)
+			if (x < 0.5) {
+				return EASE_IN_OUT_CONST * Math.pow(x, 1.925);
+
+			} else {
+				return 1 - EASE_IN_OUT_CONST * Math.pow(1-x, 1.925);
+			}
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeInOutQuadratic: function(x) {
+			if (x < 0.5) {
+				return (2 * x * x);
+
+			} else {
+				x -= 1;
+				return 1 - (2 * x * x);
+			}
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeInOutCubic: function(x) {
+			if (x < 0.5) {
+				return (4 * x * x * x);
+
+			} else {
+				x -= 1;
+				return 1 + (4 * x * x * x);
+			}
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeInOutQuartic: function(x) {
+			if (x < 0.5) {
+				return (8 * x * x * x * x);
+
+			} else {
+				x -= 1;
+				return 1 + (8 * x * x * x * x);
+			}
+		},
+
+		/**
+		 * @param x {number} the value of x along the curve, 0.0 <= x <= 1.0
+		 * @return {number} the y value along the curve
+		 */
+		easeInOutQuintic: function(x) {
+			if (x < 0.5) {
+				return (16 * x * x * x * x * x);
+
+			} else {
+				x -= 1;
+				return 1 + (16 * x * x * x * x * x);
+			}
+		}
+	};
+})();
+})(ionic);
+
+/**
+ * @fileoverview gl-matrix - High performance matrix and vector operations
+ * @author Brandon Jones
+ * @author Colin MacKenzie IV
+ * @version 2.2.1
+ */
+
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+
+(function(_global) {
+  "use strict";
+
+  var shim = {};
+  if (typeof(exports) === 'undefined') {
+    if(typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+      shim.exports = {};
+      define(function() {
+        return shim.exports;
+      });
+    } else {
+      // gl-matrix lives in a browser, define its namespaces in global
+      shim.exports = typeof(window) !== 'undefined' ? window : _global;
     }
+  }
+  else {
+    // gl-matrix lives in commonjs, define its namespaces in exports
+    shim.exports = exports;
+  }
 
-    // Bind or set our tabWillChange callback
-    this.controllerWillChange = options.controllerWillChange || function(controller) {};
-    this.controllerChanged = options.controllerChanged || function(controller) {};
+  (function(exports) {
+    /* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
 
-    // Try to select the first controller if we have one
-    this.setSelectedController(0);
-  },
-  // Start listening for events on our tab bar
-  _bindEvents: function() {
-    var _this = this;
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
 
-    this.tabBar.tryTabSelect = function(index) {
-      _this.setSelectedController(index);
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+
+if(!GLMAT_EPSILON) {
+    var GLMAT_EPSILON = 0.000001;
+}
+
+if(!GLMAT_ARRAY_TYPE) {
+    var GLMAT_ARRAY_TYPE = (typeof Float32Array !== 'undefined') ? Float32Array : Array;
+}
+
+if(!GLMAT_RANDOM) {
+    var GLMAT_RANDOM = Math.random;
+}
+
+/**
+ * @class Common utilities
+ * @name glMatrix
+ */
+var glMatrix = {};
+
+/**
+ * Sets the type of array used when creating new vectors and matricies
+ *
+ * @param {Type} type Array type, such as Float32Array or Array
+ */
+glMatrix.setMatrixArrayType = function(type) {
+    GLMAT_ARRAY_TYPE = type;
+};
+
+if(typeof(exports) !== 'undefined') {
+    exports.glMatrix = glMatrix;
+}
+
+var degree = Math.PI / 180;
+
+/**
+* Convert Degree To Radian
+*
+* @param {Number} Angle in Degrees
+*/
+glMatrix.toRadian = function(a){
+     return a * degree;
+}
+;
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+/**
+ * @class 2 Dimensional Vector
+ * @name vec2
+ */
+
+var vec2 = {};
+
+/**
+ * Creates a new, empty vec2
+ *
+ * @returns {vec2} a new 2D vector
+ */
+vec2.create = function() {
+    var out = new GLMAT_ARRAY_TYPE(2);
+    out[0] = 0;
+    out[1] = 0;
+    return out;
+};
+
+/**
+ * Creates a new vec2 initialized with values from an existing vector
+ *
+ * @param {vec2} a vector to clone
+ * @returns {vec2} a new 2D vector
+ */
+vec2.clone = function(a) {
+    var out = new GLMAT_ARRAY_TYPE(2);
+    out[0] = a[0];
+    out[1] = a[1];
+    return out;
+};
+
+/**
+ * Creates a new vec2 initialized with the given values
+ *
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @returns {vec2} a new 2D vector
+ */
+vec2.fromValues = function(x, y) {
+    var out = new GLMAT_ARRAY_TYPE(2);
+    out[0] = x;
+    out[1] = y;
+    return out;
+};
+
+/**
+ * Copy the values from one vec2 to another
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the source vector
+ * @returns {vec2} out
+ */
+vec2.copy = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    return out;
+};
+
+/**
+ * Set the components of a vec2 to the given values
+ *
+ * @param {vec2} out the receiving vector
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @returns {vec2} out
+ */
+vec2.set = function(out, x, y) {
+    out[0] = x;
+    out[1] = y;
+    return out;
+};
+
+/**
+ * Adds two vec2's
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {vec2} out
+ */
+vec2.add = function(out, a, b) {
+    out[0] = a[0] + b[0];
+    out[1] = a[1] + b[1];
+    return out;
+};
+
+/**
+ * Subtracts vector b from vector a
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {vec2} out
+ */
+vec2.subtract = function(out, a, b) {
+    out[0] = a[0] - b[0];
+    out[1] = a[1] - b[1];
+    return out;
+};
+
+/**
+ * Alias for {@link vec2.subtract}
+ * @function
+ */
+vec2.sub = vec2.subtract;
+
+/**
+ * Multiplies two vec2's
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {vec2} out
+ */
+vec2.multiply = function(out, a, b) {
+    out[0] = a[0] * b[0];
+    out[1] = a[1] * b[1];
+    return out;
+};
+
+/**
+ * Alias for {@link vec2.multiply}
+ * @function
+ */
+vec2.mul = vec2.multiply;
+
+/**
+ * Divides two vec2's
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {vec2} out
+ */
+vec2.divide = function(out, a, b) {
+    out[0] = a[0] / b[0];
+    out[1] = a[1] / b[1];
+    return out;
+};
+
+/**
+ * Alias for {@link vec2.divide}
+ * @function
+ */
+vec2.div = vec2.divide;
+
+/**
+ * Returns the minimum of two vec2's
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {vec2} out
+ */
+vec2.min = function(out, a, b) {
+    out[0] = Math.min(a[0], b[0]);
+    out[1] = Math.min(a[1], b[1]);
+    return out;
+};
+
+/**
+ * Returns the maximum of two vec2's
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {vec2} out
+ */
+vec2.max = function(out, a, b) {
+    out[0] = Math.max(a[0], b[0]);
+    out[1] = Math.max(a[1], b[1]);
+    return out;
+};
+
+/**
+ * Scales a vec2 by a scalar number
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the vector to scale
+ * @param {Number} b amount to scale the vector by
+ * @returns {vec2} out
+ */
+vec2.scale = function(out, a, b) {
+    out[0] = a[0] * b;
+    out[1] = a[1] * b;
+    return out;
+};
+
+/**
+ * Adds two vec2's after scaling the second operand by a scalar value
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @param {Number} scale the amount to scale b by before adding
+ * @returns {vec2} out
+ */
+vec2.scaleAndAdd = function(out, a, b, scale) {
+    out[0] = a[0] + (b[0] * scale);
+    out[1] = a[1] + (b[1] * scale);
+    return out;
+};
+
+/**
+ * Calculates the euclidian distance between two vec2's
+ *
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {Number} distance between a and b
+ */
+vec2.distance = function(a, b) {
+    var x = b[0] - a[0],
+        y = b[1] - a[1];
+    return Math.sqrt(x*x + y*y);
+};
+
+/**
+ * Alias for {@link vec2.distance}
+ * @function
+ */
+vec2.dist = vec2.distance;
+
+/**
+ * Calculates the squared euclidian distance between two vec2's
+ *
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {Number} squared distance between a and b
+ */
+vec2.squaredDistance = function(a, b) {
+    var x = b[0] - a[0],
+        y = b[1] - a[1];
+    return x*x + y*y;
+};
+
+/**
+ * Alias for {@link vec2.squaredDistance}
+ * @function
+ */
+vec2.sqrDist = vec2.squaredDistance;
+
+/**
+ * Calculates the length of a vec2
+ *
+ * @param {vec2} a vector to calculate length of
+ * @returns {Number} length of a
+ */
+vec2.length = function (a) {
+    var x = a[0],
+        y = a[1];
+    return Math.sqrt(x*x + y*y);
+};
+
+/**
+ * Alias for {@link vec2.length}
+ * @function
+ */
+vec2.len = vec2.length;
+
+/**
+ * Calculates the squared length of a vec2
+ *
+ * @param {vec2} a vector to calculate squared length of
+ * @returns {Number} squared length of a
+ */
+vec2.squaredLength = function (a) {
+    var x = a[0],
+        y = a[1];
+    return x*x + y*y;
+};
+
+/**
+ * Alias for {@link vec2.squaredLength}
+ * @function
+ */
+vec2.sqrLen = vec2.squaredLength;
+
+/**
+ * Negates the components of a vec2
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a vector to negate
+ * @returns {vec2} out
+ */
+vec2.negate = function(out, a) {
+    out[0] = -a[0];
+    out[1] = -a[1];
+    return out;
+};
+
+/**
+ * Normalize a vec2
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a vector to normalize
+ * @returns {vec2} out
+ */
+vec2.normalize = function(out, a) {
+    var x = a[0],
+        y = a[1];
+    var len = x*x + y*y;
+    if (len > 0) {
+        //TODO: evaluate use of glm_invsqrt here?
+        len = 1 / Math.sqrt(len);
+        out[0] = a[0] * len;
+        out[1] = a[1] * len;
+    }
+    return out;
+};
+
+/**
+ * Calculates the dot product of two vec2's
+ *
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {Number} dot product of a and b
+ */
+vec2.dot = function (a, b) {
+    return a[0] * b[0] + a[1] * b[1];
+};
+
+/**
+ * Computes the cross product of two vec2's
+ * Note that the cross product must by definition produce a 3D vector
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @returns {vec3} out
+ */
+vec2.cross = function(out, a, b) {
+    var z = a[0] * b[1] - a[1] * b[0];
+    out[0] = out[1] = 0;
+    out[2] = z;
+    return out;
+};
+
+/**
+ * Performs a linear interpolation between two vec2's
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the first operand
+ * @param {vec2} b the second operand
+ * @param {Number} t interpolation amount between the two inputs
+ * @returns {vec2} out
+ */
+vec2.lerp = function (out, a, b, t) {
+    var ax = a[0],
+        ay = a[1];
+    out[0] = ax + t * (b[0] - ax);
+    out[1] = ay + t * (b[1] - ay);
+    return out;
+};
+
+/**
+ * Generates a random vector with the given scale
+ *
+ * @param {vec2} out the receiving vector
+ * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
+ * @returns {vec2} out
+ */
+vec2.random = function (out, scale) {
+    scale = scale || 1.0;
+    var r = GLMAT_RANDOM() * 2.0 * Math.PI;
+    out[0] = Math.cos(r) * scale;
+    out[1] = Math.sin(r) * scale;
+    return out;
+};
+
+/**
+ * Transforms the vec2 with a mat2
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the vector to transform
+ * @param {mat2} m matrix to transform with
+ * @returns {vec2} out
+ */
+vec2.transformMat2 = function(out, a, m) {
+    var x = a[0],
+        y = a[1];
+    out[0] = m[0] * x + m[2] * y;
+    out[1] = m[1] * x + m[3] * y;
+    return out;
+};
+
+/**
+ * Transforms the vec2 with a mat2d
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the vector to transform
+ * @param {mat2d} m matrix to transform with
+ * @returns {vec2} out
+ */
+vec2.transformMat2d = function(out, a, m) {
+    var x = a[0],
+        y = a[1];
+    out[0] = m[0] * x + m[2] * y + m[4];
+    out[1] = m[1] * x + m[3] * y + m[5];
+    return out;
+};
+
+/**
+ * Transforms the vec2 with a mat3
+ * 3rd vector component is implicitly '1'
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the vector to transform
+ * @param {mat3} m matrix to transform with
+ * @returns {vec2} out
+ */
+vec2.transformMat3 = function(out, a, m) {
+    var x = a[0],
+        y = a[1];
+    out[0] = m[0] * x + m[3] * y + m[6];
+    out[1] = m[1] * x + m[4] * y + m[7];
+    return out;
+};
+
+/**
+ * Transforms the vec2 with a mat4
+ * 3rd vector component is implicitly '0'
+ * 4th vector component is implicitly '1'
+ *
+ * @param {vec2} out the receiving vector
+ * @param {vec2} a the vector to transform
+ * @param {mat4} m matrix to transform with
+ * @returns {vec2} out
+ */
+vec2.transformMat4 = function(out, a, m) {
+    var x = a[0],
+        y = a[1];
+    out[0] = m[0] * x + m[4] * y + m[12];
+    out[1] = m[1] * x + m[5] * y + m[13];
+    return out;
+};
+
+/**
+ * Perform some operation over an array of vec2s.
+ *
+ * @param {Array} a the array of vectors to iterate over
+ * @param {Number} stride Number of elements between the start of each vec2. If 0 assumes tightly packed
+ * @param {Number} offset Number of elements to skip at the beginning of the array
+ * @param {Number} count Number of vec2s to iterate over. If 0 iterates over entire array
+ * @param {Function} fn Function to call for each vector in the array
+ * @param {Object} [arg] additional argument to pass to fn
+ * @returns {Array} a
+ * @function
+ */
+vec2.forEach = (function() {
+    var vec = vec2.create();
+
+    return function(a, stride, offset, count, fn, arg) {
+        var i, l;
+        if(!stride) {
+            stride = 2;
+        }
+
+        if(!offset) {
+            offset = 0;
+        }
+
+        if(count) {
+            l = Math.min((count * stride) + offset, a.length);
+        } else {
+            l = a.length;
+        }
+
+        for(i = offset; i < l; i += stride) {
+            vec[0] = a[i]; vec[1] = a[i+1];
+            fn(vec, vec, arg);
+            a[i] = vec[0]; a[i+1] = vec[1];
+        }
+
+        return a;
     };
-  },
+})();
 
+/**
+ * Returns a string representation of a vector
+ *
+ * @param {vec2} vec vector to represent as a string
+ * @returns {String} string representation of the vector
+ */
+vec2.str = function (a) {
+    return 'vec2(' + a[0] + ', ' + a[1] + ')';
+};
 
-  selectController: function(index) {
-    var shouldChange = true;
+if(typeof(exports) !== 'undefined') {
+    exports.vec2 = vec2;
+}
 
-    // Check if we should switch to this tab. This lets the app
-    // cancel tab switches if the context isn't right, for example.
-    if(this.controllerWillChange) {
-      if(this.controllerWillChange(this.controllers[index], index) === false) {
-        shouldChange = false;
-      }
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+/**
+ * @class 3 Dimensional Vector
+ * @name vec3
+ */
+
+var vec3 = {};
+
+/**
+ * Creates a new, empty vec3
+ *
+ * @returns {vec3} a new 3D vector
+ */
+vec3.create = function() {
+    var out = new GLMAT_ARRAY_TYPE(3);
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    return out;
+};
+
+/**
+ * Creates a new vec3 initialized with values from an existing vector
+ *
+ * @param {vec3} a vector to clone
+ * @returns {vec3} a new 3D vector
+ */
+vec3.clone = function(a) {
+    var out = new GLMAT_ARRAY_TYPE(3);
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    return out;
+};
+
+/**
+ * Creates a new vec3 initialized with the given values
+ *
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @param {Number} z Z component
+ * @returns {vec3} a new 3D vector
+ */
+vec3.fromValues = function(x, y, z) {
+    var out = new GLMAT_ARRAY_TYPE(3);
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    return out;
+};
+
+/**
+ * Copy the values from one vec3 to another
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the source vector
+ * @returns {vec3} out
+ */
+vec3.copy = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    return out;
+};
+
+/**
+ * Set the components of a vec3 to the given values
+ *
+ * @param {vec3} out the receiving vector
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @param {Number} z Z component
+ * @returns {vec3} out
+ */
+vec3.set = function(out, x, y, z) {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    return out;
+};
+
+/**
+ * Adds two vec3's
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {vec3} out
+ */
+vec3.add = function(out, a, b) {
+    out[0] = a[0] + b[0];
+    out[1] = a[1] + b[1];
+    out[2] = a[2] + b[2];
+    return out;
+};
+
+/**
+ * Subtracts vector b from vector a
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {vec3} out
+ */
+vec3.subtract = function(out, a, b) {
+    out[0] = a[0] - b[0];
+    out[1] = a[1] - b[1];
+    out[2] = a[2] - b[2];
+    return out;
+};
+
+/**
+ * Alias for {@link vec3.subtract}
+ * @function
+ */
+vec3.sub = vec3.subtract;
+
+/**
+ * Multiplies two vec3's
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {vec3} out
+ */
+vec3.multiply = function(out, a, b) {
+    out[0] = a[0] * b[0];
+    out[1] = a[1] * b[1];
+    out[2] = a[2] * b[2];
+    return out;
+};
+
+/**
+ * Alias for {@link vec3.multiply}
+ * @function
+ */
+vec3.mul = vec3.multiply;
+
+/**
+ * Divides two vec3's
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {vec3} out
+ */
+vec3.divide = function(out, a, b) {
+    out[0] = a[0] / b[0];
+    out[1] = a[1] / b[1];
+    out[2] = a[2] / b[2];
+    return out;
+};
+
+/**
+ * Alias for {@link vec3.divide}
+ * @function
+ */
+vec3.div = vec3.divide;
+
+/**
+ * Returns the minimum of two vec3's
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {vec3} out
+ */
+vec3.min = function(out, a, b) {
+    out[0] = Math.min(a[0], b[0]);
+    out[1] = Math.min(a[1], b[1]);
+    out[2] = Math.min(a[2], b[2]);
+    return out;
+};
+
+/**
+ * Returns the maximum of two vec3's
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {vec3} out
+ */
+vec3.max = function(out, a, b) {
+    out[0] = Math.max(a[0], b[0]);
+    out[1] = Math.max(a[1], b[1]);
+    out[2] = Math.max(a[2], b[2]);
+    return out;
+};
+
+/**
+ * Scales a vec3 by a scalar number
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the vector to scale
+ * @param {Number} b amount to scale the vector by
+ * @returns {vec3} out
+ */
+vec3.scale = function(out, a, b) {
+    out[0] = a[0] * b;
+    out[1] = a[1] * b;
+    out[2] = a[2] * b;
+    return out;
+};
+
+/**
+ * Adds two vec3's after scaling the second operand by a scalar value
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @param {Number} scale the amount to scale b by before adding
+ * @returns {vec3} out
+ */
+vec3.scaleAndAdd = function(out, a, b, scale) {
+    out[0] = a[0] + (b[0] * scale);
+    out[1] = a[1] + (b[1] * scale);
+    out[2] = a[2] + (b[2] * scale);
+    return out;
+};
+
+/**
+ * Calculates the euclidian distance between two vec3's
+ *
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {Number} distance between a and b
+ */
+vec3.distance = function(a, b) {
+    var x = b[0] - a[0],
+        y = b[1] - a[1],
+        z = b[2] - a[2];
+    return Math.sqrt(x*x + y*y + z*z);
+};
+
+/**
+ * Alias for {@link vec3.distance}
+ * @function
+ */
+vec3.dist = vec3.distance;
+
+/**
+ * Calculates the squared euclidian distance between two vec3's
+ *
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {Number} squared distance between a and b
+ */
+vec3.squaredDistance = function(a, b) {
+    var x = b[0] - a[0],
+        y = b[1] - a[1],
+        z = b[2] - a[2];
+    return x*x + y*y + z*z;
+};
+
+/**
+ * Alias for {@link vec3.squaredDistance}
+ * @function
+ */
+vec3.sqrDist = vec3.squaredDistance;
+
+/**
+ * Calculates the length of a vec3
+ *
+ * @param {vec3} a vector to calculate length of
+ * @returns {Number} length of a
+ */
+vec3.length = function (a) {
+    var x = a[0],
+        y = a[1],
+        z = a[2];
+    return Math.sqrt(x*x + y*y + z*z);
+};
+
+/**
+ * Alias for {@link vec3.length}
+ * @function
+ */
+vec3.len = vec3.length;
+
+/**
+ * Calculates the squared length of a vec3
+ *
+ * @param {vec3} a vector to calculate squared length of
+ * @returns {Number} squared length of a
+ */
+vec3.squaredLength = function (a) {
+    var x = a[0],
+        y = a[1],
+        z = a[2];
+    return x*x + y*y + z*z;
+};
+
+/**
+ * Alias for {@link vec3.squaredLength}
+ * @function
+ */
+vec3.sqrLen = vec3.squaredLength;
+
+/**
+ * Negates the components of a vec3
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a vector to negate
+ * @returns {vec3} out
+ */
+vec3.negate = function(out, a) {
+    out[0] = -a[0];
+    out[1] = -a[1];
+    out[2] = -a[2];
+    return out;
+};
+
+/**
+ * Normalize a vec3
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a vector to normalize
+ * @returns {vec3} out
+ */
+vec3.normalize = function(out, a) {
+    var x = a[0],
+        y = a[1],
+        z = a[2];
+    var len = x*x + y*y + z*z;
+    if (len > 0) {
+        //TODO: evaluate use of glm_invsqrt here?
+        len = 1 / Math.sqrt(len);
+        out[0] = a[0] * len;
+        out[1] = a[1] * len;
+        out[2] = a[2] * len;
+    }
+    return out;
+};
+
+/**
+ * Calculates the dot product of two vec3's
+ *
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {Number} dot product of a and b
+ */
+vec3.dot = function (a, b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+};
+
+/**
+ * Computes the cross product of two vec3's
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @returns {vec3} out
+ */
+vec3.cross = function(out, a, b) {
+    var ax = a[0], ay = a[1], az = a[2],
+        bx = b[0], by = b[1], bz = b[2];
+
+    out[0] = ay * bz - az * by;
+    out[1] = az * bx - ax * bz;
+    out[2] = ax * by - ay * bx;
+    return out;
+};
+
+/**
+ * Performs a linear interpolation between two vec3's
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the first operand
+ * @param {vec3} b the second operand
+ * @param {Number} t interpolation amount between the two inputs
+ * @returns {vec3} out
+ */
+vec3.lerp = function (out, a, b, t) {
+    var ax = a[0],
+        ay = a[1],
+        az = a[2];
+    out[0] = ax + t * (b[0] - ax);
+    out[1] = ay + t * (b[1] - ay);
+    out[2] = az + t * (b[2] - az);
+    return out;
+};
+
+/**
+ * Generates a random vector with the given scale
+ *
+ * @param {vec3} out the receiving vector
+ * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
+ * @returns {vec3} out
+ */
+vec3.random = function (out, scale) {
+    scale = scale || 1.0;
+
+    var r = GLMAT_RANDOM() * 2.0 * Math.PI;
+    var z = (GLMAT_RANDOM() * 2.0) - 1.0;
+    var zScale = Math.sqrt(1.0-z*z) * scale;
+
+    out[0] = Math.cos(r) * zScale;
+    out[1] = Math.sin(r) * zScale;
+    out[2] = z * scale;
+    return out;
+};
+
+/**
+ * Transforms the vec3 with a mat4.
+ * 4th vector component is implicitly '1'
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the vector to transform
+ * @param {mat4} m matrix to transform with
+ * @returns {vec3} out
+ */
+vec3.transformMat4 = function(out, a, m) {
+    var x = a[0], y = a[1], z = a[2];
+    out[0] = m[0] * x + m[4] * y + m[8] * z + m[12];
+    out[1] = m[1] * x + m[5] * y + m[9] * z + m[13];
+    out[2] = m[2] * x + m[6] * y + m[10] * z + m[14];
+    return out;
+};
+
+/**
+ * Transforms the vec3 with a mat3.
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the vector to transform
+ * @param {mat4} m the 3x3 matrix to transform with
+ * @returns {vec3} out
+ */
+vec3.transformMat3 = function(out, a, m) {
+    var x = a[0], y = a[1], z = a[2];
+    out[0] = x * m[0] + y * m[3] + z * m[6];
+    out[1] = x * m[1] + y * m[4] + z * m[7];
+    out[2] = x * m[2] + y * m[5] + z * m[8];
+    return out;
+};
+
+/**
+ * Transforms the vec3 with a quat
+ *
+ * @param {vec3} out the receiving vector
+ * @param {vec3} a the vector to transform
+ * @param {quat} q quaternion to transform with
+ * @returns {vec3} out
+ */
+vec3.transformQuat = function(out, a, q) {
+    // benchmarks: http://jsperf.com/quaternion-transform-vec3-implementations
+
+    var x = a[0], y = a[1], z = a[2],
+        qx = q[0], qy = q[1], qz = q[2], qw = q[3],
+
+        // calculate quat * vec
+        ix = qw * x + qy * z - qz * y,
+        iy = qw * y + qz * x - qx * z,
+        iz = qw * z + qx * y - qy * x,
+        iw = -qx * x - qy * y - qz * z;
+
+    // calculate result * inverse quat
+    out[0] = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+    out[1] = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+    out[2] = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+    return out;
+};
+
+/*
+* Rotate a 3D vector around the x-axis
+* @param {vec3} out The receiving vec3
+* @param {vec3} a The vec3 point to rotate
+* @param {vec3} b The origin of the rotation
+* @param {Number} c The angle of rotation
+* @returns {vec3} out
+*/
+vec3.rotateX = function(out, a, b, c){
+  var p = [], r=[];
+  //Translate point to the origin
+  p[0] = a[0] - b[0];
+  p[1] = a[1] - b[1];
+  p[2] = a[2] - b[2];
+
+  //perform rotation
+  r[0] = p[0];
+  r[1] = p[1]*Math.cos(c) - p[2]*Math.sin(c);
+  r[2] = p[1]*Math.sin(c) + p[2]*Math.cos(c);
+
+  //translate to correct position
+  out[0] = r[0] + b[0];
+  out[1] = r[1] + b[1];
+  out[2] = r[2] + b[2];
+
+  return out;
+};
+
+/*
+* Rotate a 3D vector around the y-axis
+* @param {vec3} out The receiving vec3
+* @param {vec3} a The vec3 point to rotate
+* @param {vec3} b The origin of the rotation
+* @param {Number} c The angle of rotation
+* @returns {vec3} out
+*/
+vec3.rotateY = function(out, a, b, c){
+  var p = [], r=[];
+  //Translate point to the origin
+  p[0] = a[0] - b[0];
+  p[1] = a[1] - b[1];
+  p[2] = a[2] - b[2];
+
+  //perform rotation
+  r[0] = p[2]*Math.sin(c) + p[0]*Math.cos(c);
+  r[1] = p[1];
+  r[2] = p[2]*Math.cos(c) - p[0]*Math.sin(c);
+
+  //translate to correct position
+  out[0] = r[0] + b[0];
+  out[1] = r[1] + b[1];
+  out[2] = r[2] + b[2];
+
+  return out;
+};
+
+/*
+* Rotate a 3D vector around the z-axis
+* @param {vec3} out The receiving vec3
+* @param {vec3} a The vec3 point to rotate
+* @param {vec3} b The origin of the rotation
+* @param {Number} c The angle of rotation
+* @returns {vec3} out
+*/
+vec3.rotateZ = function(out, a, b, c){
+  var p = [], r=[];
+  //Translate point to the origin
+  p[0] = a[0] - b[0];
+  p[1] = a[1] - b[1];
+  p[2] = a[2] - b[2];
+
+  //perform rotation
+  r[0] = p[0]*Math.cos(c) - p[1]*Math.sin(c);
+  r[1] = p[0]*Math.sin(c) + p[1]*Math.cos(c);
+  r[2] = p[2];
+
+  //translate to correct position
+  out[0] = r[0] + b[0];
+  out[1] = r[1] + b[1];
+  out[2] = r[2] + b[2];
+
+  return out;
+};
+
+/**
+ * Perform some operation over an array of vec3s.
+ *
+ * @param {Array} a the array of vectors to iterate over
+ * @param {Number} stride Number of elements between the start of each vec3. If 0 assumes tightly packed
+ * @param {Number} offset Number of elements to skip at the beginning of the array
+ * @param {Number} count Number of vec3s to iterate over. If 0 iterates over entire array
+ * @param {Function} fn Function to call for each vector in the array
+ * @param {Object} [arg] additional argument to pass to fn
+ * @returns {Array} a
+ * @function
+ */
+vec3.forEach = (function() {
+    var vec = vec3.create();
+
+    return function(a, stride, offset, count, fn, arg) {
+        var i, l;
+        if(!stride) {
+            stride = 3;
+        }
+
+        if(!offset) {
+            offset = 0;
+        }
+
+        if(count) {
+            l = Math.min((count * stride) + offset, a.length);
+        } else {
+            l = a.length;
+        }
+
+        for(i = offset; i < l; i += stride) {
+            vec[0] = a[i]; vec[1] = a[i+1]; vec[2] = a[i+2];
+            fn(vec, vec, arg);
+            a[i] = vec[0]; a[i+1] = vec[1]; a[i+2] = vec[2];
+        }
+
+        return a;
+    };
+})();
+
+/**
+ * Returns a string representation of a vector
+ *
+ * @param {vec3} vec vector to represent as a string
+ * @returns {String} string representation of the vector
+ */
+vec3.str = function (a) {
+    return 'vec3(' + a[0] + ', ' + a[1] + ', ' + a[2] + ')';
+};
+
+if(typeof(exports) !== 'undefined') {
+    exports.vec3 = vec3;
+}
+
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+/**
+ * @class 4 Dimensional Vector
+ * @name vec4
+ */
+
+var vec4 = {};
+
+/**
+ * Creates a new, empty vec4
+ *
+ * @returns {vec4} a new 4D vector
+ */
+vec4.create = function() {
+    var out = new GLMAT_ARRAY_TYPE(4);
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    return out;
+};
+
+/**
+ * Creates a new vec4 initialized with values from an existing vector
+ *
+ * @param {vec4} a vector to clone
+ * @returns {vec4} a new 4D vector
+ */
+vec4.clone = function(a) {
+    var out = new GLMAT_ARRAY_TYPE(4);
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    return out;
+};
+
+/**
+ * Creates a new vec4 initialized with the given values
+ *
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @param {Number} z Z component
+ * @param {Number} w W component
+ * @returns {vec4} a new 4D vector
+ */
+vec4.fromValues = function(x, y, z, w) {
+    var out = new GLMAT_ARRAY_TYPE(4);
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    out[3] = w;
+    return out;
+};
+
+/**
+ * Copy the values from one vec4 to another
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the source vector
+ * @returns {vec4} out
+ */
+vec4.copy = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    return out;
+};
+
+/**
+ * Set the components of a vec4 to the given values
+ *
+ * @param {vec4} out the receiving vector
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @param {Number} z Z component
+ * @param {Number} w W component
+ * @returns {vec4} out
+ */
+vec4.set = function(out, x, y, z, w) {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    out[3] = w;
+    return out;
+};
+
+/**
+ * Adds two vec4's
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {vec4} out
+ */
+vec4.add = function(out, a, b) {
+    out[0] = a[0] + b[0];
+    out[1] = a[1] + b[1];
+    out[2] = a[2] + b[2];
+    out[3] = a[3] + b[3];
+    return out;
+};
+
+/**
+ * Subtracts vector b from vector a
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {vec4} out
+ */
+vec4.subtract = function(out, a, b) {
+    out[0] = a[0] - b[0];
+    out[1] = a[1] - b[1];
+    out[2] = a[2] - b[2];
+    out[3] = a[3] - b[3];
+    return out;
+};
+
+/**
+ * Alias for {@link vec4.subtract}
+ * @function
+ */
+vec4.sub = vec4.subtract;
+
+/**
+ * Multiplies two vec4's
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {vec4} out
+ */
+vec4.multiply = function(out, a, b) {
+    out[0] = a[0] * b[0];
+    out[1] = a[1] * b[1];
+    out[2] = a[2] * b[2];
+    out[3] = a[3] * b[3];
+    return out;
+};
+
+/**
+ * Alias for {@link vec4.multiply}
+ * @function
+ */
+vec4.mul = vec4.multiply;
+
+/**
+ * Divides two vec4's
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {vec4} out
+ */
+vec4.divide = function(out, a, b) {
+    out[0] = a[0] / b[0];
+    out[1] = a[1] / b[1];
+    out[2] = a[2] / b[2];
+    out[3] = a[3] / b[3];
+    return out;
+};
+
+/**
+ * Alias for {@link vec4.divide}
+ * @function
+ */
+vec4.div = vec4.divide;
+
+/**
+ * Returns the minimum of two vec4's
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {vec4} out
+ */
+vec4.min = function(out, a, b) {
+    out[0] = Math.min(a[0], b[0]);
+    out[1] = Math.min(a[1], b[1]);
+    out[2] = Math.min(a[2], b[2]);
+    out[3] = Math.min(a[3], b[3]);
+    return out;
+};
+
+/**
+ * Returns the maximum of two vec4's
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {vec4} out
+ */
+vec4.max = function(out, a, b) {
+    out[0] = Math.max(a[0], b[0]);
+    out[1] = Math.max(a[1], b[1]);
+    out[2] = Math.max(a[2], b[2]);
+    out[3] = Math.max(a[3], b[3]);
+    return out;
+};
+
+/**
+ * Scales a vec4 by a scalar number
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the vector to scale
+ * @param {Number} b amount to scale the vector by
+ * @returns {vec4} out
+ */
+vec4.scale = function(out, a, b) {
+    out[0] = a[0] * b;
+    out[1] = a[1] * b;
+    out[2] = a[2] * b;
+    out[3] = a[3] * b;
+    return out;
+};
+
+/**
+ * Adds two vec4's after scaling the second operand by a scalar value
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @param {Number} scale the amount to scale b by before adding
+ * @returns {vec4} out
+ */
+vec4.scaleAndAdd = function(out, a, b, scale) {
+    out[0] = a[0] + (b[0] * scale);
+    out[1] = a[1] + (b[1] * scale);
+    out[2] = a[2] + (b[2] * scale);
+    out[3] = a[3] + (b[3] * scale);
+    return out;
+};
+
+/**
+ * Calculates the euclidian distance between two vec4's
+ *
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {Number} distance between a and b
+ */
+vec4.distance = function(a, b) {
+    var x = b[0] - a[0],
+        y = b[1] - a[1],
+        z = b[2] - a[2],
+        w = b[3] - a[3];
+    return Math.sqrt(x*x + y*y + z*z + w*w);
+};
+
+/**
+ * Alias for {@link vec4.distance}
+ * @function
+ */
+vec4.dist = vec4.distance;
+
+/**
+ * Calculates the squared euclidian distance between two vec4's
+ *
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {Number} squared distance between a and b
+ */
+vec4.squaredDistance = function(a, b) {
+    var x = b[0] - a[0],
+        y = b[1] - a[1],
+        z = b[2] - a[2],
+        w = b[3] - a[3];
+    return x*x + y*y + z*z + w*w;
+};
+
+/**
+ * Alias for {@link vec4.squaredDistance}
+ * @function
+ */
+vec4.sqrDist = vec4.squaredDistance;
+
+/**
+ * Calculates the length of a vec4
+ *
+ * @param {vec4} a vector to calculate length of
+ * @returns {Number} length of a
+ */
+vec4.length = function (a) {
+    var x = a[0],
+        y = a[1],
+        z = a[2],
+        w = a[3];
+    return Math.sqrt(x*x + y*y + z*z + w*w);
+};
+
+/**
+ * Alias for {@link vec4.length}
+ * @function
+ */
+vec4.len = vec4.length;
+
+/**
+ * Calculates the squared length of a vec4
+ *
+ * @param {vec4} a vector to calculate squared length of
+ * @returns {Number} squared length of a
+ */
+vec4.squaredLength = function (a) {
+    var x = a[0],
+        y = a[1],
+        z = a[2],
+        w = a[3];
+    return x*x + y*y + z*z + w*w;
+};
+
+/**
+ * Alias for {@link vec4.squaredLength}
+ * @function
+ */
+vec4.sqrLen = vec4.squaredLength;
+
+/**
+ * Negates the components of a vec4
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a vector to negate
+ * @returns {vec4} out
+ */
+vec4.negate = function(out, a) {
+    out[0] = -a[0];
+    out[1] = -a[1];
+    out[2] = -a[2];
+    out[3] = -a[3];
+    return out;
+};
+
+/**
+ * Normalize a vec4
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a vector to normalize
+ * @returns {vec4} out
+ */
+vec4.normalize = function(out, a) {
+    var x = a[0],
+        y = a[1],
+        z = a[2],
+        w = a[3];
+    var len = x*x + y*y + z*z + w*w;
+    if (len > 0) {
+        len = 1 / Math.sqrt(len);
+        out[0] = a[0] * len;
+        out[1] = a[1] * len;
+        out[2] = a[2] * len;
+        out[3] = a[3] * len;
+    }
+    return out;
+};
+
+/**
+ * Calculates the dot product of two vec4's
+ *
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @returns {Number} dot product of a and b
+ */
+vec4.dot = function (a, b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+};
+
+/**
+ * Performs a linear interpolation between two vec4's
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the first operand
+ * @param {vec4} b the second operand
+ * @param {Number} t interpolation amount between the two inputs
+ * @returns {vec4} out
+ */
+vec4.lerp = function (out, a, b, t) {
+    var ax = a[0],
+        ay = a[1],
+        az = a[2],
+        aw = a[3];
+    out[0] = ax + t * (b[0] - ax);
+    out[1] = ay + t * (b[1] - ay);
+    out[2] = az + t * (b[2] - az);
+    out[3] = aw + t * (b[3] - aw);
+    return out;
+};
+
+/**
+ * Generates a random vector with the given scale
+ *
+ * @param {vec4} out the receiving vector
+ * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
+ * @returns {vec4} out
+ */
+vec4.random = function (out, scale) {
+    scale = scale || 1.0;
+
+    //TODO: This is a pretty awful way of doing this. Find something better.
+    out[0] = GLMAT_RANDOM();
+    out[1] = GLMAT_RANDOM();
+    out[2] = GLMAT_RANDOM();
+    out[3] = GLMAT_RANDOM();
+    vec4.normalize(out, out);
+    vec4.scale(out, out, scale);
+    return out;
+};
+
+/**
+ * Transforms the vec4 with a mat4.
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the vector to transform
+ * @param {mat4} m matrix to transform with
+ * @returns {vec4} out
+ */
+vec4.transformMat4 = function(out, a, m) {
+    var x = a[0], y = a[1], z = a[2], w = a[3];
+    out[0] = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
+    out[1] = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
+    out[2] = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
+    out[3] = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+    return out;
+};
+
+/**
+ * Transforms the vec4 with a quat
+ *
+ * @param {vec4} out the receiving vector
+ * @param {vec4} a the vector to transform
+ * @param {quat} q quaternion to transform with
+ * @returns {vec4} out
+ */
+vec4.transformQuat = function(out, a, q) {
+    var x = a[0], y = a[1], z = a[2],
+        qx = q[0], qy = q[1], qz = q[2], qw = q[3],
+
+        // calculate quat * vec
+        ix = qw * x + qy * z - qz * y,
+        iy = qw * y + qz * x - qx * z,
+        iz = qw * z + qx * y - qy * x,
+        iw = -qx * x - qy * y - qz * z;
+
+    // calculate result * inverse quat
+    out[0] = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+    out[1] = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+    out[2] = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+    return out;
+};
+
+/**
+ * Perform some operation over an array of vec4s.
+ *
+ * @param {Array} a the array of vectors to iterate over
+ * @param {Number} stride Number of elements between the start of each vec4. If 0 assumes tightly packed
+ * @param {Number} offset Number of elements to skip at the beginning of the array
+ * @param {Number} count Number of vec2s to iterate over. If 0 iterates over entire array
+ * @param {Function} fn Function to call for each vector in the array
+ * @param {Object} [arg] additional argument to pass to fn
+ * @returns {Array} a
+ * @function
+ */
+vec4.forEach = (function() {
+    var vec = vec4.create();
+
+    return function(a, stride, offset, count, fn, arg) {
+        var i, l;
+        if(!stride) {
+            stride = 4;
+        }
+
+        if(!offset) {
+            offset = 0;
+        }
+
+        if(count) {
+            l = Math.min((count * stride) + offset, a.length);
+        } else {
+            l = a.length;
+        }
+
+        for(i = offset; i < l; i += stride) {
+            vec[0] = a[i]; vec[1] = a[i+1]; vec[2] = a[i+2]; vec[3] = a[i+3];
+            fn(vec, vec, arg);
+            a[i] = vec[0]; a[i+1] = vec[1]; a[i+2] = vec[2]; a[i+3] = vec[3];
+        }
+
+        return a;
+    };
+})();
+
+/**
+ * Returns a string representation of a vector
+ *
+ * @param {vec4} vec vector to represent as a string
+ * @returns {String} string representation of the vector
+ */
+vec4.str = function (a) {
+    return 'vec4(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ')';
+};
+
+if(typeof(exports) !== 'undefined') {
+    exports.vec4 = vec4;
+}
+
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+/**
+ * @class 2x2 Matrix
+ * @name mat2
+ */
+
+var mat2 = {};
+
+/**
+ * Creates a new identity mat2
+ *
+ * @returns {mat2} a new 2x2 matrix
+ */
+mat2.create = function() {
+    var out = new GLMAT_ARRAY_TYPE(4);
+    out[0] = 1;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 1;
+    return out;
+};
+
+/**
+ * Creates a new mat2 initialized with values from an existing matrix
+ *
+ * @param {mat2} a matrix to clone
+ * @returns {mat2} a new 2x2 matrix
+ */
+mat2.clone = function(a) {
+    var out = new GLMAT_ARRAY_TYPE(4);
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    return out;
+};
+
+/**
+ * Copy the values from one mat2 to another
+ *
+ * @param {mat2} out the receiving matrix
+ * @param {mat2} a the source matrix
+ * @returns {mat2} out
+ */
+mat2.copy = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    return out;
+};
+
+/**
+ * Set a mat2 to the identity matrix
+ *
+ * @param {mat2} out the receiving matrix
+ * @returns {mat2} out
+ */
+mat2.identity = function(out) {
+    out[0] = 1;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 1;
+    return out;
+};
+
+/**
+ * Transpose the values of a mat2
+ *
+ * @param {mat2} out the receiving matrix
+ * @param {mat2} a the source matrix
+ * @returns {mat2} out
+ */
+mat2.transpose = function(out, a) {
+    // If we are transposing ourselves we can skip a few steps but have to cache some values
+    if (out === a) {
+        var a1 = a[1];
+        out[1] = a[2];
+        out[2] = a1;
+    } else {
+        out[0] = a[0];
+        out[1] = a[2];
+        out[2] = a[1];
+        out[3] = a[3];
     }
 
-    if(shouldChange) {
-      this.setSelectedController(index);
+    return out;
+};
+
+/**
+ * Inverts a mat2
+ *
+ * @param {mat2} out the receiving matrix
+ * @param {mat2} a the source matrix
+ * @returns {mat2} out
+ */
+mat2.invert = function(out, a) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
+
+        // Calculate the determinant
+        det = a0 * a3 - a2 * a1;
+
+    if (!det) {
+        return null;
     }
-  },
+    det = 1.0 / det;
 
-  // Force the selection of a controller at the given index
-  setSelectedController: function(index) {
-    if(index >= this.controllers.length) {
-      return;
+    out[0] =  a3 * det;
+    out[1] = -a1 * det;
+    out[2] = -a2 * det;
+    out[3] =  a0 * det;
+
+    return out;
+};
+
+/**
+ * Calculates the adjugate of a mat2
+ *
+ * @param {mat2} out the receiving matrix
+ * @param {mat2} a the source matrix
+ * @returns {mat2} out
+ */
+mat2.adjoint = function(out, a) {
+    // Caching this value is nessecary if out == a
+    var a0 = a[0];
+    out[0] =  a[3];
+    out[1] = -a[1];
+    out[2] = -a[2];
+    out[3] =  a0;
+
+    return out;
+};
+
+/**
+ * Calculates the determinant of a mat2
+ *
+ * @param {mat2} a the source matrix
+ * @returns {Number} determinant of a
+ */
+mat2.determinant = function (a) {
+    return a[0] * a[3] - a[2] * a[1];
+};
+
+/**
+ * Multiplies two mat2's
+ *
+ * @param {mat2} out the receiving matrix
+ * @param {mat2} a the first operand
+ * @param {mat2} b the second operand
+ * @returns {mat2} out
+ */
+mat2.multiply = function (out, a, b) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+    var b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+    out[0] = a0 * b0 + a2 * b1;
+    out[1] = a1 * b0 + a3 * b1;
+    out[2] = a0 * b2 + a2 * b3;
+    out[3] = a1 * b2 + a3 * b3;
+    return out;
+};
+
+/**
+ * Alias for {@link mat2.multiply}
+ * @function
+ */
+mat2.mul = mat2.multiply;
+
+/**
+ * Rotates a mat2 by the given angle
+ *
+ * @param {mat2} out the receiving matrix
+ * @param {mat2} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat2} out
+ */
+mat2.rotate = function (out, a, rad) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
+        s = Math.sin(rad),
+        c = Math.cos(rad);
+    out[0] = a0 *  c + a2 * s;
+    out[1] = a1 *  c + a3 * s;
+    out[2] = a0 * -s + a2 * c;
+    out[3] = a1 * -s + a3 * c;
+    return out;
+};
+
+/**
+ * Scales the mat2 by the dimensions in the given vec2
+ *
+ * @param {mat2} out the receiving matrix
+ * @param {mat2} a the matrix to rotate
+ * @param {vec2} v the vec2 to scale the matrix by
+ * @returns {mat2} out
+ **/
+mat2.scale = function(out, a, v) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
+        v0 = v[0], v1 = v[1];
+    out[0] = a0 * v0;
+    out[1] = a1 * v0;
+    out[2] = a2 * v1;
+    out[3] = a3 * v1;
+    return out;
+};
+
+/**
+ * Returns a string representation of a mat2
+ *
+ * @param {mat2} mat matrix to represent as a string
+ * @returns {String} string representation of the matrix
+ */
+mat2.str = function (a) {
+    return 'mat2(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ')';
+};
+
+/**
+ * Returns Frobenius norm of a mat2
+ *
+ * @param {mat2} a the matrix to calculate Frobenius norm of
+ * @returns {Number} Frobenius norm
+ */
+mat2.frob = function (a) {
+  return(Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2) + Math.pow(a[2], 2) + Math.pow(a[3], 2)));
+};
+
+/**
+ * Returns L, D and U matrices (Lower triangular, Diagonal and Upper triangular) by factorizing the input matrix
+ * @param {mat2} L the lower triangular matrix
+ * @param {mat2} D the diagonal matrix
+ * @param {mat2} U the upper triangular matrix
+ * @param {mat2} a the input matrix to factorize
+ */
+
+mat2.LDU = function (L, D, U, a) {
+    L[2] = a[2]/a[0];
+    U[0] = a[0];
+    U[1] = a[1];
+    U[3] = a[3] - L[2] * U[1];
+    return [L, D, U];
+};
+
+if(typeof(exports) !== 'undefined') {
+    exports.mat2 = mat2;
+}
+
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+/**
+ * @class 2x3 Matrix
+ * @name mat2d
+ *
+ * @description
+ * A mat2d contains six elements defined as:
+ * <pre>
+ * [a, c, tx,
+ *  b, d, ty]
+ * </pre>
+ * This is a short form for the 3x3 matrix:
+ * <pre>
+ * [a, c, tx,
+ *  b, d, ty,
+ *  0, 0, 1]
+ * </pre>
+ * The last row is ignored so the array is shorter and operations are faster.
+ */
+
+var mat2d = {};
+
+/**
+ * Creates a new identity mat2d
+ *
+ * @returns {mat2d} a new 2x3 matrix
+ */
+mat2d.create = function() {
+    var out = new GLMAT_ARRAY_TYPE(6);
+    out[0] = 1;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 1;
+    out[4] = 0;
+    out[5] = 0;
+    return out;
+};
+
+/**
+ * Creates a new mat2d initialized with values from an existing matrix
+ *
+ * @param {mat2d} a matrix to clone
+ * @returns {mat2d} a new 2x3 matrix
+ */
+mat2d.clone = function(a) {
+    var out = new GLMAT_ARRAY_TYPE(6);
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    out[4] = a[4];
+    out[5] = a[5];
+    return out;
+};
+
+/**
+ * Copy the values from one mat2d to another
+ *
+ * @param {mat2d} out the receiving matrix
+ * @param {mat2d} a the source matrix
+ * @returns {mat2d} out
+ */
+mat2d.copy = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    out[4] = a[4];
+    out[5] = a[5];
+    return out;
+};
+
+/**
+ * Set a mat2d to the identity matrix
+ *
+ * @param {mat2d} out the receiving matrix
+ * @returns {mat2d} out
+ */
+mat2d.identity = function(out) {
+    out[0] = 1;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 1;
+    out[4] = 0;
+    out[5] = 0;
+    return out;
+};
+
+/**
+ * Inverts a mat2d
+ *
+ * @param {mat2d} out the receiving matrix
+ * @param {mat2d} a the source matrix
+ * @returns {mat2d} out
+ */
+mat2d.invert = function(out, a) {
+    var aa = a[0], ab = a[1], ac = a[2], ad = a[3],
+        atx = a[4], aty = a[5];
+
+    var det = aa * ad - ab * ac;
+    if(!det){
+        return null;
     }
-    var lastController = this.selectedController;
-    var lastIndex = this.selectedIndex;
+    det = 1.0 / det;
 
-    this.selectedController = this.controllers[index];
-    this.selectedIndex = index;
+    out[0] = ad * det;
+    out[1] = -ab * det;
+    out[2] = -ac * det;
+    out[3] = aa * det;
+    out[4] = (ac * aty - ad * atx) * det;
+    out[5] = (ab * atx - aa * aty) * det;
+    return out;
+};
 
-    this._showController(index);
-    this.tabBar.setSelectedItem(index);
+/**
+ * Calculates the determinant of a mat2d
+ *
+ * @param {mat2d} a the source matrix
+ * @returns {Number} determinant of a
+ */
+mat2d.determinant = function (a) {
+    return a[0] * a[3] - a[1] * a[2];
+};
 
-    this.controllerChanged && this.controllerChanged(lastController, lastIndex, this.selectedController, this.selectedIndex);
-  },
+/**
+ * Multiplies two mat2d's
+ *
+ * @param {mat2d} out the receiving matrix
+ * @param {mat2d} a the first operand
+ * @param {mat2d} b the second operand
+ * @returns {mat2d} out
+ */
+mat2d.multiply = function (out, a, b) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3], a4 = a[4], a5 = a[5],
+        b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3], b4 = b[4], b5 = b[5];
+    out[0] = a0 * b0 + a2 * b1;
+    out[1] = a1 * b0 + a3 * b1;
+    out[2] = a0 * b2 + a2 * b3;
+    out[3] = a1 * b2 + a3 * b3;
+    out[4] = a0 * b4 + a2 * b5 + a4;
+    out[5] = a1 * b4 + a3 * b5 + a5;
+    return out;
+};
 
-  _showController: function(index) {
-    var c;
+/**
+ * Alias for {@link mat2d.multiply}
+ * @function
+ */
+mat2d.mul = mat2d.multiply;
 
-    for(var i = 0, j = this.controllers.length; i < j; i ++) {
-      c = this.controllers[i];
-      //c.detach && c.detach();
-      c.isVisible = false;
-      c.visibilityChanged && c.visibilityChanged();
+
+/**
+ * Rotates a mat2d by the given angle
+ *
+ * @param {mat2d} out the receiving matrix
+ * @param {mat2d} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat2d} out
+ */
+mat2d.rotate = function (out, a, rad) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3], a4 = a[4], a5 = a[5],
+        s = Math.sin(rad),
+        c = Math.cos(rad);
+    out[0] = a0 *  c + a2 * s;
+    out[1] = a1 *  c + a3 * s;
+    out[2] = a0 * -s + a2 * c;
+    out[3] = a1 * -s + a3 * c;
+    out[4] = a4;
+    out[5] = a5;
+    return out;
+};
+
+/**
+ * Scales the mat2d by the dimensions in the given vec2
+ *
+ * @param {mat2d} out the receiving matrix
+ * @param {mat2d} a the matrix to translate
+ * @param {vec2} v the vec2 to scale the matrix by
+ * @returns {mat2d} out
+ **/
+mat2d.scale = function(out, a, v) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3], a4 = a[4], a5 = a[5],
+        v0 = v[0], v1 = v[1];
+    out[0] = a0 * v0;
+    out[1] = a1 * v0;
+    out[2] = a2 * v1;
+    out[3] = a3 * v1;
+    out[4] = a4;
+    out[5] = a5;
+    return out;
+};
+
+/**
+ * Translates the mat2d by the dimensions in the given vec2
+ *
+ * @param {mat2d} out the receiving matrix
+ * @param {mat2d} a the matrix to translate
+ * @param {vec2} v the vec2 to translate the matrix by
+ * @returns {mat2d} out
+ **/
+mat2d.translate = function(out, a, v) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3], a4 = a[4], a5 = a[5],
+        v0 = v[0], v1 = v[1];
+    out[0] = a0;
+    out[1] = a1;
+    out[2] = a2;
+    out[3] = a3;
+    out[4] = a0 * v0 + a2 * v1 + a4;
+    out[5] = a1 * v0 + a3 * v1 + a5;
+    return out;
+};
+
+/**
+ * Returns a string representation of a mat2d
+ *
+ * @param {mat2d} a matrix to represent as a string
+ * @returns {String} string representation of the matrix
+ */
+mat2d.str = function (a) {
+    return 'mat2d(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' +
+                    a[3] + ', ' + a[4] + ', ' + a[5] + ')';
+};
+
+/**
+ * Returns Frobenius norm of a mat2d
+ *
+ * @param {mat2d} a the matrix to calculate Frobenius norm of
+ * @returns {Number} Frobenius norm
+ */
+mat2d.frob = function (a) {
+  return(Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2) + Math.pow(a[2], 2) + Math.pow(a[3], 2) + Math.pow(a[4], 2) + Math.pow(a[5], 2) + 1));
+};
+
+if(typeof(exports) !== 'undefined') {
+    exports.mat2d = mat2d;
+}
+
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+/**
+ * @class 3x3 Matrix
+ * @name mat3
+ */
+
+var mat3 = {};
+
+/**
+ * Creates a new identity mat3
+ *
+ * @returns {mat3} a new 3x3 matrix
+ */
+mat3.create = function() {
+    var out = new GLMAT_ARRAY_TYPE(9);
+    out[0] = 1;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 1;
+    out[5] = 0;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 1;
+    return out;
+};
+
+/**
+ * Copies the upper-left 3x3 values into the given mat3.
+ *
+ * @param {mat3} out the receiving 3x3 matrix
+ * @param {mat4} a   the source 4x4 matrix
+ * @returns {mat3} out
+ */
+mat3.fromMat4 = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[4];
+    out[4] = a[5];
+    out[5] = a[6];
+    out[6] = a[8];
+    out[7] = a[9];
+    out[8] = a[10];
+    return out;
+};
+
+/**
+ * Creates a new mat3 initialized with values from an existing matrix
+ *
+ * @param {mat3} a matrix to clone
+ * @returns {mat3} a new 3x3 matrix
+ */
+mat3.clone = function(a) {
+    var out = new GLMAT_ARRAY_TYPE(9);
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    out[4] = a[4];
+    out[5] = a[5];
+    out[6] = a[6];
+    out[7] = a[7];
+    out[8] = a[8];
+    return out;
+};
+
+/**
+ * Copy the values from one mat3 to another
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat3} a the source matrix
+ * @returns {mat3} out
+ */
+mat3.copy = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    out[4] = a[4];
+    out[5] = a[5];
+    out[6] = a[6];
+    out[7] = a[7];
+    out[8] = a[8];
+    return out;
+};
+
+/**
+ * Set a mat3 to the identity matrix
+ *
+ * @param {mat3} out the receiving matrix
+ * @returns {mat3} out
+ */
+mat3.identity = function(out) {
+    out[0] = 1;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 1;
+    out[5] = 0;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 1;
+    return out;
+};
+
+/**
+ * Transpose the values of a mat3
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat3} a the source matrix
+ * @returns {mat3} out
+ */
+mat3.transpose = function(out, a) {
+    // If we are transposing ourselves we can skip a few steps but have to cache some values
+    if (out === a) {
+        var a01 = a[1], a02 = a[2], a12 = a[5];
+        out[1] = a[3];
+        out[2] = a[6];
+        out[3] = a01;
+        out[5] = a[7];
+        out[6] = a02;
+        out[7] = a12;
+    } else {
+        out[0] = a[0];
+        out[1] = a[3];
+        out[2] = a[6];
+        out[3] = a[1];
+        out[4] = a[4];
+        out[5] = a[7];
+        out[6] = a[2];
+        out[7] = a[5];
+        out[8] = a[8];
     }
 
-    c = this.controllers[index];
-    //c.attach && c.attach();
-    c.isVisible = true;
-    c.visibilityChanged && c.visibilityChanged();
-  },
+    return out;
+};
 
-  _clearSelected: function() {
-    this.selectedController = null;
-    this.selectedIndex = -1;
-  },
+/**
+ * Inverts a mat3
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat3} a the source matrix
+ * @returns {mat3} out
+ */
+mat3.invert = function(out, a) {
+    var a00 = a[0], a01 = a[1], a02 = a[2],
+        a10 = a[3], a11 = a[4], a12 = a[5],
+        a20 = a[6], a21 = a[7], a22 = a[8],
 
-  // Return the tab at the given index
-  getController: function(index) {
-    return this.controllers[index];
-  },
+        b01 = a22 * a11 - a12 * a21,
+        b11 = -a22 * a10 + a12 * a20,
+        b21 = a21 * a10 - a11 * a20,
 
-  // Return the current tab list
-  getControllers: function() {
-    return this.controllers;
-  },
+        // Calculate the determinant
+        det = a00 * b01 + a01 * b11 + a02 * b21;
 
-  // Get the currently selected controller
-  getSelectedController: function() {
-    return this.selectedController;
-  },
-
-  // Get the index of the currently selected controller
-  getSelectedControllerIndex: function() {
-    return this.selectedIndex;
-  },
-
-  // Add a tab
-  addController: function(controller) {
-    this.controllers.push(controller);
-
-    this.tabBar.addItem({
-      title: controller.title,
-      icon: controller.icon,
-      badge: controller.badge
-    });
-
-    // If we don't have a selected controller yet, select the first one.
-    if(!this.selectedController) {
-      this.setSelectedController(0);
+    if (!det) {
+        return null;
     }
-  },
+    det = 1.0 / det;
 
-  // Set the tabs and select the first
-  setControllers: function(controllers) {
-    this.controllers = controllers;
-    this._clearSelected();
-    this.selectController(0);
-  },
-});
+    out[0] = b01 * det;
+    out[1] = (-a22 * a01 + a02 * a21) * det;
+    out[2] = (a12 * a01 - a02 * a11) * det;
+    out[3] = b11 * det;
+    out[4] = (a22 * a00 - a02 * a20) * det;
+    out[5] = (-a12 * a00 + a02 * a10) * det;
+    out[6] = b21 * det;
+    out[7] = (-a21 * a00 + a01 * a20) * det;
+    out[8] = (a11 * a00 - a01 * a10) * det;
+    return out;
+};
 
-})(window.ionic);
+/**
+ * Calculates the adjugate of a mat3
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat3} a the source matrix
+ * @returns {mat3} out
+ */
+mat3.adjoint = function(out, a) {
+    var a00 = a[0], a01 = a[1], a02 = a[2],
+        a10 = a[3], a11 = a[4], a12 = a[5],
+        a20 = a[6], a21 = a[7], a22 = a[8];
+
+    out[0] = (a11 * a22 - a12 * a21);
+    out[1] = (a02 * a21 - a01 * a22);
+    out[2] = (a01 * a12 - a02 * a11);
+    out[3] = (a12 * a20 - a10 * a22);
+    out[4] = (a00 * a22 - a02 * a20);
+    out[5] = (a02 * a10 - a00 * a12);
+    out[6] = (a10 * a21 - a11 * a20);
+    out[7] = (a01 * a20 - a00 * a21);
+    out[8] = (a00 * a11 - a01 * a10);
+    return out;
+};
+
+/**
+ * Calculates the determinant of a mat3
+ *
+ * @param {mat3} a the source matrix
+ * @returns {Number} determinant of a
+ */
+mat3.determinant = function (a) {
+    var a00 = a[0], a01 = a[1], a02 = a[2],
+        a10 = a[3], a11 = a[4], a12 = a[5],
+        a20 = a[6], a21 = a[7], a22 = a[8];
+
+    return a00 * (a22 * a11 - a12 * a21) + a01 * (-a22 * a10 + a12 * a20) + a02 * (a21 * a10 - a11 * a20);
+};
+
+/**
+ * Multiplies two mat3's
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat3} a the first operand
+ * @param {mat3} b the second operand
+ * @returns {mat3} out
+ */
+mat3.multiply = function (out, a, b) {
+    var a00 = a[0], a01 = a[1], a02 = a[2],
+        a10 = a[3], a11 = a[4], a12 = a[5],
+        a20 = a[6], a21 = a[7], a22 = a[8],
+
+        b00 = b[0], b01 = b[1], b02 = b[2],
+        b10 = b[3], b11 = b[4], b12 = b[5],
+        b20 = b[6], b21 = b[7], b22 = b[8];
+
+    out[0] = b00 * a00 + b01 * a10 + b02 * a20;
+    out[1] = b00 * a01 + b01 * a11 + b02 * a21;
+    out[2] = b00 * a02 + b01 * a12 + b02 * a22;
+
+    out[3] = b10 * a00 + b11 * a10 + b12 * a20;
+    out[4] = b10 * a01 + b11 * a11 + b12 * a21;
+    out[5] = b10 * a02 + b11 * a12 + b12 * a22;
+
+    out[6] = b20 * a00 + b21 * a10 + b22 * a20;
+    out[7] = b20 * a01 + b21 * a11 + b22 * a21;
+    out[8] = b20 * a02 + b21 * a12 + b22 * a22;
+    return out;
+};
+
+/**
+ * Alias for {@link mat3.multiply}
+ * @function
+ */
+mat3.mul = mat3.multiply;
+
+/**
+ * Translate a mat3 by the given vector
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat3} a the matrix to translate
+ * @param {vec2} v vector to translate by
+ * @returns {mat3} out
+ */
+mat3.translate = function(out, a, v) {
+    var a00 = a[0], a01 = a[1], a02 = a[2],
+        a10 = a[3], a11 = a[4], a12 = a[5],
+        a20 = a[6], a21 = a[7], a22 = a[8],
+        x = v[0], y = v[1];
+
+    out[0] = a00;
+    out[1] = a01;
+    out[2] = a02;
+
+    out[3] = a10;
+    out[4] = a11;
+    out[5] = a12;
+
+    out[6] = x * a00 + y * a10 + a20;
+    out[7] = x * a01 + y * a11 + a21;
+    out[8] = x * a02 + y * a12 + a22;
+    return out;
+};
+
+/**
+ * Rotates a mat3 by the given angle
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat3} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat3} out
+ */
+mat3.rotate = function (out, a, rad) {
+    var a00 = a[0], a01 = a[1], a02 = a[2],
+        a10 = a[3], a11 = a[4], a12 = a[5],
+        a20 = a[6], a21 = a[7], a22 = a[8],
+
+        s = Math.sin(rad),
+        c = Math.cos(rad);
+
+    out[0] = c * a00 + s * a10;
+    out[1] = c * a01 + s * a11;
+    out[2] = c * a02 + s * a12;
+
+    out[3] = c * a10 - s * a00;
+    out[4] = c * a11 - s * a01;
+    out[5] = c * a12 - s * a02;
+
+    out[6] = a20;
+    out[7] = a21;
+    out[8] = a22;
+    return out;
+};
+
+/**
+ * Scales the mat3 by the dimensions in the given vec2
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat3} a the matrix to rotate
+ * @param {vec2} v the vec2 to scale the matrix by
+ * @returns {mat3} out
+ **/
+mat3.scale = function(out, a, v) {
+    var x = v[0], y = v[1];
+
+    out[0] = x * a[0];
+    out[1] = x * a[1];
+    out[2] = x * a[2];
+
+    out[3] = y * a[3];
+    out[4] = y * a[4];
+    out[5] = y * a[5];
+
+    out[6] = a[6];
+    out[7] = a[7];
+    out[8] = a[8];
+    return out;
+};
+
+/**
+ * Copies the values from a mat2d into a mat3
+ *
+ * @param {mat3} out the receiving matrix
+ * @param {mat2d} a the matrix to copy
+ * @returns {mat3} out
+ **/
+mat3.fromMat2d = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = 0;
+
+    out[3] = a[2];
+    out[4] = a[3];
+    out[5] = 0;
+
+    out[6] = a[4];
+    out[7] = a[5];
+    out[8] = 1;
+    return out;
+};
+
+/**
+* Calculates a 3x3 matrix from the given quaternion
+*
+* @param {mat3} out mat3 receiving operation result
+* @param {quat} q Quaternion to create matrix from
+*
+* @returns {mat3} out
+*/
+mat3.fromQuat = function (out, q) {
+    var x = q[0], y = q[1], z = q[2], w = q[3],
+        x2 = x + x,
+        y2 = y + y,
+        z2 = z + z,
+
+        xx = x * x2,
+        yx = y * x2,
+        yy = y * y2,
+        zx = z * x2,
+        zy = z * y2,
+        zz = z * z2,
+        wx = w * x2,
+        wy = w * y2,
+        wz = w * z2;
+
+    out[0] = 1 - yy - zz;
+    out[3] = yx - wz;
+    out[6] = zx + wy;
+
+    out[1] = yx + wz;
+    out[4] = 1 - xx - zz;
+    out[7] = zy - wx;
+
+    out[2] = zx - wy;
+    out[5] = zy + wx;
+    out[8] = 1 - xx - yy;
+
+    return out;
+};
+
+/**
+* Calculates a 3x3 normal matrix (transpose inverse) from the 4x4 matrix
+*
+* @param {mat3} out mat3 receiving operation result
+* @param {mat4} a Mat4 to derive the normal matrix from
+*
+* @returns {mat3} out
+*/
+mat3.normalFromMat4 = function (out, a) {
+    var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+        a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+        a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15],
+
+        b00 = a00 * a11 - a01 * a10,
+        b01 = a00 * a12 - a02 * a10,
+        b02 = a00 * a13 - a03 * a10,
+        b03 = a01 * a12 - a02 * a11,
+        b04 = a01 * a13 - a03 * a11,
+        b05 = a02 * a13 - a03 * a12,
+        b06 = a20 * a31 - a21 * a30,
+        b07 = a20 * a32 - a22 * a30,
+        b08 = a20 * a33 - a23 * a30,
+        b09 = a21 * a32 - a22 * a31,
+        b10 = a21 * a33 - a23 * a31,
+        b11 = a22 * a33 - a23 * a32,
+
+        // Calculate the determinant
+        det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+
+    if (!det) {
+        return null;
+    }
+    det = 1.0 / det;
+
+    out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+    out[1] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+    out[2] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+
+    out[3] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+    out[4] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+    out[5] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+
+    out[6] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+    out[7] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+    out[8] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+
+    return out;
+};
+
+/**
+ * Returns a string representation of a mat3
+ *
+ * @param {mat3} mat matrix to represent as a string
+ * @returns {String} string representation of the matrix
+ */
+mat3.str = function (a) {
+    return 'mat3(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' +
+                    a[3] + ', ' + a[4] + ', ' + a[5] + ', ' +
+                    a[6] + ', ' + a[7] + ', ' + a[8] + ')';
+};
+
+/**
+ * Returns Frobenius norm of a mat3
+ *
+ * @param {mat3} a the matrix to calculate Frobenius norm of
+ * @returns {Number} Frobenius norm
+ */
+mat3.frob = function (a) {
+  return(Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2) + Math.pow(a[2], 2) + Math.pow(a[3], 2) + Math.pow(a[4], 2) + Math.pow(a[5], 2) + Math.pow(a[6], 2) + Math.pow(a[7], 2) + Math.pow(a[8], 2)));
+};
+
+
+if(typeof(exports) !== 'undefined') {
+    exports.mat3 = mat3;
+}
+
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+/**
+ * @class 4x4 Matrix
+ * @name mat4
+ */
+
+var mat4 = {};
+
+/**
+ * Creates a new identity mat4
+ *
+ * @returns {mat4} a new 4x4 matrix
+ */
+mat4.create = function() {
+    var out = new GLMAT_ARRAY_TYPE(16);
+    out[0] = 1;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = 1;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[10] = 1;
+    out[11] = 0;
+    out[12] = 0;
+    out[13] = 0;
+    out[14] = 0;
+    out[15] = 1;
+    return out;
+};
+
+/**
+ * Creates a new mat4 initialized with values from an existing matrix
+ *
+ * @param {mat4} a matrix to clone
+ * @returns {mat4} a new 4x4 matrix
+ */
+mat4.clone = function(a) {
+    var out = new GLMAT_ARRAY_TYPE(16);
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    out[4] = a[4];
+    out[5] = a[5];
+    out[6] = a[6];
+    out[7] = a[7];
+    out[8] = a[8];
+    out[9] = a[9];
+    out[10] = a[10];
+    out[11] = a[11];
+    out[12] = a[12];
+    out[13] = a[13];
+    out[14] = a[14];
+    out[15] = a[15];
+    return out;
+};
+
+/**
+ * Copy the values from one mat4 to another
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the source matrix
+ * @returns {mat4} out
+ */
+mat4.copy = function(out, a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    out[4] = a[4];
+    out[5] = a[5];
+    out[6] = a[6];
+    out[7] = a[7];
+    out[8] = a[8];
+    out[9] = a[9];
+    out[10] = a[10];
+    out[11] = a[11];
+    out[12] = a[12];
+    out[13] = a[13];
+    out[14] = a[14];
+    out[15] = a[15];
+    return out;
+};
+
+/**
+ * Set a mat4 to the identity matrix
+ *
+ * @param {mat4} out the receiving matrix
+ * @returns {mat4} out
+ */
+mat4.identity = function(out) {
+    out[0] = 1;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = 1;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[10] = 1;
+    out[11] = 0;
+    out[12] = 0;
+    out[13] = 0;
+    out[14] = 0;
+    out[15] = 1;
+    return out;
+};
+
+/**
+ * Transpose the values of a mat4
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the source matrix
+ * @returns {mat4} out
+ */
+mat4.transpose = function(out, a) {
+    // If we are transposing ourselves we can skip a few steps but have to cache some values
+    if (out === a) {
+        var a01 = a[1], a02 = a[2], a03 = a[3],
+            a12 = a[6], a13 = a[7],
+            a23 = a[11];
+
+        out[1] = a[4];
+        out[2] = a[8];
+        out[3] = a[12];
+        out[4] = a01;
+        out[6] = a[9];
+        out[7] = a[13];
+        out[8] = a02;
+        out[9] = a12;
+        out[11] = a[14];
+        out[12] = a03;
+        out[13] = a13;
+        out[14] = a23;
+    } else {
+        out[0] = a[0];
+        out[1] = a[4];
+        out[2] = a[8];
+        out[3] = a[12];
+        out[4] = a[1];
+        out[5] = a[5];
+        out[6] = a[9];
+        out[7] = a[13];
+        out[8] = a[2];
+        out[9] = a[6];
+        out[10] = a[10];
+        out[11] = a[14];
+        out[12] = a[3];
+        out[13] = a[7];
+        out[14] = a[11];
+        out[15] = a[15];
+    }
+
+    return out;
+};
+
+/**
+ * Inverts a mat4
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the source matrix
+ * @returns {mat4} out
+ */
+mat4.invert = function(out, a) {
+    var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+        a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+        a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15],
+
+        b00 = a00 * a11 - a01 * a10,
+        b01 = a00 * a12 - a02 * a10,
+        b02 = a00 * a13 - a03 * a10,
+        b03 = a01 * a12 - a02 * a11,
+        b04 = a01 * a13 - a03 * a11,
+        b05 = a02 * a13 - a03 * a12,
+        b06 = a20 * a31 - a21 * a30,
+        b07 = a20 * a32 - a22 * a30,
+        b08 = a20 * a33 - a23 * a30,
+        b09 = a21 * a32 - a22 * a31,
+        b10 = a21 * a33 - a23 * a31,
+        b11 = a22 * a33 - a23 * a32,
+
+        // Calculate the determinant
+        det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+
+    if (!det) {
+        return null;
+    }
+    det = 1.0 / det;
+
+    out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+    out[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+    out[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+    out[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
+    out[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+    out[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+    out[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+    out[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
+    out[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+    out[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+    out[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+    out[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
+    out[12] = (a11 * b07 - a10 * b09 - a12 * b06) * det;
+    out[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
+    out[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
+    out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+
+    return out;
+};
+
+/**
+ * Calculates the adjugate of a mat4
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the source matrix
+ * @returns {mat4} out
+ */
+mat4.adjoint = function(out, a) {
+    var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+        a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+        a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+
+    out[0]  =  (a11 * (a22 * a33 - a23 * a32) - a21 * (a12 * a33 - a13 * a32) + a31 * (a12 * a23 - a13 * a22));
+    out[1]  = -(a01 * (a22 * a33 - a23 * a32) - a21 * (a02 * a33 - a03 * a32) + a31 * (a02 * a23 - a03 * a22));
+    out[2]  =  (a01 * (a12 * a33 - a13 * a32) - a11 * (a02 * a33 - a03 * a32) + a31 * (a02 * a13 - a03 * a12));
+    out[3]  = -(a01 * (a12 * a23 - a13 * a22) - a11 * (a02 * a23 - a03 * a22) + a21 * (a02 * a13 - a03 * a12));
+    out[4]  = -(a10 * (a22 * a33 - a23 * a32) - a20 * (a12 * a33 - a13 * a32) + a30 * (a12 * a23 - a13 * a22));
+    out[5]  =  (a00 * (a22 * a33 - a23 * a32) - a20 * (a02 * a33 - a03 * a32) + a30 * (a02 * a23 - a03 * a22));
+    out[6]  = -(a00 * (a12 * a33 - a13 * a32) - a10 * (a02 * a33 - a03 * a32) + a30 * (a02 * a13 - a03 * a12));
+    out[7]  =  (a00 * (a12 * a23 - a13 * a22) - a10 * (a02 * a23 - a03 * a22) + a20 * (a02 * a13 - a03 * a12));
+    out[8]  =  (a10 * (a21 * a33 - a23 * a31) - a20 * (a11 * a33 - a13 * a31) + a30 * (a11 * a23 - a13 * a21));
+    out[9]  = -(a00 * (a21 * a33 - a23 * a31) - a20 * (a01 * a33 - a03 * a31) + a30 * (a01 * a23 - a03 * a21));
+    out[10] =  (a00 * (a11 * a33 - a13 * a31) - a10 * (a01 * a33 - a03 * a31) + a30 * (a01 * a13 - a03 * a11));
+    out[11] = -(a00 * (a11 * a23 - a13 * a21) - a10 * (a01 * a23 - a03 * a21) + a20 * (a01 * a13 - a03 * a11));
+    out[12] = -(a10 * (a21 * a32 - a22 * a31) - a20 * (a11 * a32 - a12 * a31) + a30 * (a11 * a22 - a12 * a21));
+    out[13] =  (a00 * (a21 * a32 - a22 * a31) - a20 * (a01 * a32 - a02 * a31) + a30 * (a01 * a22 - a02 * a21));
+    out[14] = -(a00 * (a11 * a32 - a12 * a31) - a10 * (a01 * a32 - a02 * a31) + a30 * (a01 * a12 - a02 * a11));
+    out[15] =  (a00 * (a11 * a22 - a12 * a21) - a10 * (a01 * a22 - a02 * a21) + a20 * (a01 * a12 - a02 * a11));
+    return out;
+};
+
+/**
+ * Calculates the determinant of a mat4
+ *
+ * @param {mat4} a the source matrix
+ * @returns {Number} determinant of a
+ */
+mat4.determinant = function (a) {
+    var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+        a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+        a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15],
+
+        b00 = a00 * a11 - a01 * a10,
+        b01 = a00 * a12 - a02 * a10,
+        b02 = a00 * a13 - a03 * a10,
+        b03 = a01 * a12 - a02 * a11,
+        b04 = a01 * a13 - a03 * a11,
+        b05 = a02 * a13 - a03 * a12,
+        b06 = a20 * a31 - a21 * a30,
+        b07 = a20 * a32 - a22 * a30,
+        b08 = a20 * a33 - a23 * a30,
+        b09 = a21 * a32 - a22 * a31,
+        b10 = a21 * a33 - a23 * a31,
+        b11 = a22 * a33 - a23 * a32;
+
+    // Calculate the determinant
+    return b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+};
+
+/**
+ * Multiplies two mat4's
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the first operand
+ * @param {mat4} b the second operand
+ * @returns {mat4} out
+ */
+mat4.multiply = function (out, a, b) {
+    var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+        a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+        a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+
+    // Cache only the current line of the second matrix
+    var b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+    out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
+    out[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
+    out[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
+    out[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    return out;
+};
+
+/**
+ * Alias for {@link mat4.multiply}
+ * @function
+ */
+mat4.mul = mat4.multiply;
+
+/**
+ * Translate a mat4 by the given vector
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to translate
+ * @param {vec3} v vector to translate by
+ * @returns {mat4} out
+ */
+mat4.translate = function (out, a, v) {
+    var x = v[0], y = v[1], z = v[2],
+        a00, a01, a02, a03,
+        a10, a11, a12, a13,
+        a20, a21, a22, a23;
+
+    if (a === out) {
+        out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
+        out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
+        out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
+        out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
+    } else {
+        a00 = a[0]; a01 = a[1]; a02 = a[2]; a03 = a[3];
+        a10 = a[4]; a11 = a[5]; a12 = a[6]; a13 = a[7];
+        a20 = a[8]; a21 = a[9]; a22 = a[10]; a23 = a[11];
+
+        out[0] = a00; out[1] = a01; out[2] = a02; out[3] = a03;
+        out[4] = a10; out[5] = a11; out[6] = a12; out[7] = a13;
+        out[8] = a20; out[9] = a21; out[10] = a22; out[11] = a23;
+
+        out[12] = a00 * x + a10 * y + a20 * z + a[12];
+        out[13] = a01 * x + a11 * y + a21 * z + a[13];
+        out[14] = a02 * x + a12 * y + a22 * z + a[14];
+        out[15] = a03 * x + a13 * y + a23 * z + a[15];
+    }
+
+    return out;
+};
+
+/**
+ * Scales the mat4 by the dimensions in the given vec3
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to scale
+ * @param {vec3} v the vec3 to scale the matrix by
+ * @returns {mat4} out
+ **/
+mat4.scale = function(out, a, v) {
+    var x = v[0], y = v[1], z = v[2];
+
+    out[0] = a[0] * x;
+    out[1] = a[1] * x;
+    out[2] = a[2] * x;
+    out[3] = a[3] * x;
+    out[4] = a[4] * y;
+    out[5] = a[5] * y;
+    out[6] = a[6] * y;
+    out[7] = a[7] * y;
+    out[8] = a[8] * z;
+    out[9] = a[9] * z;
+    out[10] = a[10] * z;
+    out[11] = a[11] * z;
+    out[12] = a[12];
+    out[13] = a[13];
+    out[14] = a[14];
+    out[15] = a[15];
+    return out;
+};
+
+/**
+ * Rotates a mat4 by the given angle
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @param {vec3} axis the axis to rotate around
+ * @returns {mat4} out
+ */
+mat4.rotate = function (out, a, rad, axis) {
+    var x = axis[0], y = axis[1], z = axis[2],
+        len = Math.sqrt(x * x + y * y + z * z),
+        s, c, t,
+        a00, a01, a02, a03,
+        a10, a11, a12, a13,
+        a20, a21, a22, a23,
+        b00, b01, b02,
+        b10, b11, b12,
+        b20, b21, b22;
+
+    if (Math.abs(len) < GLMAT_EPSILON) { return null; }
+
+    len = 1 / len;
+    x *= len;
+    y *= len;
+    z *= len;
+
+    s = Math.sin(rad);
+    c = Math.cos(rad);
+    t = 1 - c;
+
+    a00 = a[0]; a01 = a[1]; a02 = a[2]; a03 = a[3];
+    a10 = a[4]; a11 = a[5]; a12 = a[6]; a13 = a[7];
+    a20 = a[8]; a21 = a[9]; a22 = a[10]; a23 = a[11];
+
+    // Construct the elements of the rotation matrix
+    b00 = x * x * t + c; b01 = y * x * t + z * s; b02 = z * x * t - y * s;
+    b10 = x * y * t - z * s; b11 = y * y * t + c; b12 = z * y * t + x * s;
+    b20 = x * z * t + y * s; b21 = y * z * t - x * s; b22 = z * z * t + c;
+
+    // Perform rotation-specific matrix multiplication
+    out[0] = a00 * b00 + a10 * b01 + a20 * b02;
+    out[1] = a01 * b00 + a11 * b01 + a21 * b02;
+    out[2] = a02 * b00 + a12 * b01 + a22 * b02;
+    out[3] = a03 * b00 + a13 * b01 + a23 * b02;
+    out[4] = a00 * b10 + a10 * b11 + a20 * b12;
+    out[5] = a01 * b10 + a11 * b11 + a21 * b12;
+    out[6] = a02 * b10 + a12 * b11 + a22 * b12;
+    out[7] = a03 * b10 + a13 * b11 + a23 * b12;
+    out[8] = a00 * b20 + a10 * b21 + a20 * b22;
+    out[9] = a01 * b20 + a11 * b21 + a21 * b22;
+    out[10] = a02 * b20 + a12 * b21 + a22 * b22;
+    out[11] = a03 * b20 + a13 * b21 + a23 * b22;
+
+    if (a !== out) { // If the source and destination differ, copy the unchanged last row
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+    }
+    return out;
+};
+
+/**
+ * Rotates a matrix by the given angle around the X axis
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+mat4.rotateX = function (out, a, rad) {
+    var s = Math.sin(rad),
+        c = Math.cos(rad),
+        a10 = a[4],
+        a11 = a[5],
+        a12 = a[6],
+        a13 = a[7],
+        a20 = a[8],
+        a21 = a[9],
+        a22 = a[10],
+        a23 = a[11];
+
+    if (a !== out) { // If the source and destination differ, copy the unchanged rows
+        out[0]  = a[0];
+        out[1]  = a[1];
+        out[2]  = a[2];
+        out[3]  = a[3];
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+    }
+
+    // Perform axis-specific matrix multiplication
+    out[4] = a10 * c + a20 * s;
+    out[5] = a11 * c + a21 * s;
+    out[6] = a12 * c + a22 * s;
+    out[7] = a13 * c + a23 * s;
+    out[8] = a20 * c - a10 * s;
+    out[9] = a21 * c - a11 * s;
+    out[10] = a22 * c - a12 * s;
+    out[11] = a23 * c - a13 * s;
+    return out;
+};
+
+/**
+ * Rotates a matrix by the given angle around the Y axis
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+mat4.rotateY = function (out, a, rad) {
+    var s = Math.sin(rad),
+        c = Math.cos(rad),
+        a00 = a[0],
+        a01 = a[1],
+        a02 = a[2],
+        a03 = a[3],
+        a20 = a[8],
+        a21 = a[9],
+        a22 = a[10],
+        a23 = a[11];
+
+    if (a !== out) { // If the source and destination differ, copy the unchanged rows
+        out[4]  = a[4];
+        out[5]  = a[5];
+        out[6]  = a[6];
+        out[7]  = a[7];
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+    }
+
+    // Perform axis-specific matrix multiplication
+    out[0] = a00 * c - a20 * s;
+    out[1] = a01 * c - a21 * s;
+    out[2] = a02 * c - a22 * s;
+    out[3] = a03 * c - a23 * s;
+    out[8] = a00 * s + a20 * c;
+    out[9] = a01 * s + a21 * c;
+    out[10] = a02 * s + a22 * c;
+    out[11] = a03 * s + a23 * c;
+    return out;
+};
+
+/**
+ * Rotates a matrix by the given angle around the Z axis
+ *
+ * @param {mat4} out the receiving matrix
+ * @param {mat4} a the matrix to rotate
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+mat4.rotateZ = function (out, a, rad) {
+    var s = Math.sin(rad),
+        c = Math.cos(rad),
+        a00 = a[0],
+        a01 = a[1],
+        a02 = a[2],
+        a03 = a[3],
+        a10 = a[4],
+        a11 = a[5],
+        a12 = a[6],
+        a13 = a[7];
+
+    if (a !== out) { // If the source and destination differ, copy the unchanged last row
+        out[8]  = a[8];
+        out[9]  = a[9];
+        out[10] = a[10];
+        out[11] = a[11];
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+    }
+
+    // Perform axis-specific matrix multiplication
+    out[0] = a00 * c + a10 * s;
+    out[1] = a01 * c + a11 * s;
+    out[2] = a02 * c + a12 * s;
+    out[3] = a03 * c + a13 * s;
+    out[4] = a10 * c - a00 * s;
+    out[5] = a11 * c - a01 * s;
+    out[6] = a12 * c - a02 * s;
+    out[7] = a13 * c - a03 * s;
+    return out;
+};
+
+/**
+ * Creates a matrix from a quaternion rotation and vector translation
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.translate(dest, vec);
+ *     var quatMat = mat4.create();
+ *     quat4.toMat4(quat, quatMat);
+ *     mat4.multiply(dest, quatMat);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {quat4} q Rotation quaternion
+ * @param {vec3} v Translation vector
+ * @returns {mat4} out
+ */
+mat4.fromRotationTranslation = function (out, q, v) {
+    // Quaternion math
+    var x = q[0], y = q[1], z = q[2], w = q[3],
+        x2 = x + x,
+        y2 = y + y,
+        z2 = z + z,
+
+        xx = x * x2,
+        xy = x * y2,
+        xz = x * z2,
+        yy = y * y2,
+        yz = y * z2,
+        zz = z * z2,
+        wx = w * x2,
+        wy = w * y2,
+        wz = w * z2;
+
+    out[0] = 1 - (yy + zz);
+    out[1] = xy + wz;
+    out[2] = xz - wy;
+    out[3] = 0;
+    out[4] = xy - wz;
+    out[5] = 1 - (xx + zz);
+    out[6] = yz + wx;
+    out[7] = 0;
+    out[8] = xz + wy;
+    out[9] = yz - wx;
+    out[10] = 1 - (xx + yy);
+    out[11] = 0;
+    out[12] = v[0];
+    out[13] = v[1];
+    out[14] = v[2];
+    out[15] = 1;
+
+    return out;
+};
+
+mat4.fromQuat = function (out, q) {
+    var x = q[0], y = q[1], z = q[2], w = q[3],
+        x2 = x + x,
+        y2 = y + y,
+        z2 = z + z,
+
+        xx = x * x2,
+        yx = y * x2,
+        yy = y * y2,
+        zx = z * x2,
+        zy = z * y2,
+        zz = z * z2,
+        wx = w * x2,
+        wy = w * y2,
+        wz = w * z2;
+
+    out[0] = 1 - yy - zz;
+    out[1] = yx + wz;
+    out[2] = zx - wy;
+    out[3] = 0;
+
+    out[4] = yx - wz;
+    out[5] = 1 - xx - zz;
+    out[6] = zy + wx;
+    out[7] = 0;
+
+    out[8] = zx + wy;
+    out[9] = zy - wx;
+    out[10] = 1 - xx - yy;
+    out[11] = 0;
+
+    out[12] = 0;
+    out[13] = 0;
+    out[14] = 0;
+    out[15] = 1;
+
+    return out;
+};
+
+/**
+ * Generates a frustum matrix with the given bounds
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {Number} left Left bound of the frustum
+ * @param {Number} right Right bound of the frustum
+ * @param {Number} bottom Bottom bound of the frustum
+ * @param {Number} top Top bound of the frustum
+ * @param {Number} near Near bound of the frustum
+ * @param {Number} far Far bound of the frustum
+ * @returns {mat4} out
+ */
+mat4.frustum = function (out, left, right, bottom, top, near, far) {
+    var rl = 1 / (right - left),
+        tb = 1 / (top - bottom),
+        nf = 1 / (near - far);
+    out[0] = (near * 2) * rl;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = (near * 2) * tb;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = (right + left) * rl;
+    out[9] = (top + bottom) * tb;
+    out[10] = (far + near) * nf;
+    out[11] = -1;
+    out[12] = 0;
+    out[13] = 0;
+    out[14] = (far * near * 2) * nf;
+    out[15] = 0;
+    return out;
+};
+
+/**
+ * Generates a perspective projection matrix with the given bounds
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {number} fovy Vertical field of view in radians
+ * @param {number} aspect Aspect ratio. typically viewport width/height
+ * @param {number} near Near bound of the frustum
+ * @param {number} far Far bound of the frustum
+ * @returns {mat4} out
+ */
+mat4.perspective = function (out, fovy, aspect, near, far) {
+    var f = 1.0 / Math.tan(fovy / 2),
+        nf = 1 / (near - far);
+    out[0] = f / aspect;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = f;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[10] = (far + near) * nf;
+    out[11] = -1;
+    out[12] = 0;
+    out[13] = 0;
+    out[14] = (2 * far * near) * nf;
+    out[15] = 0;
+    return out;
+};
+
+/**
+ * Generates a orthogonal projection matrix with the given bounds
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {number} left Left bound of the frustum
+ * @param {number} right Right bound of the frustum
+ * @param {number} bottom Bottom bound of the frustum
+ * @param {number} top Top bound of the frustum
+ * @param {number} near Near bound of the frustum
+ * @param {number} far Far bound of the frustum
+ * @returns {mat4} out
+ */
+mat4.ortho = function (out, left, right, bottom, top, near, far) {
+    var lr = 1 / (left - right),
+        bt = 1 / (bottom - top),
+        nf = 1 / (near - far);
+    out[0] = -2 * lr;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = -2 * bt;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[10] = 2 * nf;
+    out[11] = 0;
+    out[12] = (left + right) * lr;
+    out[13] = (top + bottom) * bt;
+    out[14] = (far + near) * nf;
+    out[15] = 1;
+    return out;
+};
+
+/**
+ * Generates a look-at matrix with the given eye position, focal point, and up axis
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {vec3} eye Position of the viewer
+ * @param {vec3} center Point the viewer is looking at
+ * @param {vec3} up vec3 pointing up
+ * @returns {mat4} out
+ */
+mat4.lookAt = function (out, eye, center, up) {
+    var x0, x1, x2, y0, y1, y2, z0, z1, z2, len,
+        eyex = eye[0],
+        eyey = eye[1],
+        eyez = eye[2],
+        upx = up[0],
+        upy = up[1],
+        upz = up[2],
+        centerx = center[0],
+        centery = center[1],
+        centerz = center[2];
+
+    if (Math.abs(eyex - centerx) < GLMAT_EPSILON &&
+        Math.abs(eyey - centery) < GLMAT_EPSILON &&
+        Math.abs(eyez - centerz) < GLMAT_EPSILON) {
+        return mat4.identity(out);
+    }
+
+    z0 = eyex - centerx;
+    z1 = eyey - centery;
+    z2 = eyez - centerz;
+
+    len = 1 / Math.sqrt(z0 * z0 + z1 * z1 + z2 * z2);
+    z0 *= len;
+    z1 *= len;
+    z2 *= len;
+
+    x0 = upy * z2 - upz * z1;
+    x1 = upz * z0 - upx * z2;
+    x2 = upx * z1 - upy * z0;
+    len = Math.sqrt(x0 * x0 + x1 * x1 + x2 * x2);
+    if (!len) {
+        x0 = 0;
+        x1 = 0;
+        x2 = 0;
+    } else {
+        len = 1 / len;
+        x0 *= len;
+        x1 *= len;
+        x2 *= len;
+    }
+
+    y0 = z1 * x2 - z2 * x1;
+    y1 = z2 * x0 - z0 * x2;
+    y2 = z0 * x1 - z1 * x0;
+
+    len = Math.sqrt(y0 * y0 + y1 * y1 + y2 * y2);
+    if (!len) {
+        y0 = 0;
+        y1 = 0;
+        y2 = 0;
+    } else {
+        len = 1 / len;
+        y0 *= len;
+        y1 *= len;
+        y2 *= len;
+    }
+
+    out[0] = x0;
+    out[1] = y0;
+    out[2] = z0;
+    out[3] = 0;
+    out[4] = x1;
+    out[5] = y1;
+    out[6] = z1;
+    out[7] = 0;
+    out[8] = x2;
+    out[9] = y2;
+    out[10] = z2;
+    out[11] = 0;
+    out[12] = -(x0 * eyex + x1 * eyey + x2 * eyez);
+    out[13] = -(y0 * eyex + y1 * eyey + y2 * eyez);
+    out[14] = -(z0 * eyex + z1 * eyey + z2 * eyez);
+    out[15] = 1;
+
+    return out;
+};
+
+/**
+ * Returns a string representation of a mat4
+ *
+ * @param {mat4} mat matrix to represent as a string
+ * @returns {String} string representation of the matrix
+ */
+mat4.str = function (a) {
+    return 'mat4(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ', ' +
+                    a[4] + ', ' + a[5] + ', ' + a[6] + ', ' + a[7] + ', ' +
+                    a[8] + ', ' + a[9] + ', ' + a[10] + ', ' + a[11] + ', ' +
+                    a[12] + ', ' + a[13] + ', ' + a[14] + ', ' + a[15] + ')';
+};
+
+/**
+ * Returns Frobenius norm of a mat4
+ *
+ * @param {mat4} a the matrix to calculate Frobenius norm of
+ * @returns {Number} Frobenius norm
+ */
+mat4.frob = function (a) {
+  return(Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2) + Math.pow(a[2], 2) + Math.pow(a[3], 2) + Math.pow(a[4], 2) + Math.pow(a[5], 2) + Math.pow(a[6], 2) + Math.pow(a[6], 2) + Math.pow(a[7], 2) + Math.pow(a[8], 2) + Math.pow(a[9], 2) + Math.pow(a[10], 2) + Math.pow(a[11], 2) + Math.pow(a[12], 2) + Math.pow(a[13], 2) + Math.pow(a[14], 2) + Math.pow(a[15], 2) ));
+};
+
+
+if(typeof(exports) !== 'undefined') {
+    exports.mat4 = mat4;
+}
+
+/* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+/**
+ * @class Quaternion
+ * @name quat
+ */
+
+var quat = {};
+
+/**
+ * Creates a new identity quat
+ *
+ * @returns {quat} a new quaternion
+ */
+quat.create = function() {
+    var out = new GLMAT_ARRAY_TYPE(4);
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 1;
+    return out;
+};
+
+/**
+ * Sets a quaternion to represent the shortest rotation from one
+ * vector to another.
+ *
+ * Both vectors are assumed to be unit length.
+ *
+ * @param {quat} out the receiving quaternion.
+ * @param {vec3} a the initial vector
+ * @param {vec3} b the destination vector
+ * @returns {quat} out
+ */
+quat.rotationTo = (function() {
+    var tmpvec3 = vec3.create();
+    var xUnitVec3 = vec3.fromValues(1,0,0);
+    var yUnitVec3 = vec3.fromValues(0,1,0);
+
+    return function(out, a, b) {
+        var dot = vec3.dot(a, b);
+        if (dot < -0.999999) {
+            vec3.cross(tmpvec3, xUnitVec3, a);
+            if (vec3.length(tmpvec3) < 0.000001)
+                vec3.cross(tmpvec3, yUnitVec3, a);
+            vec3.normalize(tmpvec3, tmpvec3);
+            quat.setAxisAngle(out, tmpvec3, Math.PI);
+            return out;
+        } else if (dot > 0.999999) {
+            out[0] = 0;
+            out[1] = 0;
+            out[2] = 0;
+            out[3] = 1;
+            return out;
+        } else {
+            vec3.cross(tmpvec3, a, b);
+            out[0] = tmpvec3[0];
+            out[1] = tmpvec3[1];
+            out[2] = tmpvec3[2];
+            out[3] = 1 + dot;
+            return quat.normalize(out, out);
+        }
+    };
+})();
+
+/**
+ * Sets the specified quaternion with values corresponding to the given
+ * axes. Each axis is a vec3 and is expected to be unit length and
+ * perpendicular to all other specified axes.
+ *
+ * @param {vec3} view  the vector representing the viewing direction
+ * @param {vec3} right the vector representing the local "right" direction
+ * @param {vec3} up    the vector representing the local "up" direction
+ * @returns {quat} out
+ */
+quat.setAxes = (function() {
+    var matr = mat3.create();
+
+    return function(out, view, right, up) {
+        matr[0] = right[0];
+        matr[3] = right[1];
+        matr[6] = right[2];
+
+        matr[1] = up[0];
+        matr[4] = up[1];
+        matr[7] = up[2];
+
+        matr[2] = -view[0];
+        matr[5] = -view[1];
+        matr[8] = -view[2];
+
+        return quat.normalize(out, quat.fromMat3(out, matr));
+    };
+})();
+
+/**
+ * Creates a new quat initialized with values from an existing quaternion
+ *
+ * @param {quat} a quaternion to clone
+ * @returns {quat} a new quaternion
+ * @function
+ */
+quat.clone = vec4.clone;
+
+/**
+ * Creates a new quat initialized with the given values
+ *
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @param {Number} z Z component
+ * @param {Number} w W component
+ * @returns {quat} a new quaternion
+ * @function
+ */
+quat.fromValues = vec4.fromValues;
+
+/**
+ * Copy the values from one quat to another
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a the source quaternion
+ * @returns {quat} out
+ * @function
+ */
+quat.copy = vec4.copy;
+
+/**
+ * Set the components of a quat to the given values
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {Number} x X component
+ * @param {Number} y Y component
+ * @param {Number} z Z component
+ * @param {Number} w W component
+ * @returns {quat} out
+ * @function
+ */
+quat.set = vec4.set;
+
+/**
+ * Set a quat to the identity quaternion
+ *
+ * @param {quat} out the receiving quaternion
+ * @returns {quat} out
+ */
+quat.identity = function(out) {
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 1;
+    return out;
+};
+
+/**
+ * Sets a quat from the given angle and rotation axis,
+ * then returns it.
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {vec3} axis the axis around which to rotate
+ * @param {Number} rad the angle in radians
+ * @returns {quat} out
+ **/
+quat.setAxisAngle = function(out, axis, rad) {
+    rad = rad * 0.5;
+    var s = Math.sin(rad);
+    out[0] = s * axis[0];
+    out[1] = s * axis[1];
+    out[2] = s * axis[2];
+    out[3] = Math.cos(rad);
+    return out;
+};
+
+/**
+ * Adds two quat's
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a the first operand
+ * @param {quat} b the second operand
+ * @returns {quat} out
+ * @function
+ */
+quat.add = vec4.add;
+
+/**
+ * Multiplies two quat's
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a the first operand
+ * @param {quat} b the second operand
+ * @returns {quat} out
+ */
+quat.multiply = function(out, a, b) {
+    var ax = a[0], ay = a[1], az = a[2], aw = a[3],
+        bx = b[0], by = b[1], bz = b[2], bw = b[3];
+
+    out[0] = ax * bw + aw * bx + ay * bz - az * by;
+    out[1] = ay * bw + aw * by + az * bx - ax * bz;
+    out[2] = az * bw + aw * bz + ax * by - ay * bx;
+    out[3] = aw * bw - ax * bx - ay * by - az * bz;
+    return out;
+};
+
+/**
+ * Alias for {@link quat.multiply}
+ * @function
+ */
+quat.mul = quat.multiply;
+
+/**
+ * Scales a quat by a scalar number
+ *
+ * @param {quat} out the receiving vector
+ * @param {quat} a the vector to scale
+ * @param {Number} b amount to scale the vector by
+ * @returns {quat} out
+ * @function
+ */
+quat.scale = vec4.scale;
+
+/**
+ * Rotates a quaternion by the given angle about the X axis
+ *
+ * @param {quat} out quat receiving operation result
+ * @param {quat} a quat to rotate
+ * @param {number} rad angle (in radians) to rotate
+ * @returns {quat} out
+ */
+quat.rotateX = function (out, a, rad) {
+    rad *= 0.5;
+
+    var ax = a[0], ay = a[1], az = a[2], aw = a[3],
+        bx = Math.sin(rad), bw = Math.cos(rad);
+
+    out[0] = ax * bw + aw * bx;
+    out[1] = ay * bw + az * bx;
+    out[2] = az * bw - ay * bx;
+    out[3] = aw * bw - ax * bx;
+    return out;
+};
+
+/**
+ * Rotates a quaternion by the given angle about the Y axis
+ *
+ * @param {quat} out quat receiving operation result
+ * @param {quat} a quat to rotate
+ * @param {number} rad angle (in radians) to rotate
+ * @returns {quat} out
+ */
+quat.rotateY = function (out, a, rad) {
+    rad *= 0.5;
+
+    var ax = a[0], ay = a[1], az = a[2], aw = a[3],
+        by = Math.sin(rad), bw = Math.cos(rad);
+
+    out[0] = ax * bw - az * by;
+    out[1] = ay * bw + aw * by;
+    out[2] = az * bw + ax * by;
+    out[3] = aw * bw - ay * by;
+    return out;
+};
+
+/**
+ * Rotates a quaternion by the given angle about the Z axis
+ *
+ * @param {quat} out quat receiving operation result
+ * @param {quat} a quat to rotate
+ * @param {number} rad angle (in radians) to rotate
+ * @returns {quat} out
+ */
+quat.rotateZ = function (out, a, rad) {
+    rad *= 0.5;
+
+    var ax = a[0], ay = a[1], az = a[2], aw = a[3],
+        bz = Math.sin(rad), bw = Math.cos(rad);
+
+    out[0] = ax * bw + ay * bz;
+    out[1] = ay * bw - ax * bz;
+    out[2] = az * bw + aw * bz;
+    out[3] = aw * bw - az * bz;
+    return out;
+};
+
+/**
+ * Calculates the W component of a quat from the X, Y, and Z components.
+ * Assumes that quaternion is 1 unit in length.
+ * Any existing W component will be ignored.
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a quat to calculate W component of
+ * @returns {quat} out
+ */
+quat.calculateW = function (out, a) {
+    var x = a[0], y = a[1], z = a[2];
+
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    out[3] = -Math.sqrt(Math.abs(1.0 - x * x - y * y - z * z));
+    return out;
+};
+
+/**
+ * Calculates the dot product of two quat's
+ *
+ * @param {quat} a the first operand
+ * @param {quat} b the second operand
+ * @returns {Number} dot product of a and b
+ * @function
+ */
+quat.dot = vec4.dot;
+
+/**
+ * Performs a linear interpolation between two quat's
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a the first operand
+ * @param {quat} b the second operand
+ * @param {Number} t interpolation amount between the two inputs
+ * @returns {quat} out
+ * @function
+ */
+quat.lerp = vec4.lerp;
+
+/**
+ * Performs a spherical linear interpolation between two quat
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a the first operand
+ * @param {quat} b the second operand
+ * @param {Number} t interpolation amount between the two inputs
+ * @returns {quat} out
+ */
+quat.slerp = function (out, a, b, t) {
+    // benchmarks:
+    //    http://jsperf.com/quaternion-slerp-implementations
+
+    var ax = a[0], ay = a[1], az = a[2], aw = a[3],
+        bx = b[0], by = b[1], bz = b[2], bw = b[3];
+
+    var        omega, cosom, sinom, scale0, scale1;
+
+    // calc cosine
+    cosom = ax * bx + ay * by + az * bz + aw * bw;
+    // adjust signs (if necessary)
+    if ( cosom < 0.0 ) {
+        cosom = -cosom;
+        bx = - bx;
+        by = - by;
+        bz = - bz;
+        bw = - bw;
+    }
+    // calculate coefficients
+    if ( (1.0 - cosom) > 0.000001 ) {
+        // standard case (slerp)
+        omega  = Math.acos(cosom);
+        sinom  = Math.sin(omega);
+        scale0 = Math.sin((1.0 - t) * omega) / sinom;
+        scale1 = Math.sin(t * omega) / sinom;
+    } else {
+        // "from" and "to" quaternions are very close
+        //  ... so we can do a linear interpolation
+        scale0 = 1.0 - t;
+        scale1 = t;
+    }
+    // calculate final values
+    out[0] = scale0 * ax + scale1 * bx;
+    out[1] = scale0 * ay + scale1 * by;
+    out[2] = scale0 * az + scale1 * bz;
+    out[3] = scale0 * aw + scale1 * bw;
+
+    return out;
+};
+
+/**
+ * Calculates the inverse of a quat
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a quat to calculate inverse of
+ * @returns {quat} out
+ */
+quat.invert = function(out, a) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
+        dot = a0*a0 + a1*a1 + a2*a2 + a3*a3,
+        invDot = dot ? 1.0/dot : 0;
+
+    // TODO: Would be faster to return [0,0,0,0] immediately if dot == 0
+
+    out[0] = -a0*invDot;
+    out[1] = -a1*invDot;
+    out[2] = -a2*invDot;
+    out[3] = a3*invDot;
+    return out;
+};
+
+/**
+ * Calculates the conjugate of a quat
+ * If the quaternion is normalized, this function is faster than quat.inverse and produces the same result.
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a quat to calculate conjugate of
+ * @returns {quat} out
+ */
+quat.conjugate = function (out, a) {
+    out[0] = -a[0];
+    out[1] = -a[1];
+    out[2] = -a[2];
+    out[3] = a[3];
+    return out;
+};
+
+/**
+ * Calculates the length of a quat
+ *
+ * @param {quat} a vector to calculate length of
+ * @returns {Number} length of a
+ * @function
+ */
+quat.length = vec4.length;
+
+/**
+ * Alias for {@link quat.length}
+ * @function
+ */
+quat.len = quat.length;
+
+/**
+ * Calculates the squared length of a quat
+ *
+ * @param {quat} a vector to calculate squared length of
+ * @returns {Number} squared length of a
+ * @function
+ */
+quat.squaredLength = vec4.squaredLength;
+
+/**
+ * Alias for {@link quat.squaredLength}
+ * @function
+ */
+quat.sqrLen = quat.squaredLength;
+
+/**
+ * Normalize a quat
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {quat} a quaternion to normalize
+ * @returns {quat} out
+ * @function
+ */
+quat.normalize = vec4.normalize;
+
+/**
+ * Creates a quaternion from the given 3x3 rotation matrix.
+ *
+ * NOTE: The resultant quaternion is not normalized, so you should be sure
+ * to renormalize the quaternion yourself where necessary.
+ *
+ * @param {quat} out the receiving quaternion
+ * @param {mat3} m rotation matrix
+ * @returns {quat} out
+ * @function
+ */
+quat.fromMat3 = function(out, m) {
+    // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
+    // article "Quaternion Calculus and Fast Animation".
+    var fTrace = m[0] + m[4] + m[8];
+    var fRoot;
+
+    if ( fTrace > 0.0 ) {
+        // |w| > 1/2, may as well choose w > 1/2
+        fRoot = Math.sqrt(fTrace + 1.0);  // 2w
+        out[3] = 0.5 * fRoot;
+        fRoot = 0.5/fRoot;  // 1/(4w)
+        out[0] = (m[7]-m[5])*fRoot;
+        out[1] = (m[2]-m[6])*fRoot;
+        out[2] = (m[3]-m[1])*fRoot;
+    } else {
+        // |w| <= 1/2
+        var i = 0;
+        if ( m[4] > m[0] )
+          i = 1;
+        if ( m[8] > m[i*3+i] )
+          i = 2;
+        var j = (i+1)%3;
+        var k = (i+2)%3;
+
+        fRoot = Math.sqrt(m[i*3+i]-m[j*3+j]-m[k*3+k] + 1.0);
+        out[i] = 0.5 * fRoot;
+        fRoot = 0.5 / fRoot;
+        out[3] = (m[k*3+j] - m[j*3+k]) * fRoot;
+        out[j] = (m[j*3+i] + m[i*3+j]) * fRoot;
+        out[k] = (m[k*3+i] + m[i*3+k]) * fRoot;
+    }
+
+    return out;
+};
+
+/**
+ * Returns a string representation of a quatenion
+ *
+ * @param {quat} vec vector to represent as a string
+ * @returns {String} string representation of the vector
+ */
+quat.str = function (a) {
+    return 'quat(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ')';
+};
+
+if(typeof(exports) !== 'undefined') {
+    exports.quat = quat;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  })(shim.exports);
+})(this);
+
+(function(window) {
+
+  // Namespace
+  ionic.Animation = ionic.Animation || {};
+
+
+  ionic.Animation.TimingFn = {
+    'linear': function(duration) {
+      return function(t) {
+        return ionic.Animation.Bezier.linear(t, duration);
+      };
+    },
+    'ease': function(duration) {
+      return function(t) {
+        return ionic.Animation.Bezier.ease(t, duration);
+      };
+    },
+    'ease-in': function(duration) {
+      return function(t) {
+        return ionic.Animation.Bezier.easeIn(t, duration);
+      };
+    },
+    'ease-out': function(duration) {
+      return function(t) {
+        return ionic.Animation.Bezier.easeOut(t, duration);
+      };
+    },
+    'ease-in-out': function(duration) {
+      return function(t) {
+        return ionic.Animation.Bezier.easeInOut(t, duration);
+      };
+    }
+  };
+})(window);
 
 })();
