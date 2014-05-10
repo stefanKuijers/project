@@ -39,6 +39,7 @@
       <script src="js/directive/number-picker.js"></script>
       <script src="js/directive/interval-picker.js"></script>
       <script src="js/directive/day-selector.js"></script>
+      <script src="js/directive/scroll-controll.js"></script>
 
       <script src="js/router.js"></script>
       <script src="js/app.js"></script>
@@ -49,18 +50,18 @@
          <ion-side-menu-content ng-controller="NavCtrl">
             
 
-            <ion-nav-bar class="bar-stable nav-title-slide-ios7">
-               <button ng-if="data.show_home_button" class="button-icon back-home icon ion-chevron-left" ng-click="go_home()">
-                  <div class="back-button-label back-home">Terug</div>
+            <ion-nav-bar class="nav-title-slide-ios7">
+               <button ng-if="data.show_home_button" class="button-icon button-clear back-home icon ion-chevron-left" ng-click="go_home()">
+                  <div class="back-button-label back-home">terug</div>
                </button>
-               <ion-nav-back-button ng-if="!data.show_home_button" class="button-icon icon ion-chevron-left">
-                  <div class="back-button-label">Terug</div>
+               <ion-nav-back-button ng-if="!data.show_home_button" class="button-icon icon button-clear ion-chevron-left">
+                  <div class="back-button-label">terug</div>
                </ion-nav-back-button>
             </ion-nav-bar>
             
             <ion-nav-buttons side="right">
                <button class="button button-icon button-clear ion-ios7-gear" ng-click="showSettings()">
-                 <div class="settings-button-label">Instellingen</div>
+                 <div class="settings-button-label">instellingen</div>
                </button>
             </ion-nav-buttons>
   

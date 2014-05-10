@@ -1,4 +1,4 @@
-angular.module('project.controller.overview', ['project.service.phonestorage', 'project.service.api', 'project.service.util'])
+angular.module('project.controller.overview', ['project.service.phonestorage', 'project.service.api', 'project.service.util', 'project.directive.scoll_controll'])
    .controller('OverviewCtrl', ['$scope', '$filter', 'Phonestorage', 'API', 'Util', function($scope, $filter, Phonestorage, API, Util) {
       var interaction_listeners = [];
 

@@ -4,6 +4,82 @@
 		"selected_items":
 		[
 			[
+				"backgroun",
+				"background-color"
+			],
+			[
+				"scroll_",
+				"scroll_up_el"
+			],
+			[
+				"add",
+				"addClass	addClass"
+			],
+			[
+				"inn",
+				"innerHeight	.innerHeight"
+			],
+			[
+				"background",
+				"background-size"
+			],
+			[
+				"margin",
+				"margin-top"
+			],
+			[
+				"paddin",
+				"padding-left"
+			],
+			[
+				"border-bottom",
+				"border-bottom-width"
+			],
+			[
+				"border-bo",
+				"border-bottom-color"
+			],
+			[
+				"tablet_",
+				"med-icon-tablet_1"
+			],
+			[
+				"back",
+				"background-position"
+			],
+			[
+				"padding",
+				"padding-bottom"
+			],
+			[
+				"z",
+				"z-index"
+			],
+			[
+				"font-",
+				"font-style"
+			],
+			[
+				"font",
+				"font-size"
+			],
+			[
+				"PHP",
+				"php"
+			],
+			[
+				"set",
+				"setTimeout"
+			],
+			[
+				"list-sty",
+				"list-style-type"
+			],
+			[
+				"USER_DA",
+				"USER_DATA_TABLE_NAME"
+			],
+			[
 				"required",
 				"required_filters"
 			],
@@ -18,14 +94,6 @@
 			[
 				"popup",
 				"popup"
-			],
-			[
-				"font",
-				"font-weight"
-			],
-			[
-				"padding",
-				"padding-bottom"
 			],
 			[
 				"fade",
@@ -58,10 +126,6 @@
 			[
 				"new_value",
 				"new_value"
-			],
-			[
-				"set",
-				"setTimeout"
 			],
 			[
 				"clea",
@@ -118,10 +182,6 @@
 			[
 				"update",
 				"update_at"
-			],
-			[
-				"margin",
-				"margin-top"
 			],
 			[
 				"noti",
@@ -190,10 +250,6 @@
 			[
 				"medici",
 				"medicin"
-			],
-			[
-				"add",
-				"add_med_to_storage"
 			],
 			[
 				"min",
@@ -458,62 +514,6 @@
 			[
 				"ME",
 				"MED_DATA_RETRIEVED"
-			],
-			[
-				"M",
-				"MED_TABLE_NAME"
-			],
-			[
-				"result",
-				"result_rows"
-			],
-			[
-				"sto",
-				"storageLog"
-			],
-			[
-				"res",
-				"results"
-			],
-			[
-				"cone",
-				"connection"
-			],
-			[
-				"e",
-				"executeSql"
-			],
-			[
-				"pa",
-				"parsed_meds"
-			],
-			[
-				"parse",
-				"parsed_meds_length"
-			],
-			[
-				"back",
-				"background-repeat"
-			],
-			[
-				"tex",
-				"text-align"
-			],
-			[
-				"font-",
-				"font-weight"
-			],
-			[
-				"bac",
-				"background-size"
-			],
-			[
-				"background",
-				"background-image"
-			],
-			[
-				"parsed",
-				"parsed_meds"
 			]
 		]
 	},
@@ -523,39 +523,7 @@
 			"file": "style.css",
 			"settings":
 			{
-				"buffer_size": 6635,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/controller/med_detail.js",
-			"settings":
-			{
-				"buffer_size": 4879,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/view/medicijn-detail.html",
-			"settings":
-			{
-				"buffer_size": 4685,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/controller/overview.js",
-			"settings":
-			{
-				"buffer_size": 1900,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/service/util.js",
-			"settings":
-			{
-				"buffer_size": 2411,
+				"buffer_size": 11801,
 				"line_ending": "Windows"
 			}
 		},
@@ -563,15 +531,31 @@
 			"file": "/C/dev/project/www/view/overzicht.html",
 			"settings":
 			{
-				"buffer_size": 1828,
+				"buffer_size": 2046,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/dev/project/www/js/service/api.js",
+			"file": "/C/dev/project/www/js/controller/overview.js",
 			"settings":
 			{
-				"buffer_size": 15210,
+				"buffer_size": 1936,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/dev/project/www/js/directive/scroll-controll.js",
+			"settings":
+			{
+				"buffer_size": 1341,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/dev/project/www/index.html",
+			"settings":
+			{
+				"buffer_size": 3591,
 				"line_ending": "Windows"
 			}
 		}
@@ -744,31 +728,41 @@
 	},
 	"file_history":
 	[
-		"/C/dev/project/www/view/medicijn-detail.html",
 		"/C/dev/project/www/js/service/phonestorage.js",
+		"/C/xampp/htdocs/index.php",
+		"/C/xampp/apache/conf/httpd.conf",
+		"/C/dev/project-api/node_modules/restify/node_modules/bunyan/docs/bunyan.1",
+		"/C/Users/S/Desktop/html_email/metio_new_client.html",
+		"/C/dev/project/www/js/service/notification.js",
+		"/C/dev/project/www/js/controller/med_detail.js",
+		"/C/dev/project/www/js/controller/nav_control.js",
+		"/C/dev/project/www/js/controller/settings.js",
+		"/C/dev/project/www/js/app.js",
+		"/C/dev/project/www/index.html",
+		"/C/dev/project/www/js/router.js",
 		"/C/dev/project/www/view/new-med-scan.html",
 		"/C/dev/project/www/js/controller/new_med_scan.js",
+		"/C/dev/project/www/view/dialog/scan_explanation.html",
+		"/C/dev/project/www/js/service/api.js",
+		"/C/dev/project/www/css/style.css",
+		"/C/dev/project/www/view/medicijn-detail.html",
+		"/C/dev/project/www/js/controller/overview.js",
+		"/C/dev/project/www/js/service/util.js",
+		"/C/dev/project/www/view/overzicht.html",
 		"/C/dev/project/www/js/controller/new_med_type.js",
-		"/C/dev/project/www/js/controller/med_detail.js",
 		"/C/dev/project/www/js/directive/time-picker.js",
 		"/C/dev/project/www/view/new-med-type.html",
-		"/C/dev/project/www/js/service/util.js",
 		"/C/dev/project/www/js/directive/dosis_time.js",
-		"/C/dev/project/www/js/service/notification.js",
 		"/C/dev/project/www/js/directive/number-picker.js",
-		"/C/dev/project/www/index.html",
 		"/C/dev/project/www/lib/moment.min.js",
 		"/C/dev/project/www/lib/date.js",
 		"/C/dev/project/.gitignore",
 		"/C/dev/project/www/js/directive/day-selector.js",
 		"/C/dev/project/www/js/directive/interval-picker.js",
-		"/C/dev/project/www/css/style.css",
 		"/C/dev/project/www/js/controller/new_med.js",
 		"/C/dev/project/www/js/controller/interval.js",
 		"/C/dev/project/www/view/ui/time-picker.html",
 		"/C/dev/project-api/node_modules/restify/node_modules/formidable/test/standalone/test-issue-46.js",
-		"/C/dev/project/www/js/service/api.js",
-		"/C/dev/project/www/js/app.js",
 		"/C/dev/project/plugins/android.json",
 		"/C/dev/project/www/view/settings.html",
 		"/C/dev/project/www/view/medicijn-detail-new.html",
@@ -776,15 +770,11 @@
 		"/C/dev/project/config.xml",
 		"/C/dev/project/www/config.xml",
 		"/C/dev/project/www/js/directive/focus_and_blur.js",
-		"/C/dev/project/www/js/controller/overview.js",
-		"/C/dev/project/www/js/controller/nav_control.js",
 		"/C/dev/barcode/www/index.html",
 		"/C/dev/barcode/www/js/index.js",
-		"/C/dev/project/www/js/router.js",
 		"/C/dev/live-templates/README.md",
 		"/C/Users/S/Desktop/zegnu_replaced_koomen.sql",
 		"/C/Users/S/Downloads/kuijerss_wp1.sql",
-		"/C/dev/project/www/js/controller/settings.js",
 		"/C/dev/project/www/js/service/storage.js",
 		"/C/dev/project/www/lib/live-templates.js",
 		"/C/dev/project-api/server.js",
@@ -796,7 +786,6 @@
 		"/C/dev/project/www/js/directive/radio.js",
 		"/C/dev/project/www/js/controller/history.js",
 		"/C/dev/project/www/view/dialog/med_reminder.html",
-		"/C/dev/project/www/view/overzicht.html",
 		"/C/dev/project/www/view/dialog/med_interaction.html",
 		"/C/dev/project/www/view/history.html",
 		"/C/dev/project/platforms/android/CordovaLib/src/com/squareup/okhttp/TunnelRequest.java",
@@ -866,12 +855,7 @@
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/page-full-width.php",
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/page.php",
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/archive.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/designer.js",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/row-page-excerpts.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/row-page-excerpts-second.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/archive-product.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/customer-processing-order.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/customer-completed-order.php"
+		"/C/Users/S/AppData/Local/Temp/fz3temp-1/designer.js"
 	],
 	"find":
 	{
@@ -907,6 +891,26 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"12%",
+			"10%",
+			"{ ",
+			"time-header",
+			"20",
+			"190",
+			"C:/xampp/htdocs",
+			"DocumentRoot",
+			"important",
+			";\n",
+			"h1",
+			":",
+			"back-button",
+			"ion-nav-back-button",
+			"$urlRouter",
+			"li",
+			"settings",
+			"SETTINGS",
+			"settings",
+			"setup_settings_table",
 			"medd",
 			"options.filters[filter]",
 			"array[index][filter]",
@@ -1014,27 +1018,7 @@
 			"$elem",
 			"element",
 			"attrs",
-			"elem",
-			"scope",
-			"time_input_by_class",
-			"dose_time",
-			"$stateParams",
-			"_this.shouldGoBack",
-			"_this.shouldGoBack()",
-			"backBu",
-			"/koomen",
-			"/koomen/",
-			"koomen",
-			"zeg.nu\\\\www\\\\koomen",
-			"koomen",
-			"zeg.nu/koomen",
-			"/koomen",
-			"url",
-			"1",
-			"Persistencejs",
-			"ee",
-			"eee",
-			"ee"
+			"elem"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1052,7 +1036,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -1061,15 +1045,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6635,
+						"buffer_size": 11801,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4171,
-								4171
+								7786,
+								7786
 							]
 						],
 						"settings":
@@ -1077,63 +1061,63 @@
 							"syntax": "Packages/CSS/CSS.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 5632.0,
+						"translation.y": 9900.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "/C/dev/project/www/js/controller/med_detail.js",
+					"file": "/C/dev/project/www/view/overzicht.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4879,
+						"buffer_size": 2046,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2707,
-								2707
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1261.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/C/dev/project/www/view/medicijn-detail.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4685,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								649,
-								649
+								122,
+								122
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/HTML/HTML.tmLanguage"
 						},
-						"translation.x": 89.0,
-						"translation.y": 264.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/dev/project/www/js/controller/overview.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1936,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								159,
+								159
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 1005.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -1141,19 +1125,19 @@
 				},
 				{
 					"buffer": 3,
-					"file": "/C/dev/project/www/js/controller/overview.js",
+					"file": "/C/dev/project/www/js/directive/scroll-controll.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1900,
+						"buffer_size": 1341,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1891,
-								1891
+								707,
+								707
 							]
 						],
 						"settings":
@@ -1161,62 +1145,6 @@
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 163.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/C/dev/project/www/js/service/util.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2411,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								996,
-								996
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 581.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/C/dev/project/www/view/overzicht.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1828,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1230,
-								1230
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 130.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
@@ -1224,28 +1152,28 @@
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "/C/dev/project/www/js/service/api.js",
+					"buffer": 4,
+					"file": "/C/dev/project/www/index.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 15210,
+						"buffer_size": 3591,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								11252,
-								11252
+								1932,
+								1932
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+							"syntax": "Packages/HTML/HTML.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 4726.0,
+						"translation.y": 396.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
@@ -1398,7 +1326,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 225.0,
+	"side_bar_width": 261.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

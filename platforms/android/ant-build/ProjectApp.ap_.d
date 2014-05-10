@@ -86,8 +86,14 @@ C:\dev\project\platforms\android\assets\www\bower_components\persistence\lib\per
 C:\dev\project\platforms\android\assets\www\css\style.css \
 C:\dev\project\platforms\android\assets\www\css\thesis_project.sublime-project \
 C:\dev\project\platforms\android\assets\www\css\thesis_project.sublime-workspace \
+C:\dev\project\platforms\android\assets\www\img\history_icon.png \
 C:\dev\project\platforms\android\assets\www\img\ionic.png \
+C:\dev\project\platforms\android\assets\www\img\liquid.png \
+C:\dev\project\platforms\android\assets\www\img\new_med_icon.png \
 C:\dev\project\platforms\android\assets\www\img\placeholder.png \
+C:\dev\project\platforms\android\assets\www\img\tablet_1.png \
+C:\dev\project\platforms\android\assets\www\img\tablet_2.png \
+C:\dev\project\platforms\android\assets\www\img\tablet_3.png \
 C:\dev\project\platforms\android\assets\www\js\app.js \
 C:\dev\project\platforms\android\assets\www\js\controller \
 C:\dev\project\platforms\android\assets\www\js\directive \
@@ -106,6 +112,7 @@ C:\dev\project\platforms\android\assets\www\js\directive\dosis_time.js \
 C:\dev\project\platforms\android\assets\www\js\directive\interval-picker.js \
 C:\dev\project\platforms\android\assets\www\js\directive\number-picker.js \
 C:\dev\project\platforms\android\assets\www\js\directive\radio.js \
+C:\dev\project\platforms\android\assets\www\js\directive\scroll-controll.js \
 C:\dev\project\platforms\android\assets\www\js\directive\search.js \
 C:\dev\project\platforms\android\assets\www\js\directive\time-picker.js \
 C:\dev\project\platforms\android\assets\www\js\service\api.js \

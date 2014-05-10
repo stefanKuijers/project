@@ -1,23 +1,25 @@
-<ion-view title="Overzicht">
-   <ion-content class="has-header">
-      <div class="med-list scroll has-header has-footer">
-         <a class="item" ng-repeat="med in med_overview" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
-            <div class="time-container" ng-class="{'time-header': med.time_header==true}">
+<ion-view title="overzicht">
+   <ion-content class="has-header overzicht-view">
+      <div pj-scroll-controll parent-level="2" class="med-list scroll has-header has-footer">
+         <a class="item med-item" ng-class="{'time-header': med.time_header==true}" ng-repeat="med in med_overview" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
+            <div class="time-container time-col">
                <span ng-if="med.time_header" class="time">
                   {{med.time}}
                </span>
+               <div class="triangle"></div>
             </div>
-            <div class="med-icon med-icon-{{med.icon}} placeholder-img">
-               <i class="med-icon-interaction icon ion-alert-circled" ng-if="med.interactions.length > 0"></i>
-               <span style="color: rgba(1,1,1,0)">{{med.icon}}</span>
-            </div>
-            <div class="med-info">
-               <div class="med-name"><h2>{{med.trade_name}}</h2></div>
-               <div class="dosis">
-                  <div class="dose-amount">{{med.amount}} <span>x</span></div>
-                  <div class="dose">
-                     <div class="amount">{{med.dosis_amount}}</div>
-                     <div class="unit">{{med.unit}}</div>
+            <div class="info-col">
+               <div class="med-icon med-icon-{{med.icon}} placeholder-img">
+                  <i class="med-icon-interaction icon ion-alert-circled" ng-if="med.interactions.length > 0"></i>
+               </div>
+               <div class="med-info">
+                  <div class="med-name"><h2>{{med.trade_name}}</h2></div>
+                  <div class="dosis">
+                     <div class="dose-amount">{{med.amount}} <span>x</span></div>
+                     <div class="dose">
+                        <div class="amount">{{med.dosis_amount}}</div>
+                        <div class="unit">{{med.unit}}</div>
+                     </div>
                   </div>
                </div>
             </div>
@@ -25,16 +27,18 @@
       </div>
    </ion-content>
 
-   <ion-footer-bar class="bar-stable">
+   <ion-footer-bar class="bar-stable overzicht-footer">
       <div class="col">
          <a class="button button-clear button-block" href="#/nieuw">
-            <div class="placeholder-img nav-icon nav-icon-new"></div>
+            <!-- <img ng-src="../img/new_med_icon.png">
+             --><div class="new-med-icon"></div>
             <span class="button-label">Nieuw Medicijn</span>
          </a>
       </div>
       <div class="col">
          <a class="button button-clear button-block" href="#/geschiedenis">  
-            <div class="placeholder-img nav-icon nav-icon-history"></div>
+            <!-- <img ng-src="../img/history_icon.png"> -->
+            <div class="history-icon"></div>
             <span class="button-label">Geschiedenis</span>
          </a>
       </div>         
