@@ -89,11 +89,15 @@ C:\dev\project\platforms\android\assets\www\css\thesis_project.sublime-workspace
 C:\dev\project\platforms\android\assets\www\img\history_icon.png \
 C:\dev\project\platforms\android\assets\www\img\ionic.png \
 C:\dev\project\platforms\android\assets\www\img\liquid.png \
+C:\dev\project\platforms\android\assets\www\img\liquid_L.png \
 C:\dev\project\platforms\android\assets\www\img\new_med_icon.png \
 C:\dev\project\platforms\android\assets\www\img\placeholder.png \
 C:\dev\project\platforms\android\assets\www\img\tablet_1.png \
+C:\dev\project\platforms\android\assets\www\img\tablet_1_L.png \
 C:\dev\project\platforms\android\assets\www\img\tablet_2.png \
+C:\dev\project\platforms\android\assets\www\img\tablet_2_L.png \
 C:\dev\project\platforms\android\assets\www\img\tablet_3.png \
+C:\dev\project\platforms\android\assets\www\img\tablet_3_L.png \
 C:\dev\project\platforms\android\assets\www\js\app.js \
 C:\dev\project\platforms\android\assets\www\js\controller \
 C:\dev\project\platforms\android\assets\www\js\directive \

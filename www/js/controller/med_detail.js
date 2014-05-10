@@ -10,7 +10,7 @@ angular.module(
       'project.service.notification',
       'project.service.util'
    ])
-   .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', 'Phonestorage', 'Notification', 'Util', 'API', function($scope, $stateParams, $filter, Phonestorage, Notification, Util, API) {
+   .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', '$ionicScrollDelegate','Phonestorage', 'Notification', 'Util', 'API', function($scope, $stateParams, $filter, $ionicScrollDelegate, Phonestorage, Notification, Util, API) {
       $scope.events = {
          DOSE_CHANGED: 'DOSE_CHANGED'
       }

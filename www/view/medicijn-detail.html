@@ -1,114 +1,112 @@
 <ion-view title="{{med.trade_name}}">
-   <ion-content class="has-header padding-view med-detail">
-    
-      <div class="med-icon placeholder-img">
-         {{med.form}}
-      </div>
+   <ion-content class="has-header med-detail">
+      <div class="med-column left-med-column">
+         <div class="med-icon med-icon-{{med.icon}}"></div>
 
-      <div class="med-info">
-         <!-- primary info -->
-         <h1 class="med-name">{{med.trade_name}}</h1>
-         <div class="dose-detail">
-            <div class="amount">{{med.dosis_amount}}</div>
-            <div class="unit">{{med.unit}}</div>
-         </div>
-         <p class="description">{{med.description}}</p>
+         <div class="med-info">
+            <!-- primary info -->
+            <h1 class="med-name">{{med.trade_name}} {{med.dosis_amount}}{{med.unit}}</div>
+            <p class="description">{{med.description}}</p>
 
-         <div class="list secondary-info">
+            <div class="list secondary-info">
 
-            <div class="item item-divider">
-               Inamemomenten
-            </div>
-            <div class="item header-item" ng-if="times.length != false">
-               <div class="row header-row">
-                  <div class="col col-time">Tijd</div>
-                  <div class="col col-amount">Hoeveel</div>
-                  <div class="col col-interval">Herhaling</div>
-                  <div class="col col-reminder">Herinnering</div>
-                  <div class="col col-delete"></div>
+               <div class="item item-divider">
+                  <h2>Inamemomenten</h2>
                </div>
-            </div>
-            <div pj-dose-item class="item dosis" ng-repeat="dose in times" data-id="{{dose.id}}">
-               <div class="row item-row">
-                  <div class="col col-time">
-                     <button class="button button-block button-positive" ng-click="adjust_time()">{{dose.time}}</button>
+               <div class="item header-item" ng-if="times.length != false">
+                  <div class="row header-row">
+                     <div class="col col-time">Tijd</div>
+                     <div class="col col-amount">Hoeveel</div>
+                     <div class="col col-interval">Herhaling</div>
+                     <div class="col col-reminder">Herinnering</div>
+                     <div class="col col-delete"></div>
                   </div>
-                  <div class="col col-amount">
-                     <button class="button button-block button-positive" ng-click="adjust_amount()">{{dose.amount}}</button>
-                  </div>
-                  <div class="col col-interval">
-                     <button class="button button-block button-positive" ng-click="adjust_interval()">{{dose.interval}}</button>
-                  </div>
-                  <div class="col col-reminder">
-                     <ion-toggle ng-model="dose.reminder"></ion-toggle>
+               </div>
+               <div pj-dose-item class="item dosis" ng-repeat="dose in times" data-id="{{dose.id}}">
+                  <div class="row item-row">
+                     <div class="col col-time">
+                        <button class="button button-block button-positive" ng-click="adjust_time()">{{dose.time}}</button>
+                     </div>
+                     <div class="col col-amount">
+                        <button class="button button-block button-positive" ng-click="adjust_amount()">{{dose.amount}}</button>
+                     </div>
+                     <div class="col col-interval">
+                        <button class="button button-block button-positive" ng-click="adjust_interval()">{{dose.interval}}</button>
+                     </div>
+                     <div class="col col-reminder">
+                        <ion-toggle ng-model="dose.reminder"></ion-toggle>
+                     </div>
+                     
+                     <div class="col col-delete">
+                        <button class="button button-block button-assertive" ng-click="delete()">X</button>
+                     </div>
                   </div>
                   
-                  <div class="col col-delete">
-                     <button class="button button-block button-assertive" ng-click="delete()">verwijder</button>
-                  </div>
                </div>
-               
-            </div>
-            <div class="item" ng-if="times.length == false">
-               Dit medicijn heeft geen inname momenten. 
-            </div>
-            <div class="item dosis add-item">
-               <div class="row">
-                  <div class="col">
-                  <button class="button button-block button-dark icon-left ion-plus-round" ng-click="new_dose_click()">
-                     <div class="add-dose-button-label">Innamemoment Toevoegen</div>
-                  </button>
-                  </div>
-               </div>    
-            </div>
-
-            <div class="item item-divider interaction-div item-icon-right" ng-if="interactions.length > 0">
-               Risicovolle Medicijn Combinaties
-               <i class="icon ion-alert-circled"></i>
-            </div>
-            <div class="item interaction-desc-item" ng-if="interactions.length > 0">
-               U gebruikt medicijn-combinaties die een risico voor uw gezondheid vormen. Lees de onderstaande informatie goed door en raadpleeg uw arts.           
-            </div>
-            <div class="item interaction-item {{interaction.status}}" ng-repeat="interaction in interactions">
-               <div>
-                  <span class="interaction-med">
-                     {{interaction.primary_med_name}} - {{interaction.secondary_med_name}}
-                  </span>
-                  <span class="interaction-status">{{interaction.status}}</span> 
+               <div class="item" ng-if="times.length == false">
+                  Dit medicijn heeft geen inname momenten. 
                </div>
-               <span class="interaction-desc">{{interaction.description}}</span>     
+               <div class="item dosis add-item">
+                  <div class="row">
+                     <div class="col">
+                     <button class="button button-block button-positive icon-left ion-plus-round" ng-click="new_dose_click()">
+                        <div class="add-dose-button-label">Innamemoment Toevoegen</div>
+                     </button>
+                     </div>
+                  </div>    
+               </div>
             </div>
-
-            <div class="item item-divider when-to-div">
-               Toepassing
-            </div>
-            <div class="item when-to-item">
-               {{med.when_to_use}}         
-            </div>
-
-            <div class="item item-divider when-not-div">
-               Waarschuwingen
-            </div>
-            <div class="item when-not-item">
-                  {{med.when_not_to_use}}
-            </div>
-
-            <div class="item item-divider how-div">
-               Hoe te gebruiken
-            </div>
-            <div class="item how-item">
-               {{med.how_to_use}}         
-            </div>
-
-            <div class="item item-divider note-div">
-               Notulen
-            </div>
-            <div class="item note-item">
-               {{med.note}}         
-            </div>
-
          </div>
       </div>
+
+      <div class="med-column right-med-column">
+         <div class="item item-divider interaction-div item-icon-right" ng-if="interactions.length > 0">
+            <h2>Risicovolle Medicijn Combinaties</h2>
+            <i class="icon ion-alert-circled"></i>
+         </div>
+         <div class="item interaction-desc-item" ng-if="interactions.length > 0">
+            U gebruikt medicijn-combinaties die een risico voor uw gezondheid vormen. Lees de onderstaande informatie goed door en raadpleeg uw arts.           
+         </div>
+         <div class="item interaction-item {{interaction.status}}" ng-repeat="interaction in interactions">
+            <div>
+               <span class="interaction-med">
+                  {{interaction.primary_med_name}} - {{interaction.secondary_med_name}}
+               </span>
+               <span class="interaction-status">{{interaction.status}}</span> 
+            </div>
+            <span class="interaction-desc">{{interaction.description}}</span>     
+         </div>
+
+         <div class="item item-divider when-to-div">
+            <h2>Toepassing</h2>
+         </div>
+         <div class="item when-to-item">
+            {{med.when_to_use}}         
+         </div>
+
+         <div class="item item-divider when-not-div">
+            <h2>Waarschuwingen</h2>
+         </div>
+         <div class="item when-not-item">
+               {{med.when_not_to_use}}
+         </div>
+
+         <div class="item item-divider how-div">
+            <h2>Hoe te gebruiken</h2>
+         </div>
+         <div class="item how-item">
+            {{med.how_to_use}}         
+         </div>
+
+         <div class="item item-divider note-div">
+            <h2>Notulen</h2>
+         </div>
+         <div class="item note-item">
+            {{med.note}}         
+         </div>
+
+      </div>
+      <div class="floater"></div>
 
    </ion-content>
 </ion-view>

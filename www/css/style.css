@@ -48,7 +48,7 @@ input[type="search"],
 }
 
 .back-button-label.back-home {
-   padding: 15px 0px;
+   padding: 8px 0px;
 }
 
 .back-home {
@@ -150,6 +150,25 @@ a.item::after {
    font-size: 18pt;
 }
 
+.button.button-positive,
+.toggle input:checked + .track {
+   background-color: #053E80;
+}
+
+.toggle input:checked + .track {
+   border-color: #053E80;
+}
+
+.button {
+   border-radius: 7px;
+   font-weight: bold;
+}
+
+.right-med-column .item {
+   text-overflow: clip;
+   white-space: normal;
+}
+
 
 /* view specific */
 /**/
@@ -208,11 +227,11 @@ a.item::after {
    background-size: contain;
    position:relative;
 }
-.med-icon.med-icon-tablet_1 { background-image: url(../img/tablet_1.png)}
-.med-icon.med-icon-tablet_2 { background-image: url(../img/tablet_2.png)}
-.med-icon.med-icon-tablet_3 { background-image: url(../img/tablet_3.png)}
-.med-icon.med-icon-powder   { background-image: url(../img/powder.png)}
-.med-icon.med-icon-liquid   { background-image: url(../img/liquid.png)}
+.med-icon.med-icon-tablet_1 { background-image: url(../img/tablet_1_L.png)}
+.med-icon.med-icon-tablet_2 { background-image: url(../img/tablet_2_L.png)}
+.med-icon.med-icon-tablet_3 { background-image: url(../img/tablet_3_L.png)}
+.med-icon.med-icon-powder   { background-image: url(../img/powder_L.png)}
+.med-icon.med-icon-liquid   { background-image: url(../img/liquid_L.png)}
 
 .med-icon .med-icon-interaction {
    color: #c90000;
@@ -249,17 +268,11 @@ a.item::after {
    height: 0; 
    border-left: 0px solid transparent;
    border-right: 30px solid transparent;
-   
    border-top: 30px solid #BDDCFF;
 }
 
 .med-list .med-name {
    padding-bottom: 4px;
-}
-
-.dosis {
-   margin-top: 4px;
-   clear: left;
 }
 
 .dose-amount,
@@ -293,9 +306,12 @@ a.item::after {
 
 /* med-detail */
 .med-detail .med-icon {
-   width: 40%;
-   padding-bottom: 40%;
-   margin:auto;
+   width: 35%;
+   padding-bottom: 35%;
+   margin:15px auto 2px auto;
+   background-repeat: no-repeat;
+   background-size: contain;
+   background-position: center;
 }
 
 .med-detail .med-name,
@@ -310,29 +326,14 @@ a.item::after {
 }
 
 .med-detail .med-name {
-   margin-bottom: 0;
-   margin-top: 10px;
-   width:70%;
-}
-
-.med-detail .dose-detail {
-   font-size: 36px;
-   margin-top: 20px;
-   width: 20%;
-}
-
-.med-detail .description {
-   clear: left;
-}
-
-.secondary-info .item {
-   white-space: normal;
+   margin-bottom: 15px;
+   width: 100%;
+   text-align: center;
 }
 
 .med-detail .item-divider {
-   padding-top: 20px;
-   padding-bottom: 20px;
-   margin-top: 20px;
+   
+   background-color: #BDDCFF;
 }
 
 .col-reminder .item {
@@ -340,17 +341,23 @@ a.item::after {
    overflow: visible;
 }
 
+.item.dosis .button {
+   padding: 0;
+}
+
 .col-time     { flex: none; width:17%; min-width: 90px; }
 .col-amount   { flex: none; width:15%; min-width: 80px; }
 .col-interval { flex: none; width:26%; min-width: 121px;}
 .col-reminder { flex: none; width:15%; min-width: 110px; }
-.col-delete   { flex: none; width:22%; min-width: 120px;}
+.col-delete   { flex: none; width:8%; min-width: 60px;}
 
 .col-reminder .item-toggle .toggle {
    top: 10px;
    left:5px;
    right:0;
 }
+
+
 
 .col-reminder .item-toggle .track {
    width: 90px;
@@ -377,8 +384,21 @@ a.item::after {
 .dosis.item {
    padding: 0;
 }
+
+.dosis.item.add-item .button {
+   padding: 0 10px;
+}
+
 .item.header-item {
-   padding: 15px 0 0 0;
+   padding: 5px 0 0 0;
+}
+.row.header-row {
+   padding: 0 5px;
+}
+
+.dosis .row {
+   padding: 0 5px;
+   margin:0;
 }
 
 .item.header-item .col-reminder { width:25%; }
@@ -466,19 +486,32 @@ div[pj-number-picker] button {
 /* scroll-controll */
 .scroll-controll {
    position: fixed;
-   background-color: teal;
-   height: 100px;
+   background-color: #BDDCFF;
+
+   height: 65px;
+   width: 100px;
+   right: 10px;
    z-index: 11;
-   -webkit-transform: translate3d(0, 0, 0);
 }
 
 .scroll-controll.scroll-up {
    top: 2px;
-   background-color: red;
+   border-bottom-right-radius: 15px;
+   border-bottom-left-radius: 15px;
+}
+
+.scroll-controll .handle {
+   font-size: 50pt;
+   color: #053E80;
+   text-align: center;
+   width: 100%;
+   display:inline-block;
 }
 
 .scroll-controll.scroll-down {
    bottom: 0;
+   border-top-right-radius: 15px;
+   border-top-left-radius: 15px;
 }
 
 /* new medicin */
@@ -520,22 +553,16 @@ div[pj-number-picker] button {
 
 /* history */
 
-/* wireframe styles */
-/*.placeholder-img {
-   background-size: 100%;
-   background-repeat: no-repeat;
-   text-align: center;
-   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAFE0lEQVR42u3cy20iYRBF4Y4AEmDJhggcAQkQCHkQCOmQAMEwwtIsxgNtGvpRVf+3uLKQvHBX1bnHWBZd13U3Efk/h8Ph/tUgRHpiCCKDAbleryLN5Ovr6/vu1+v1c0B+ftP9teFJC3nJII++2fCkJXP8fd0LCJNIi+Z4YpPntmASackcgwFhEmnJHIMBYRJpyRxvA8Ik0oI53gaESaQFc3wMCJNIZXN8DAiTSGVzjAYIk0hFc4wGCJNIRXOMDgiTSCVzjA4Ik0glc0wGCJNIBXNMBgiTSAVzTA4Ik0hmc0wOCJNIZnPMBgiTSEZzzAYIk0hGc8wOCJNIJnPMDgiTSMbSnR0QJpFMZTs7IEwimUp2MUCYRDKU62KAMIlkKNXFAWESiVymiwPCJBK5RMMAwiQSsTzDAMIkErE0wwHCJBKpLMMBwiQSqSTDAsIkzBGtqLuIrc0kzAEQJpGgZRgeECZhDoAwCXMkKOYuQ0szCXMAhEmYAyBMwhzxSy4tIEzCHABhEuYACJMwB0AMnzlSllgZQJhEeQGESZQWQCyFOQBiOcwBEEtijkrP0lVsXSZRSgBhEmUEEMtTQgCxROUDEMtUOgCxVOYAiOUyR+2SaRYQJlEuALFspQIQS1cmALF8JQIQR6A8AOIYlAZAHIWyAIjjUBIAYZK235gqSoA4FqUAEEejDADieJQAQBwR+AHimEAPEEcFdoAwCcgBwiRZP5DZLgHi2JgDII6OOQDCJMwBECZhDoAwCXMAhEmWPUr7BAiTMAdAmIQ5AMIkzAEQJpnyaO0PIEzCHABhEuYAiIEzB0BkyqO2L4AwCXMAhEmGHbk9AYRJmAMgMuzo7QcgFvFg9swBECbpgcBeACIPFsIcAJEnJvkZswGIPF4KcwBEHr0P8esVQOSXv2TZCUCYo+fNuDfqALGEF+ZuNwBhjh47MAlAmMM/KgJEPrMBkwCEOZgEIMzxWfszCUCYg0kAwhw+uAEghjz5XO0OIMzBJABhDiYBCHMwCUAMdck52iVAmINJAMIcTAIQ5mASgDCHnxEgzOFnBYjkbWU7Bog2ZhKAaGHPABDt61kAonU9E0CYw7MBhDk8I0CYw7MCBCCttqobAIg29ewA0aJmABDtaRYA0ZpmAhBtaTYA0ZJmBBDtaFYA0YpM0gFEG0rrs2sSEOYwQ4BoP7MEiNYzU4BoO7MFiJYzY4BoNyYBiFZjkpo3VAYQ5jB7gDCHHQCEOZgEIFqLSQCirZgk425KAMIcdgQQ5mASgDAHkwCEOZgkze5SAsIcTAIQ5mASgDAHk+S5ubCAMAeTAIQ5mCT47YUDhDmYBCDMIYF3HhIQ5mCSKLsPCQhzSMRbXBwQ5pBotxAKEOaQaDcRAhDmkKi3EQIQ5pCoN7IoIMwh0W9lUUCYQ6LfzCKAMIdkuZ1FAGEOyXJDswLCHJLtlmYFhDkk203NAghzSFaTzAIIc0hWk0wKCHNIdpNMCghzSHaTTAIIc0gVk0wCCHNIFZOMCghzSDWTjAoIc0g1k4wCCHNIVZOMAghzSFWTfAQIc0h1k3wECHNIdZO8BQhzSCsmeQsQ5pBWTDIIEOaQ1kwyCBDmkNZM8hIgzCGtmuQlQJhDWjVJLyDMIa2bpBcQ5pDWTfIUEOYQJun6AWEOYZIeQHa73e18PqfO5XKxcHnbJL8aROJks9l8L65C9vv97Xg8hs8/O9hutw5R5FnuajmdTmVa6p7VamWxMkr+AI3wIUCDnkvdAAAAAElFTkSuQmCC');
-   background-position: 50%;
-}
-*/
 .button-label {
    color: black;
    font-weight: bold;
 }
 
-@media screen and (orientation:portrait) {
 
+
+
+@media screen and (orientation:portrait) {
+   .
 }
 
 @media screen and (orientation:landscape) {
@@ -554,6 +581,10 @@ div[pj-number-picker] button {
       height:auto;
       display: block;
       border-right:1px solid rgb(90,90,90);
+
+      -webkit-box-shadow: 8px 0px 20px 0px rgba(50, 50, 50, 0.45);
+      -moz-box-shadow:    8px 0px 20px 0px rgba(50, 50, 50, 0.45);
+      box-shadow:         8px 0px 20px 0px rgba(50, 50, 50, 0.45);
    }
 
    .overzicht-footer .col {
@@ -587,4 +618,22 @@ div[pj-number-picker] button {
    .row.med-add-options {
       bottom: 60px;
    }
+
+   .med-column {
+      width: 50%;
+      float:left;
+   }
+
+   .left-med-column {
+      -webkit-box-shadow: 8px 0px 20px 0px rgba(50, 50, 50, 0.45);
+      -moz-box-shadow:    8px 0px 20px 0px rgba(50, 50, 50, 0.45);
+      box-shadow:         8px 0px 20px 0px rgba(50, 50, 50, 0.45);
+   }
+
+   .floater {
+      height:1px;
+      width:100%;
+      clear:both;
+   }
+   
 }
