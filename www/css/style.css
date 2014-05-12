@@ -487,6 +487,7 @@ div[pj-number-picker] button {
 .scroll-controll {
    position: fixed;
    background-color: #BDDCFF;
+   border: 4px solid #053E80;
 
    height: 65px;
    width: 100px;
@@ -498,6 +499,7 @@ div[pj-number-picker] button {
    top: 2px;
    border-bottom-right-radius: 15px;
    border-bottom-left-radius: 15px;
+   border-top: none;
 }
 
 .scroll-controll .handle {
@@ -512,6 +514,7 @@ div[pj-number-picker] button {
    bottom: 0;
    border-top-right-radius: 15px;
    border-top-left-radius: 15px;
+   border-bottom: none;
 }
 
 /* new medicin */

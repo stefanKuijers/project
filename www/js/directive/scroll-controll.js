@@ -7,14 +7,19 @@ angular.module('project.directive.scoll_controll', [])
          up: 'up',
          down: 'down'
       };
+      var available_scroll_heigth;
 
       return {
          link: function($scope, $elem, $attrs) {
-            var parent_level = $attrs.parentLevel;
-            var container = $elem;
+            var parent_level         = typeof $attrs.parentLevel == 'string' ? $attrs.parentLevel : 0;
+            var container            = $elem;
             var scroll_controll_html = '<div class="scroll-controll"><i class="handle"></i></div>';
-            var scroll_up_el, scroll_down_el, offset, current_pos;
-            var scroll_up_el_visible = scroll_down_el_visible = false;
+            var controll_visible     = false;
+            
+            $scope.scroll_up_el      = false;
+            $scope.scroll_down_el    = false;
+            $scope.offset            = false;
+            $scope.build             = false;
 
             while (parent_level-- > 0)
                container = container.parent();
@@ -25,36 +30,39 @@ angular.module('project.directive.scoll_controll', [])
                }
             }, 500);
 
-            // on scroll detect or both controllers are still needed
-            $ionicScrollDelegate.getScrollView().onScroll = function() {
-               // their function put back in to scope
-               if(!ionic.scroll.isScrolling) {
-                 setTimeout($ionicScrollDelegate.getScrollView().setScrollStart, 50);
-               } else {
-                 clearTimeout($ionicScrollDelegate.getScrollView().scrollTimer);
-                 $ionicScrollDelegate.getScrollView().scrollTimer = setTimeout($ionicScrollDelegate.getScrollView().setScrollStop, 80);
+            setInterval( function () {
+               if (available_scroll_heigth !== $elem[0].scrollHeight) {
+                  if ($elem[0].scrollHeight > container.innerHeight() && !controll_visible){
+                     // show  
+                     if (!$scope.build) $scope.build_scroll_controll();
+                     $scope.scroll_up_el.fadeIn();
+                     $scope.scroll_down_el.fadeIn();
+                     controll_visible = true; 
+                  } else if ($elem[0].scrollHeight <= container.innerHeight() && controll_visible) {
+                     // hide
+                     $scope.scroll_up_el.fadeOut();
+                     $scope.scroll_down_el.fadeOut();
+                     controll_visible = false;
+                  }
                }
 
-               // validate_scroll_controll();
-            };
-
-            // jQuery(window).on('resize', function() {
-            //    set_offset();
-            // });
+               available_scroll_heigth = $elem[0].scrollHeight;
+            }, 1000);
 
             $scope.build_scroll_controll = function() {
-               scroll_up_el = jQuery(scroll_controll_html).addClass('scroll-up').attr(attrs.direction, directions.up).hide();
-               scroll_up_el.find('.handle').addClass('icon ion-chevron-up');
-               scroll_down_el = jQuery(scroll_controll_html).addClass('scroll-down').attr(attrs.direction, directions.down).hide();
-               scroll_down_el.find('.handle').addClass('icon ion-chevron-down');
+               $scope.scroll_up_el = jQuery(scroll_controll_html).addClass('scroll-up').attr(attrs.direction, directions.up).hide();
+               $scope.scroll_up_el.find('.handle').addClass('icon ion-chevron-up');
+               $scope.scroll_down_el = jQuery(scroll_controll_html).addClass('scroll-down').attr(attrs.direction, directions.down).hide();
+               $scope.scroll_down_el.find('.handle').addClass('icon ion-chevron-down');
                set_offset();
 
-               container.append(scroll_up_el).append(scroll_down_el);
-               add_listeners(scroll_up_el), add_listeners(scroll_down_el);
+               container.append($scope.scroll_up_el).append($scope.scroll_down_el);
+               add_listeners($scope.scroll_up_el), add_listeners($scope.scroll_down_el);
 
-               // validate_scroll_controll();
-               scroll_up_el.fadeIn();
-               scroll_down_el.fadeIn();
+               $scope.scroll_up_el.fadeIn();
+               $scope.scroll_down_el.fadeIn();
+               controll_visible = true;
+               $scope.build = true;
             }
 
             function add_listeners(el) {
@@ -75,37 +83,14 @@ angular.module('project.directive.scoll_controll', [])
 
                      default: break;
                   }
-
-                  // check or both scroll controllers are still needed
-                  //validate_scroll_controll();
                });
             }
 
-            function validate_scroll_controll() {
-               current_offset_top = $ionicScrollDelegate.getScrollPosition().top;
-
-               console.log(current_offset_top, $elem[0].scrollHeight - container.innerHeight());
-
-               if (scroll_up_el_visible && current_offset_top == 0)
-                  scroll_up_el.fadeOut(),
-                  scroll_up_el_visible = false;
-               else if (!scroll_up_el_visible && current_offset_top > 0)
-                  scroll_up_el.fadeIn(),
-                  scroll_up_el_visible = true;
-
-               if (scroll_down_el_visible && current_offset_top >= ($elem[0].scrollHeight - container.innerHeight()) - 1)
-                  scroll_down_el.fadeOut(),
-                  scroll_down_el_visible = false;
-               else if (!scroll_down_el_visible && current_offset_top <= $elem[0].scrollHeight - container.innerHeight())
-                  scroll_down_el.fadeIn(),
-                  scroll_down_el_visible = true;
-            }
-
             function set_offset() {
-               offset = get_offset();
+               $scope.offset = get_offset();
 
-               scroll_up_el.css('top', offset.top);
-               scroll_down_el.css('bottom', offset.bottom);
+               $scope.scroll_up_el.css('top', $scope.offset.top);
+               $scope.scroll_down_el.css('bottom', $scope.offset.bottom);
             }
 
             function get_offset() {
