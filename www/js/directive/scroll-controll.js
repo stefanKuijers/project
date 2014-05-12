@@ -58,7 +58,7 @@ angular.module('project.directive.scoll_controll', [])
             }
 
             function add_listeners(el) {
-               el.on('mousedown', function(e, ee) {
+               el.on('mousedown touchstart', function(e, ee) {
                   var current_transform = $elem.parent().css('-webkit-transform');
                   var split = current_transform.replace(')', '').split(',');
                   var y_value = $elem.parent().css('-webkit-transform').replace(')', '').split(',').pop();
@@ -99,23 +99,13 @@ angular.module('project.directive.scoll_controll', [])
                else if (!scroll_down_el_visible && current_offset_top <= $elem[0].scrollHeight - container.innerHeight())
                   scroll_down_el.fadeIn(),
                   scroll_down_el_visible = true;
-
             }
 
             function set_offset() {
                offset = get_offset();
 
-               // not implementing as the scroll will have to be different
-               //    .css('left', offset.left)
-               //    .css('right', offset.right)
-
-               scroll_up_el
-                  .css('top', offset.top)
-               ;
-
-               scroll_down_el
-                  .css('bottom', offset.bottom)
-               ;
+               scroll_up_el.css('top', offset.top);
+               scroll_down_el.css('bottom', offset.bottom);
             }
 
             function get_offset() {

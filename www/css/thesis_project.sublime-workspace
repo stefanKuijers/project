@@ -4,6 +4,34 @@
 		"selected_items":
 		[
 			[
+				"background",
+				"background-color"
+			],
+			[
+				"border",
+				"border-color"
+			],
+			[
+				"font",
+				"font-weight"
+			],
+			[
+				"bacgroun",
+				"background-size"
+			],
+			[
+				"inline",
+				"inline-block"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"fade",
+				"fadeIn	.fadeIn()"
+			],
+			[
 				"backgroun",
 				"background-color"
 			],
@@ -18,10 +46,6 @@
 			[
 				"inn",
 				"innerHeight	.innerHeight"
-			],
-			[
-				"background",
-				"background-size"
 			],
 			[
 				"margin",
@@ -60,10 +84,6 @@
 				"font-style"
 			],
 			[
-				"font",
-				"font-size"
-			],
-			[
 				"PHP",
 				"php"
 			],
@@ -94,10 +114,6 @@
 			[
 				"popup",
 				"popup"
-			],
-			[
-				"fade",
-				"fadeOut	.fadeOut()"
 			],
 			[
 				"Interval_Unit",
@@ -380,10 +396,6 @@
 				"background-color"
 			],
 			[
-				"border",
-				"border-radius"
-			],
-			[
 				"an",
 				"answered_question"
 			],
@@ -502,70 +514,22 @@
 			[
 				"su",
 				"query_success"
-			],
-			[
-				"TABLE",
-				"table_exists"
-			],
-			[
-				"T",
-				"MED_TABLE_NAME"
-			],
-			[
-				"ME",
-				"MED_DATA_RETRIEVED"
 			]
 		]
 	},
 	"buffers":
 	[
-		{
-			"file": "style.css",
-			"settings":
-			{
-				"buffer_size": 11801,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/view/overzicht.html",
-			"settings":
-			{
-				"buffer_size": 2046,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/controller/overview.js",
-			"settings":
-			{
-				"buffer_size": 1936,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/js/directive/scroll-controll.js",
-			"settings":
-			{
-				"buffer_size": 1341,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/dev/project/www/index.html",
-			"settings":
-			{
-				"buffer_size": 3591,
-				"line_ending": "Windows"
-			}
-		}
 	],
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 490.0,
+		"height": 101.0,
 		"selected_items":
 		[
+			[
+				"forma",
+				"Format Code"
+			],
 			[
 				"rein",
 				"Indentation: Reindent Lines"
@@ -577,10 +541,6 @@
 			[
 				"reinde",
 				"Indentation: Reindent Lines"
-			],
-			[
-				"forma",
-				"Format Code"
 			],
 			[
 				"form",
@@ -728,27 +688,30 @@
 	},
 	"file_history":
 	[
+		"/C/dev/acc/config.xml",
+		"/C/dev/acc/www/index.html",
+		"/C/dev/project/www/view/overzicht.html",
+		"/C/dev/project/www/view/medicijn-detail.html",
+		"/C/dev/project/www/js/controller/med_detail.js",
+		"/C/dev/project/www/css/style.css",
+		"/C/dev/project/www/js/controller/overview.js",
+		"/C/dev/project/www/index.html",
+		"/C/dev/project/www/js/directive/scroll-controll.js",
 		"/C/dev/project/www/js/service/phonestorage.js",
 		"/C/xampp/htdocs/index.php",
 		"/C/xampp/apache/conf/httpd.conf",
 		"/C/dev/project-api/node_modules/restify/node_modules/bunyan/docs/bunyan.1",
 		"/C/Users/S/Desktop/html_email/metio_new_client.html",
 		"/C/dev/project/www/js/service/notification.js",
-		"/C/dev/project/www/js/controller/med_detail.js",
 		"/C/dev/project/www/js/controller/nav_control.js",
 		"/C/dev/project/www/js/controller/settings.js",
 		"/C/dev/project/www/js/app.js",
-		"/C/dev/project/www/index.html",
 		"/C/dev/project/www/js/router.js",
 		"/C/dev/project/www/view/new-med-scan.html",
 		"/C/dev/project/www/js/controller/new_med_scan.js",
 		"/C/dev/project/www/view/dialog/scan_explanation.html",
 		"/C/dev/project/www/js/service/api.js",
-		"/C/dev/project/www/css/style.css",
-		"/C/dev/project/www/view/medicijn-detail.html",
-		"/C/dev/project/www/js/controller/overview.js",
 		"/C/dev/project/www/js/service/util.js",
-		"/C/dev/project/www/view/overzicht.html",
 		"/C/dev/project/www/js/controller/new_med_type.js",
 		"/C/dev/project/www/js/directive/time-picker.js",
 		"/C/dev/project/www/view/new-med-type.html",
@@ -852,10 +815,7 @@
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/header.php",
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/content.php",
 		"/C/Users/S/AppData/Local/Temp/fz3temp-1/content-page.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/page-full-width.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/page.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/archive.php",
-		"/C/Users/S/AppData/Local/Temp/fz3temp-1/designer.js"
+		"/C/Users/S/AppData/Local/Temp/fz3temp-1/page-full-width.php"
 	],
 	"find":
 	{
@@ -891,6 +851,33 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"normal",
+			"dose-item",
+			"normal",
+			"dosis",
+			"}\n",
+			"item-divider",
+			"h1",
+			".pn",
+			"pane",
+			"66",
+			"32",
+			"div",
+			"10",
+			"bottom",
+			"100",
+			"current_pos.bottom",
+			"current_pos.top",
+			"up",
+			"down",
+			"top",
+			"up",
+			"$elem.",
+			"$elem.offset()",
+			":",
+			"?",
+			":",
+			"top",
 			"12%",
 			"10%",
 			"{ ",
@@ -991,34 +978,7 @@
 			"hour",
 			"add",
 			"ng-click=\"",
-			"<div class=\"",
-			"<button",
-			"++",
-			"hour",
-			"add",
-			"template_url",
-			"_new",
-			"\"button",
-			"button-positive",
-			"dark",
-			"stable",
-			"<button",
-			"button",
-			"{{",
-			"</",
-			"-col",
-			"get_dosis_listener",
-			"item-icon-left",
-			",",
-			"show",
-			"scope",
-			"el",
-			"focus",
-			"return_input_time",
-			"$elem",
-			"element",
-			"attrs",
-			"elem"
+			"<div class=\""
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1036,149 +996,8 @@
 	"groups":
 	[
 		{
-			"selected": 0,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "style.css",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11801,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								7786,
-								7786
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CSS/CSS.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 9900.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/C/dev/project/www/view/overzicht.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2046,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								122,
-								122
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/C/dev/project/www/js/controller/overview.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1936,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								159,
-								159
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 1005.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/C/dev/project/www/js/directive/scroll-controll.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1341,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								707,
-								707
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/C/dev/project/www/index.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3591,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1932,
-								1932
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 396.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				}
 			]
 		}
 	],
@@ -1229,6 +1048,14 @@
 		"selected_items":
 		[
 			[
+				"med",
+				"project\\www\\js\\controller\\med_detail.js"
+			],
+			[
+				"over",
+				"project\\www\\view\\overzicht.html"
+			],
+			[
 				"time",
 				"project\\www\\view\\ui\\time-picker.html"
 			],
@@ -1259,10 +1086,6 @@
 			[
 				"md",
 				"project\\www\\view\\medicijn-detail.html"
-			],
-			[
-				"over",
-				"project\\www\\js\\controller\\overview.js"
 			],
 			[
 				"inde",
