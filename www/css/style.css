@@ -47,13 +47,11 @@ input[type="search"],
    left: 40px;
 }
 
-.back-button-label.back-home {
-   padding: 8px 0px;
+button.back-home {
+   position:relative;
+   z-index:10;
 }
 
-.back-home {
-   color: rgb(68,68,68);
-}
 
 .settings-button-label {
    right: 45px;
@@ -331,9 +329,15 @@ a.item::after {
    text-align: center;
 }
 
-.med-detail .item-divider {
-   
+.item-divider {
    background-color: #BDDCFF;
+   border-left: none;
+   border-right:none;
+}
+
+.item {
+   margin-left: 0;
+   margin-right: 0;
 }
 
 .col-reminder .item {
@@ -356,8 +360,6 @@ a.item::after {
    left:5px;
    right:0;
 }
-
-
 
 .col-reminder .item-toggle .track {
    width: 90px;
@@ -413,22 +415,29 @@ a.item::after {
 
 /* DIRECTIVES */
 /* radio */
-.pj-radio {
+[pj-radio] {
    position:relative;
    display:block;
    width:100%;
    padding:50%;
    border-radius: 50%;
    background-color: rgba(100,100,100, 0.1);
-   border:10px solid rgba(100,100,100, 0.2);
+   -webkit-box-shadow: 0px 0px 0px 10px #BDDCFF inset;
+   -moz-box-shadow: 0px 0px 0px 10px #BDDCFF inset;
+   box-shadow: 0px 0px 0px 10px #BDDCFF inset;
+
 }
 
-.pj-radio.selected {
-   border:10px solid rgba(100,100,100, 0.5);
+[pj-radio].selected {
+   background-color: #BDDCFF;
+   /*border: 10px solid #053E80;*/
+   -webkit-box-shadow: 0px 0px 0px 10px #053E80 inset;
+   -moz-box-shadow: 0px 0px 0px 10px #053E80 inset;
+   box-shadow: 0px 0px 0px 10px #053E80 inset;
 }
 
-.pj-radio i,
-.pj-radio label {
+[pj-radio] i,
+[pj-radio] label {
    position:absolute;
    top:0;
    left:0;
@@ -436,17 +445,17 @@ a.item::after {
    line-height: 150px;
 }
 
-.pj-radio label {
+[pj-radio] label {
    font-size: 36px;
 }
 
-.pj-radio i {
+[pj-radio] i {
    display: none;
    font-size: 120px;
    opacity: 0.1;
 }
 
-.pj-radio.selected i {
+[pj-radio].selected i {
    display: block;
 }
 
@@ -524,22 +533,39 @@ div[pj-number-picker] button {
 }
 
 .radio-container {
-   width: 150px;
+   width: 100px;
    margin: auto;
 }
 
-.row.med-add-options {
+.pj-radio i, .pj-radio label {
+   line-height: 100px;
+}
+
+.med-add-options {
    position:absolute;
    left:0;
    right:0;
-   bottom:140px;
+   bottom: 5%;
    z-index: -1;
-   opacity: 0.2;
+   opacity: 1;
+   padding: 0 10%;
+   width:100%;
 }
 
-.row.med-add-options.question-answered {
+.med-add-options.question-answered {
    z-index: 10;
    opacity: 1;
+}
+
+.med-add-options .button {
+   height: 120px;
+   width:50%;
+   margin: 0 25%;
+   display: block;
+   color:white;
+   font-size: 36px;
+   padding-top: 15px;
+   float: left;
 }
 
 /* new med scan */
@@ -554,18 +580,17 @@ div[pj-number-picker] button {
    padding: 5px 0;
 }
 
+/* new med type */
+
+
 /* history */
 
-.button-label {
-   color: black;
-   font-weight: bold;
-}
 
 
 
 
 @media screen and (orientation:portrait) {
-   .
+   
 }
 
 @media screen and (orientation:landscape) {
@@ -607,30 +632,21 @@ div[pj-number-picker] button {
    }
 
    .radio-container {
-      width: 100px;
+      width: 150px;
    }
 
    .pj-radio i, .pj-radio label {
-      line-height: 100px;
+      line-height: 150px;
    }
 
    .new-med-container {
       padding: 2% 10%;
    }
 
-   .row.med-add-options {
-      bottom: 60px;
-   }
-
    .med-column {
-      width: 50%;
+      width: 49.5%;
       float:left;
-   }
-
-   .left-med-column {
-      -webkit-box-shadow: 8px 0px 20px 0px rgba(50, 50, 50, 0.45);
-      -moz-box-shadow:    8px 0px 20px 0px rgba(50, 50, 50, 0.45);
-      box-shadow:         8px 0px 20px 0px rgba(50, 50, 50, 0.45);
+      position:relative;
    }
 
    .floater {
@@ -638,5 +654,12 @@ div[pj-number-picker] button {
       width:100%;
       clear:both;
    }
-   
+
+   .med-column-divider {
+      float:left;
+      width:1%;
+      background-color: #053E80;
+      height:250px;
+      height:100vh;
+   }
 }

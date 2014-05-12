@@ -7,6 +7,7 @@ angular.module(
       'project.directive.number_picker',
       'project.directive.interval_picker',
       'project.directive.day_selector',
+      'project.directive.column_divider',
       'project.service.notification',
       'project.service.util'
    ])

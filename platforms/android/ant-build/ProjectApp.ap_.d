@@ -113,6 +113,7 @@ C:\dev\project\platforms\android\assets\www\js\controller\overview.js \
 C:\dev\project\platforms\android\assets\www\js\controller\settings.js \
 C:\dev\project\platforms\android\assets\www\js\directive\day-selector.js \
 C:\dev\project\platforms\android\assets\www\js\directive\dosis_time.js \
+C:\dev\project\platforms\android\assets\www\js\directive\float-column-divider.js \
 C:\dev\project\platforms\android\assets\www\js\directive\interval-picker.js \
 C:\dev\project\platforms\android\assets\www\js\directive\number-picker.js \
 C:\dev\project\platforms\android\assets\www\js\directive\radio.js \

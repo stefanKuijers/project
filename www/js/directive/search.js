@@ -4,7 +4,8 @@ angular.module('project.directive.search', [])
          link: function($scope, $elem, $attrs) {
 
             var list_index = 0, 
-                list_length = $scope.auto_list.length;
+                list_length = $scope.auto_list.length,
+                new_results = [];
 
             $scope.search_string = "";
             $scope.search_results = [];
@@ -12,12 +13,24 @@ angular.module('project.directive.search', [])
             $scope.$watch(
                'search_string', 
                function() { 
-                  $scope.search_results = [];
-                  if ($scope.search_string === "") return;
+                  jQuery($elem.find('.results')[0]).hide();
+
+                  $scope.search_results = new_results = [];
+                  if ($scope.search_string === "") {
+                     jQuery($elem.find('.results')[0]).fadeIn();
+                     return;
+                  }
+
                   for (list_index = 0; list_index < list_length; list_index++) {
                      if ($scope.auto_list[list_index].toLowerCase().match($scope.search_string.toLowerCase())) 
-                        $scope.search_results.push($scope.auto_list[list_index])
+                        new_results.push($scope.auto_list[list_index])
                   }
+
+                  $scope.search_results = new_results;
+
+                  setTimeout(function() {
+                     jQuery($elem.find('.results')[0]).fadeIn();
+                  }, 200);
                }
             );
 
@@ -29,6 +42,13 @@ angular.module('project.directive.search', [])
             );
 
             $scope.select_result = function(result) {
+               var el_input = $elem.find('input');
+               el_input.blur();
+               el_input.parent().parent().trigger('click');
+
+               if (typeof cordova !== 'undefined') {
+                  cordova.plugins.SoftKeyboard.hide();
+               }
                $scope.choose_result(result);
             }
 

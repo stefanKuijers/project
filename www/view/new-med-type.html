@@ -5,23 +5,25 @@
             <i class="icon ion-search placeholder-icon"></i>
             <input type="text" placeholder="Medicijnnaam" ng-model="search_string">
          </label>
-         <div 
-            class="item item-icon-right" 
-            ng-repeat="result in search_results" 
-            ng-click="select_result('{{result}}')"
-         >
-            {{result}}
-            <i class="icon ion-chevron-right placeholder-icon"></i>
-         </div>
-         <div class="item" ng-if="search_results.length == 0">
-            <div ng-if="search_string.length > 0">
-               Er zijn geen medicijnen gevonden met<br />
-               '{{search_string}}'<br />
-               in de medicijnnaam.
+         <div class="results">
+            <div 
+               class="item result item-icon-right" 
+               ng-repeat="result in search_results" 
+               ng-click="select_result('{{result}}')"
+            >
+               {{result}}
+               <i class="icon ion-chevron-right placeholder-icon"></i>
             </div>
-            <div ng-if="search_string.length == 0">
-               Voer hier boven een medicijnnaam in.<br />
-               De resultaten zullen hier verschijnen
+            <div class="item" ng-if="search_results.length == 0">
+               <div ng-if="search_string.length > 0">
+                  Er zijn geen medicijnen gevonden met<br />
+                  '{{search_string}}'<br />
+                  in de medicijnnaam.
+               </div>
+               <div ng-if="search_string.length == 0">
+                  Voer hier boven een medicijnnaam in.<br />
+                  De resultaten zullen hier verschijnen
+               </div>
             </div>
          </div>
       </div>

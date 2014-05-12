@@ -58,21 +58,21 @@
             </div>
          </div>
       </div>
-
+      <div pj-float-column-divider class="med-column-divider"></div>
       <div class="med-column right-med-column">
-         <div class="item item-divider interaction-div item-icon-right" ng-if="interactions.length > 0">
-            <h2>Risicovolle Medicijn Combinaties</h2>
-            <i class="icon ion-alert-circled"></i>
+         <div class="item item-divider interaction-div" ng-if="interactions.length > 0">
+            <h2>Risicovolle Combinaties</h2>
          </div>
          <div class="item interaction-desc-item" ng-if="interactions.length > 0">
             U gebruikt medicijn-combinaties die een risico voor uw gezondheid vormen. Lees de onderstaande informatie goed door en raadpleeg uw arts.           
          </div>
-         <div class="item interaction-item {{interaction.status}}" ng-repeat="interaction in interactions">
+         <div class="item item-icon-left interaction-item {{interaction.status}}" ng-repeat="interaction in interactions">
+            <i class="icon ion-alert-circled"></i>
             <div>
                <span class="interaction-med">
                   {{interaction.primary_med_name}} - {{interaction.secondary_med_name}}
                </span>
-               <span class="interaction-status">{{interaction.status}}</span> 
+               <!-- <span class="interaction-status">{{interaction.status}}</span> --> 
             </div>
             <span class="interaction-desc">{{interaction.description}}</span>     
          </div>
