@@ -93,9 +93,7 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
                window.location.hash = "";
          });
       }
-      
-
-      
+            
       $scope.$on(Phonestorage.events.USER_DATA_RETRIEVED, function(e, result) {
          $scope.user_data = {};
          for (var i = 0; i < result.rows.length; i++) {

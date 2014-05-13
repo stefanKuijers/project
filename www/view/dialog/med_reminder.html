@@ -1,0 +1,23 @@
+<span>{{time}}</span>
+<p>
+   Het is tijd om de onderstaande medicijnen in te nemen. 
+   Geef aan wanneer u deze medicijnen in gaat nemen
+</p>
+<div class="item item-divider">
+   <div>medicijn naam</div>
+   <div>
+      <ul>
+         <li>niet</li>
+         <li>later</li>
+         <li>nu</li>
+      </ul>
+   </div>
+</div>
+<div pj-med-action class="item" ng-repeat="med in med_list" data-id="{{med.id}}" data-task="{{med.task}}">
+   <div class="name">{{med.trade_name}}</div>
+   <div class="actions">
+      <ion-radio ng-value="actions[0].value" ng-model="med_action.action">{{actions[0].text}}</ion-radio>
+      <ion-radio ng-value="actions[1].value" ng-model="med_action.action">{{actions[1].text}}</ion-radio>
+      <ion-radio ng-value="actions[2].value" ng-model="med_action.action">{{actions[2].text}}</ion-radio>
+   </div>
+</div>

@@ -35,6 +35,10 @@ input[type="search"],
    font-size: 14.5pt;
 }
 
+.bar-header .title {
+   font-size: 18pt;
+}
+
 .back-button-label,
 .settings-button-label,
 .add-dose-button-label {
@@ -559,25 +563,43 @@ div[pj-number-picker] button {
 
 .med-add-options .button {
    height: 120px;
-   width:50%;
-   margin: 0 25%;
+   width:80%;
+   margin: 0 10%;
    display: block;
    color:white;
-   font-size: 36px;
+   font-size: 24px;
    padding-top: 15px;
    float: left;
 }
 
 /* new med scan */
 .explanation-dialog ol {
-   list-style: disc outside none;
-   list-style-type: decimal;
-   margin: 20px 0px;
-   margin-left: 30px;
+   margin-top:10px;
+   margin-bottom:30px;
 }
 
 .explanation-dialog ol li {
-   padding: 5px 0;
+   padding: 20pt 0;
+}
+
+.explanation-dialog ol li span.step {
+   font-size: 30pt;
+   font-weight: bold;
+   padding-right: 10px;
+
+   float:left;
+   clear:left;
+   width:5%;
+}
+
+.explanation-dialog ol li span.desc {
+   padding-left: 10px;
+   float:left;
+   width:95%;
+}
+
+.explanation-dialog .double .desc {
+   margin-top: -7pt;
 }
 
 /* new med type */
@@ -641,6 +663,12 @@ div[pj-number-picker] button {
 
    .pj-radio i, .pj-radio label {
       line-height: 150px;
+   }
+
+   .med-add-options .button {
+      width:70%;
+      margin: 0 15%;
+      font-size: 34px;
    }
 
    .new-med-container {

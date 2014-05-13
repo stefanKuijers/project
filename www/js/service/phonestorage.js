@@ -110,7 +110,8 @@ angular.module('project.service.phonestorage', [])
             MED_ADDED:                  "MED_ADDED",
             DOSIS_BY_TIME_RETRIEVED:    "DOSIS_BY_TIME_RETRIEVED",
             DOSE_UPDATED:               "DOSE_UPDATED",
-            USER_DATA_RETRIEVED:        "USER_DATA_RETRIEVED"
+            USER_DATA_RETRIEVED:        "USER_DATA_RETRIEVED",
+            DOSIS_BY_TASK_ID_RETRIEVED: "DOSIS_BY_TASK_ID_RETRIEVED"
          },
 
          init: function(event_scope) {
@@ -252,6 +253,29 @@ angular.module('project.service.phonestorage', [])
             this.connection.transaction(
                function(tx) {
                   self.query("SELECT * FROM " + self.settings.USER_DATA_TABLE_NAME, tx, self.events.USER_DATA_RETRIEVED, event_scope);
+               }
+            );
+         },
+         get_dosis_by_task_id: function(id, event_scope) {
+            var self = this;
+            this.connection.transaction(
+               function(tx) {
+                  self.query(
+                     "SELECT " +
+                        "Dosis.reminder_task_id AS tasks, " +
+                        "Dosis.time, " +
+                        "Dosis.med_id as id, " +
+                        "Medicin.trade_name " +
+                     "FROM " +
+                        "Dosis " +
+                     "JOIN Medicin ON Dosis.med_id = Medicin.id " +
+                     "WHERE " +
+                        "Dosis.reminder_task_id LIKE '%" + id + "%'" +
+                     ";" , 
+                     tx, 
+                     self.events.DOSIS_BY_TASK_ID_RETRIEVED, 
+                     event_scope
+                  );
                }
             );
          },

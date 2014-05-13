@@ -1,5 +1,5 @@
-angular.module('project.service.notification', ['project.service.phonestorage', 'project.service.util'])
-   .service('Notification', ['$ionicPopup', 'Phonestorage', 'Util', function($ionicPopup, Phonestorage, Util) {
+angular.module('project.service.notification', ['project.service.phonestorage', 'project.service.util', 'project.directive.med_action'])
+   .service('Notification', ['$ionicPopup', 'Phonestorage', 'API', 'Util', function($ionicPopup, Phonestorage, API, Util) {
       // documentation on window.plugin.notification.local
       // https://github.com/katzer/cordova-plugin-local-notifications
 
@@ -39,6 +39,7 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
          init: function(root_scope) {
             this.initialized = true;
             this.root_scope  = root_scope;
+            console.log("notification init and rootScope set");
             this.available   = Util.on_mobile_device;
 
             if (!Util.on_mobile_device) { Util.log("Not on mobile device"); return; }
@@ -154,45 +155,48 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
          },
 
          show_notification: function(notification_object) {
-            var scope = this;
-            $ionicPopup.show({
-               templateUrl: 'view/dialog/med_reminder.html',
-               title: "Medicijn Innamemoment",
-               subTitle: 'sub title',
-               buttons: [
-                  { 
-                     text: 'Neem niet in', 
-                     onTap: function(e) { 
-                        return {
-                           action: scope.user_response.dont_take_med,
-                           notification: notification_object
-                        }
-                     }
-                  },
-                  {
-                     text: 'Neem later in',
-                     onTap: function(e) { 
-                        return {
-                           action: scope.user_response.postpone,
-                           notification: notification_object
-                        }
-                     }
-                  },
-                  {
-                     text: 'Neem nu in',
-                     type: 'button-positive',
-                     onTap: function(e) { 
-                        return {
-                           action: scope.user_response.take_med,
-                           notification: notification_object
-                        }
-                     }
-                  }
-               ]
-               }).then(function(response) {
-                  scope.handle_user_response(response);
+            console.log(notification_object);
+            var self = this;
+            var get_set_dosis_listener = this.root_scope.$on(Phonestorage.events.DOSIS_BY_TASK_ID_RETRIEVED, function(e, result) {
+               console.log(result);
+
+               self.root_scope.med_list = [];
+
+               var med_interaction_listener = self.root_scope.$on(API.events.MED_INTERACTION, function(e, result) {
+                  var med = Util.search_object_array_by(self.root_scope.med_list, {find_one: true, filters: {id: result.med.id}});
+                  console.log(med);
+   // tying to act if the notification med has INTERACTIONS
+                  self.root_scope.med_list[self.root_scope.med_list.indexOf(med)].interactions = result.med_interactions;
+                  self.root_scope.$apply();
+               });
+               for (var i = 0; i < result.rows.length; i++) {
+                  self.root_scope.med_list[i]      = angular.copy( result.rows.item(i) );
+                  self.root_scope.med_list[i].task = notification_object.id;
+
+                  API.get_med_interactions(self.root_scope.med_list[i].id, self.root_scope);
                }
-            );
+               self.root_scope.$apply();
+               self.root_scope.taken_actions = {};
+               console.log(self.root_scope.med_list);
+
+               $ionicPopup.show({
+                  templateUrl: 'view/dialog/med_reminder.html',
+                  title: "Medicijn Innamemoment",
+                  subTitle: self.root_scope.med_list[0].time,
+                  scope: self.root_scope,
+                  buttons: [
+                     { 
+                        text: 'Klaar', 
+                        onTap: function(e) { return true; }
+                     }
+                  ]
+                  }).then(function(response) {
+                     self.handle_user_response(response, self.root_scope.taken_actions);
+                  }
+               );
+            });
+            Phonestorage.get_dosis_by_task_id(notification_object.id, this.root_scope);
+
          },
 
          handle_user_response: function(response) {

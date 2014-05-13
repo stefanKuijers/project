@@ -1,5 +1,5 @@
 <ion-header-bar class="bar bar-header bar-dark">
-   <h1 class="title">Instellingen</h1>
+   <h1 class="title">instellingen</h1>
 </ion-header-bar>
 <ion-content>
    <div class="list">
@@ -22,13 +22,7 @@
          </select>
       </div>
       <ion-toggle ng-model="settings.vibration_notification">Vibreer</ion-toggle>
-      <ion-toggle ng-model="settings.shake_to_take">Schud om medicijn te nemen</ion-toggle>
       <ion-toggle ng-model="settings.visual_notification">Visueele Feedback</ion-toggle>
-      <div class="item range range-positive">
-         <i class="icon ion-ios7-sunny-outline"></i>
-         <input type="range" name="contrast" min="0" max="100" ng-model="settings.screen_contrast">
-         <i class="icon ion-ios7-sunny"></i>
-      </div>
 
       <div class="item item-divider">
          Invoer
@@ -36,6 +30,14 @@
       <ion-toggle ng-model="settings.vibration_input">Vibratie bij invoer</ion-toggle>
       <ion-toggle ng-model="settings.sound_input">Geluid bij invoer</ion-toggle>
       
+      <div class="item item-divider">
+         Scherm Contrast
+      </div>
+      <div class="item range range-positive">
+         <i class="icon ion-ios7-sunny-outline"></i>
+         <input type="range" name="contrast" min="0" max="100" ng-model="settings.screen_contrast">
+         <i class="icon ion-ios7-sunny"></i>
+      </div>
       
       <div class="item item-divider">
          Debug

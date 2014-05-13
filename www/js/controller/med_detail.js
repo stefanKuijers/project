@@ -137,5 +137,7 @@ angular.module(
          Phonestorage.delete_dose_time(dose.id);
          $scope.times.splice($scope.times.indexOf(dose), 1);
       }
+
+      Notification.handle_notification_click(844183871, 'foreground', "['yep','nope']");
    }])
 ;
