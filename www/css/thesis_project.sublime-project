@@ -16,6 +16,10 @@
 		{
 			"follow_symlinks": true,
 			"path": "C:\\dev\\barcode"
+		},
+		{
+			"follow_symlinks": true,
+			"path": "C:\\dev\\direct_admin_skin"
 		}
 	]
 }
