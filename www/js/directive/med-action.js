@@ -1,60 +1,92 @@
-angular.module('project.directive.med_action', ['project.service.phonestorage'])
-   .directive("pjMedAction", ['Phonestorage', function(Phonestorage) {
-      var actions = {
-         dont_take: -1,
-         not_now: 0,
-         now: 1
+angular.module('project.directive.med_action', ['project.service.phonestorage', 'project.service.notification', 'project.service.util'])
+   .directive("pjMedAction", ['Phonestorage', 'Notification', 'Util', function(Phonestorage, Notification, Util) {
+      var CONST = {
+         actions: {
+            dont_take: -1,
+            later: 0,
+            now: 1
+         },
+         status: {
+            not_taken: -2,
+            early: -1,
+            on_time: 0,
+            late: 1
+         },
+         time_span_on_time: { // for it to count as 'on time' it has to be in the same hour but 5 minutes before or after the set time
+            hours: 0,
+            minutes: 10
+         },
+         slumber_minutes: 5
       }
 
       return {
          link: function($scope, $elem, $attrs) {
             $scope.med_index = 0;
             console.log($scope.$parent);
-            $scope.med_list_length = $scope.$parent.med_list.length;
+            $scope.med_list_length = $scope.badge_value = $scope.$parent.med_list.length;
             $scope.current_med = $scope.$parent.med_list[$scope.med_index];
 
             $scope.actions = [
-               {text: "niet", value: actions.dont_take},
-               {text: "niet nu", value: actions.not_now},
-               {text: "nu", value: actions.now}
+               {text: "niet", value: CONST.actions.dont_take},
+               {text: "niet nu", value: CONST.actions.later},
+               {text: "nu", value: CONST.actions.now}
             ];
             
             $scope.set_action = function(action) {
                $elem.hide();
-               // $scope.$parent.taken_actions[$scope.med_index] = {
-               //    med_id: $scope.current_med.id,
-               //    task_id: $scope.current_med.task,
-               //    action: action
-               // }
 
-
-               console.log($scope.current_med);
-               var scheduled_time_split = $scope.current_med.time.split(":");
-               
-               
+               var status;
                var now = Date.today().setTimeToNow();
-               var diff = {
-                  hours: parseInt(now.toString('HH'), 10) - parseInt(scheduled_time_split[0], 10),
-                  minutes: parseInt(now.toString('mm'), 10) - parseInt(scheduled_time_split[1], 10)
+               if (action === CONST.actions.now) {
+                  var scheduled_time_split = $scope.current_med.time.split(":");
+                  var diff = {
+                     hours: parseInt(now.toString('HH'), 10) - parseInt(scheduled_time_split[0], 10),
+                     minutes: parseInt(now.toString('mm'), 10) - parseInt(scheduled_time_split[1], 10)
+                  }
+
+                  if (diff.hours === 0 && (diff.minutes <= (CONST.time_span_on_time.minutes / 2) && diff.minutes >= -(CONST.time_span_on_time.minutes / 2)))
+                     status = CONST.status.on_time;
+                  else if (diff.hours > 0 || (diff.minutes > (CONST.time_span_on_time.minutes / 2)))
+                     status = CONST.status.late;
+                  else
+                     status = CONST.status.not_taken;
+
+               } else {
+                  status = CONST.status.not_taken;
+
+                  if (action === CONST.actions.later) {
+                     Notification.set_slumber_notification({
+                        task_id: (Util.hashString(now.toString()) + ""),
+                        date: now.addMinutes(CONST.slumber_minutes),
+                        message: "U heeft uw dosis " + $scope.current_med.trade_name + " van " + $scope.current_med.time + " nog niet ingenomen. Wilt u het nu innemen?",
+                        json: JSON.stringify({med: $scope.current_med, date: now.toString('yyyy-MM-d')})
+                     });
+                  }
                }
 
-               // determine status based on time diff
-               // safe time_diff to data_base
+               var get_history_listener = $scope.$on(Phonestorage.events.SINGLE_MED_HISTORY_EVENT_RETRIEVED, function (e, result) {
+                  get_history_listener();
+                  
+                  var med_history = (result.rows.length > 0) ? angular.copy(result.rows.item(0)) : false;
+                  console.log("med_history:",med_history);
 
-               //Phonestorage.archive_user_action($scope.current_med, status, date);
+                  if (med_history)
+                     Phonestorage.update_archive_user_action(med_history.id, $scope.current_med, status, now);
+                  else
+                     Phonestorage.archive_user_action($scope.current_med, status, now);
 
+               });
+               Phonestorage.get_single_med_history($scope.current_med, now, $scope);
 
                $scope.next();
             }
 
             $scope.next = function() {
-               $scope.med_list_length--; 
+               if ($scope.badge_value > 0) $scope.badge_value--; 
                $scope.med_index++; 
                if ($scope.med_index >= $scope.med_list_length)
                   console.log("SET all meds"),
-                  $scope.med_index = 0,
-                  $scope.med_list_length = $scope.med_list_length;
-
+                  $scope.med_index = 0;
 
                $scope.current_med = $scope.$parent.med_list[$scope.med_index];
                $elem.fadeIn();
