@@ -138,6 +138,6 @@ angular.module(
          $scope.times.splice($scope.times.indexOf(dose), 1);
       }
 
-      Notification.handle_notification_click(844183871, 'foreground', "['yep','nope']");
+      Notification.handle_notification_click(454378175, 'foreground', "['yep','nope']");
    }])
 ;

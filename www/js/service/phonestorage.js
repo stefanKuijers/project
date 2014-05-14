@@ -90,6 +90,7 @@ angular.module('project.service.phonestorage', [])
             DOSIS_TABLE_NAME:              "Dosis",
             INTERVAL_UNIT_TABLE_NAME:      "Interval_Unit", 
             USER_DATA_TABLE_NAME:          "User_Data", 
+            HISTORY_TABLE_NAME:            "History",
             accepted_units:                ["ml", "cl", "dl", "mg", "g", "pch", "sachet"],
             accepted_interval_units:       ["dagelijks", "weekelijks", "geen"],
             accepted_icons:                ["tablet_1", "tablet_2", "tablet_3", "liquid", "powder", "injection"],
@@ -337,6 +338,21 @@ angular.module('project.service.phonestorage', [])
                      tx,
                      self.events.DOSE_INSERTED,
                      event_scope
+                  );
+               }
+            );
+         },
+         archive_user_action: function(med, status, now) {
+            var self = this;
+            console.log(med, action, date);
+            this.connection.transaction(
+               function(tx) {
+                  self.query(
+                     'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + ' ' +
+                        '(med_name, time_scheduled, time_taken, date, med_id, status) ' + 
+                     'VALUES (' + med.name +', "' + med.time + '", ' + now.toString("HH:mm") + '", '+ now.toString('YYYY-MM-DD') +', "'+ med.id +'", "' + status + '")' +
+                     ';',
+                     tx
                   );
                }
             );
@@ -613,7 +629,41 @@ angular.module('project.service.phonestorage', [])
          },
 
          setup_history_table: function(scope) {
-            // setup table and inject default data
+            var self = this;
+            this.connection.transaction(
+               function(tx) {
+                  tx.executeSql('DROP TABLE IF EXISTS ' + self.settings.HISTORY_TABLE_NAME);
+                  tx.executeSql(
+                     'CREATE TABLE IF NOT EXISTS ' + self.settings.HISTORY_TABLE_NAME + ' (' +
+                        'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
+                        'status INT, ' +
+                        'time TIME, ' +
+                        'date DATE, ' +
+                        'med_name VARCHAR(50),' +
+                        'icon VARCHAR(10)' +
+                     ')'
+                  );
+                  tx.executeSql(
+                     'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + 
+                     ' (status, time_scheduled, time_taken, date, med_name, icon) ' + 
+                     'SELECT 0, "06:00", "06:00", 2014-05-01, "Ibuprofen", "tablet_1" UNION ALL ' +
+                     'SELECT -1, "08:00", NULL, 2014-05-01, "Paracetamol", "tablet_1" UNION ALL ' +
+                     'SELECT 0, "13:00", "13:00", 2014-05-01, "Hydrochloorthiazide", "tablet_1" UNION ALL ' +
+                     'SELECT 1, "06:00", "06:05", 2014-05-02, "Ibuprofen", "tablet_1" UNION ALL ' +
+                     'SELECT 0, "08:00", "08:00", 2014-05-02, "Paracetamol", "tablet_1" UNION ALL ' +
+                     'SELECT 0, "13:00", "13:00", 2014-05-02, "Hydrochloorthiazide", "tablet_1" UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", 2014-05-03, "Ibuprofen", "tablet_1" UNION ALL ' +
+                     'SELECT 1, "08:00", "08:10", 2014-05-03, "Paracetamol", "tablet_1" UNION ALL ' +
+                     'SELECT 1, "13:00", "13:30", 2014-05-03, "Hydrochloorthiazide", "tablet_1" UNION ALL ' +
+                     'SELECT -1, "06:00", NULL, 2014-05-04, "Ibuprofen", "tablet_1" UNION ALL ' +
+                     'SELECT -1, "08:00", NULL, 2014-05-04, "Paracetamol", "tablet_1" UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", 2014-05-05, "Ibuprofen", "tablet_1" UNION ALL ' +
+                     'SELECT 1, "09:00", "09:20", 2014-05-05, "Ibuprofen", "tablet_1";'
+                  );
+                  
+               }, 
+               this.query_failed
+            );
          },
 
          setup_reminder_table: function(scope) {

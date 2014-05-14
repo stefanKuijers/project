@@ -3,21 +3,13 @@
    Het is tijd om de onderstaande medicijnen in te nemen. 
    Geef aan wanneer u deze medicijnen in gaat nemen
 </p>
-<div class="item item-divider">
-   <div>medicijn naam</div>
-   <div>
-      <ul>
-         <li>niet</li>
-         <li>later</li>
-         <li>nu</li>
-      </ul>
-   </div>
-</div>
-<div pj-med-action class="item" ng-repeat="med in med_list" data-id="{{med.id}}" data-task="{{med.task}}">
-   <div class="name">{{med.trade_name}}</div>
-   <div class="actions">
-      <ion-radio ng-value="actions[0].value" ng-model="med_action.action">{{actions[0].text}}</ion-radio>
-      <ion-radio ng-value="actions[1].value" ng-model="med_action.action">{{actions[1].text}}</ion-radio>
-      <ion-radio ng-value="actions[2].value" ng-model="med_action.action">{{actions[2].text}}</ion-radio>
+
+<div pj-med-action class="js-pj-med-action" data-id="{{current_med.id}}" data-task="{{current_med.task}}">
+   <div class="badge">{{med_list_length}}</div>
+   <div class="item item-divider name"><h1>{{current_med.trade_name}}</h1></div>
+   <div class="item actions row">
+      <button class="button button-block button-positive col" ng-click="set_action(actions[0].value)">{{actions[0].text}}</button>
+      <button class="button button-block button-positive col" ng-click="set_action(actions[1].value)">{{actions[1].text}}</button>
+      <button class="button button-block button-positive col" ng-click="set_action(actions[2].value)">{{actions[2].text}}</button>
    </div>
 </div>

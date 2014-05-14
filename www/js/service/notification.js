@@ -158,26 +158,22 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             console.log(notification_object);
             var self = this;
             var get_set_dosis_listener = this.root_scope.$on(Phonestorage.events.DOSIS_BY_TASK_ID_RETRIEVED, function(e, result) {
-               console.log(result);
-
+               
                self.root_scope.med_list = [];
-
-               var med_interaction_listener = self.root_scope.$on(API.events.MED_INTERACTION, function(e, result) {
-                  var med = Util.search_object_array_by(self.root_scope.med_list, {find_one: true, filters: {id: result.med.id}});
-                  console.log(med);
-   // tying to act if the notification med has INTERACTIONS
-                  self.root_scope.med_list[self.root_scope.med_list.indexOf(med)].interactions = result.med_interactions;
-                  self.root_scope.$apply();
-               });
                for (var i = 0; i < result.rows.length; i++) {
                   self.root_scope.med_list[i]      = angular.copy( result.rows.item(i) );
                   self.root_scope.med_list[i].task = notification_object.id;
 
                   API.get_med_interactions(self.root_scope.med_list[i].id, self.root_scope);
                }
-               self.root_scope.$apply();
+
+               var med_interaction_listener = self.root_scope.$on(API.events.MED_INTERACTION, function(e, result) {
+                  var med = Util.search_object_array_by(self.root_scope.med_list, {find_one: true, filters: {id: result.med.id}});
+                  if (med)
+                     self.root_scope.med_list[self.root_scope.med_list.indexOf(med)].interactions = result.med_interactions;
+               });
+
                self.root_scope.taken_actions = {};
-               console.log(self.root_scope.med_list);
 
                $ionicPopup.show({
                   templateUrl: 'view/dialog/med_reminder.html',
