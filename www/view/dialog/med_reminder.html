@@ -3,10 +3,10 @@
 
 <div pj-med-action class="js-pj-med-action" data-id="{{current_med.id}}" data-task="{{current_med.task}}">
    <div class="badge">{{badge_value}}</div>
-   <div class="item item-divider name"><h1>{{current_med.trade_name}}</h1></div>
+   <div class="item item-divider name"><h2>{{current_med.amount}} x {{current_med.dosis_amount}}{{current_med.unit}} {{current_med.trade_name}}</h2></div>
    <div class="item actions row">
       <button class="button button-block button-positive col" ng-click="set_action(actions[0].value)">{{actions[0].text}}</button>
       <button class="button button-block button-positive col" ng-click="set_action(actions[1].value)">{{actions[1].text}}</button>
-      <button class="button button-block button-positive col" ng-click="set_action(actions[2].value)">{{actions[2].text}}</button>
+      <button class="button button-block button-positive col last" ng-click="set_action(actions[2].value)">{{actions[2].text}}</button>
    </div>
 </div>

@@ -59,9 +59,7 @@ angular.module('project.service.util', [])
                      }
                   }
                }
-
             }
-            console.log("result", results);
             return results.length > 0 ? results : false;       
          }
 

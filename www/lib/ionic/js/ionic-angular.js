@@ -2,7 +2,7 @@
  * Copyright 2014 Drifty Co.
  * http://drifty.com/
  *
- * Ionic, v1.0.0-beta.4-nightly-2042
+ * Ionic, v1.0.0-beta.5b-nightly-2120
  * A powerful HTML5 mobile app framework.
  * http://ionicframework.com/
  *
@@ -62,8 +62,10 @@ var deprecated = {
 var IonicModule = angular.module('ionic', ['ngAnimate', 'ngSanitize', 'ui.router']),
   extend = angular.extend,
   forEach = angular.forEach,
+  isDefined = angular.isDefined,
   isString = angular.isString,
   jqLite = angular.element;
+
 
 /**
  * @ngdoc service
@@ -136,8 +138,8 @@ function($rootScope, $document, $compile, $animate, $timeout, $ionicTemplateLoad
      *  - `{string=}` `destructiveText` The text for a 'danger' on the action sheet.
      *  - `{function=}` `cancel` Called if the cancel button is pressed or the backdrop is tapped.
      *  - `{function=}` `buttonClicked` Called when one of the non-destructive buttons is clicked,
-     *     with the index of the button that was clicked. Return true to close the action sheet,
-     *     or false to keep it opened.
+     *     with the index of the button that was clicked and the button object. Return true to close
+     *     the action sheet, or false to keep it opened.
      *  - `{function=}` `destructiveButtonClicked` Called when the destructive button is clicked.
      *     Return true to close the action sheet, or false to keep it opened.
      */
@@ -147,7 +149,8 @@ function($rootScope, $document, $compile, $animate, $timeout, $ionicTemplateLoad
       extend(scope, {
         cancel: angular.noop,
         buttonClicked: angular.noop,
-        destructiveButtonClicked: angular.noop
+        destructiveButtonClicked: angular.noop,
+        buttons: []
       }, opts);
 
       // Compile the template
@@ -188,7 +191,7 @@ function($rootScope, $document, $compile, $animate, $timeout, $ionicTemplateLoad
       scope.buttonClicked = function(index) {
         // Check if the button click event returned true, which means
         // we can close the action sheet
-        if((opts.buttonClicked && opts.buttonClicked(index)) === true) {
+        if((opts.buttonClicked && opts.buttonClicked(index, opts.buttons[index])) === true) {
           hideSheet(false);
         }
       };
@@ -327,6 +330,10 @@ IonicModule
   var useSlowAnimations = false;
   this.setSlowAnimations = function(isSlow) {
     useSlowAnimations = isSlow;
+  };
+
+  this.create = function(animation) {
+    return ionic.Animation.create(animation);
   };
 
   this.$get = [function() {
@@ -1173,6 +1180,7 @@ function($document, $ionicTemplateLoader, $ionicBackdrop, $timeout, $q, $log, $c
               ionic.DomUtil.centerElementByMarginTwice(self.element[0]);
               ionic.requestAnimationFrame(function() {
                 self.isShown && self.element.addClass('active');
+                ionic.DomUtil.centerElementByMarginTwice(self.element[0]);
               });
             }
           });
@@ -1245,7 +1253,8 @@ function($document, $ionicTemplateLoader, $ionicBackdrop, $timeout, $q, $log, $c
  * @module ionic
  * @description
  * The Modal is a content pane that can go over the user's main view
- * temporarily.  Usually used for making a choice or editing an item.
+ * temporarily.  Usually used for making a choice or editing an item. 
+ * Note that you need to put the content of the modal inside a div with the class `modal`.
  *
  * @usage
  * ```html
@@ -1279,7 +1288,7 @@ function($document, $ionicTemplateLoader, $ionicBackdrop, $timeout, $q, $log, $c
  *   $scope.$on('$destroy', function() {
  *     $scope.modal.remove();
  *   });
- *   // Execute action on hide modal 
+ *   // Execute action on hide modal
  *   $scope.$on('modal.hide', function() {
  *     // Execute action
  *   });
@@ -1326,6 +1335,8 @@ function($rootScope, $document, $compile, $timeout, $ionicPlatform, $ionicTempla
      *    Default: 'slide-in-up'
      *  - `{boolean=}` `focusFirstInput` Whether to autofocus the first input of
      *    the modal when shown.  Default: false.
+     *  - `{boolean=} `backdropClickToClose` Whether to close the modal on clicking the backdrop.
+     *    Default: true.
      */
     initialize: function(opts) {
       ionic.views.Modal.prototype.initialize.call(this, opts);
@@ -1373,7 +1384,7 @@ function($rootScope, $document, $compile, $timeout, $ionicPlatform, $ionicTempla
       return $timeout(function() {
         //After animating in, allow hide on backdrop click
         self.$el.on('click', function(e) {
-          if (e.target === self.el) {
+          if (self.backdropClickToClose && e.target === self.el) {
             self.hide();
           }
         });
@@ -2532,8 +2543,7 @@ IonicModule
  * @description
  * Delegate that controls the {@link ionic.directive:ionSlideBox} directive.
  *
- * Methods called directly on the $ionicSlideBoxDelegate service will control all side
- * menus.  Use the {@link ionic.service:$ionicSlideBoxDelegate#$getByHandle $getByHandle}
+ * Methods called directly on the $ionicSlideBoxDelegate service will control all slide boxes.  Use the {@link ionic.service:$ionicSlideBoxDelegate#$getByHandle $getByHandle}
  * method to control specific slide box instances.
  *
  * @usage
@@ -3784,8 +3794,6 @@ function($scope, scrollViewOptions, $timeout, $window, $$scrollValueCache, $loca
     }
   };
 
-
-
   /**
    * @private
    */
@@ -4064,30 +4072,30 @@ IonicModule
     restrict: 'E',
     replace: true,
     require: '?ngModel',
-    scope: {
-      ngModel: '=?',
-      ngValue: '=?',
-      ngChecked: '=?',
-      ngDisabled: '=?',
-      ngChange: '&'
-    },
     transclude: true,
-
     template: '<label class="item item-checkbox">' +
                 '<div class="checkbox checkbox-input-hidden disable-pointer-events">' +
-                  '<input type="checkbox" ng-model="ngModel" ng-value="ngValue" ng-change="ngChange()">' +
+                  '<input type="checkbox">' +
                   '<i class="checkbox-icon"></i>' +
                 '</div>' +
                 '<div class="item-content disable-pointer-events" ng-transclude></div>' +
               '</label>',
-
     compile: function(element, attr) {
       var input = element.find('input');
-      if(attr.name) input.attr('name', attr.name);
-      if(attr.ngChecked) input.attr('ng-checked', attr.ngChecked);
-      if(attr.ngDisabled) input.attr('ng-disabled', attr.ngDisabled);
-      if(attr.ngTrueValue) input.attr('ng-true-value', attr.ngTrueValue);
-      if(attr.ngFalseValue) input.attr('ng-false-value', attr.ngFalseValue);
+      forEach({
+        'name': attr.name,
+        'ng-value': attr.ngValue,
+        'ng-model': attr.ngModel,
+        'ng-checked': attr.ngChecked,
+        'ng-disabled': attr.ngDisabled,
+        'ng-true-value': attr.ngTrueValue,
+        'ng-false-value': attr.ngFalseValue,
+        'ng-change': attr.ngChange
+      }, function(value, name) {
+        if (isDefined(value)) {
+          input.attr(name, value);
+        }
+      });
     }
 
   };
@@ -4560,7 +4568,8 @@ function tapScrollToTopDirective() {
             bounds.left, bounds.top - 20,
             bounds.left + bounds.width, bounds.top + bounds.height
           )) {
-            $ionicScrollDelegate.scrollTop(true);
+            var scrollCtrl = $element.controller('$ionicScroll');
+            scrollCtrl && scrollCtrl.scrollTop(true);
           }
         }
       }
@@ -4586,9 +4595,10 @@ function headerFooterBarDirective(isHeader) {
 
           if (isHeader) {
             $scope.$watch(function() { return el.className; }, function(value) {
+              var isShown = value.indexOf('ng-hide') === -1;
               var isSubheader = value.indexOf('bar-subheader') !== -1;
-              $scope.$hasHeader = !isSubheader;
-              $scope.$hasSubheader = isSubheader;
+              $scope.$hasHeader = isShown && !isSubheader;
+              $scope.$hasSubheader = isShown && isSubheader;
             });
             $scope.$on('$destroy', function() {
               delete $scope.$hasHeader;
@@ -4596,9 +4606,10 @@ function headerFooterBarDirective(isHeader) {
             });
           } else {
             $scope.$watch(function() { return el.className; }, function(value) {
+              var isShown = value.indexOf('ng-hide') === -1;
               var isSubfooter = value.indexOf('bar-subfooter') !== -1;
-              $scope.$hasFooter = !isSubfooter;
-              $scope.$hasSubfooter = isSubfooter;
+              $scope.$hasFooter = isShown && !isSubfooter;
+              $scope.$hasSubfooter = isShown && isSubfooter;
             });
             $scope.$on('$destroy', function() {
               delete $scope.$hasFooter;
@@ -4795,7 +4806,9 @@ function($animate, $compile) {
     }],
     scope: true,
     compile: function($element, $attrs) {
-      var isAnchor = angular.isDefined($attrs.href) || angular.isDefined($attrs.ngHref);
+      var isAnchor = angular.isDefined($attrs.href) ||
+        angular.isDefined($attrs.ngHref) ||
+        angular.isDefined($attrs.uiSref);
       var isComplexItem = isAnchor ||
         //Lame way of testing, but we have to know at compile what to do with the element
         /ion-(delete|option|reorder)-button/i.test($element.html());
@@ -5005,6 +5018,60 @@ IonicModule
     }
   };
 }]);
+
+/**
+ * @ngdoc directive
+ * @name keyboardAttach
+ * @module ionic
+ * @restrict A
+ *
+ * @description
+ * keyboard-attach is an attribute directive which will cause an element to float above
+ * the keyboard when the keyboard shows. Currently only supports the [ion-footer-bar]({{ page.versionHref }}/api/directive/ionFooterBar/)
+ * directive.
+ *
+ * @usage
+ *
+ * ```html
+ *  <ion-footer-bar align-title="left" keyboard-attach class="bar-assertive">
+ *    <h1 class="title">Title!</h1>
+ *  </ion-footer-bar>
+ * ```
+ */
+
+IonicModule
+.directive('keyboardAttach', function() {
+  return function(scope, element, attrs) {
+    window.addEventListener('native.showkeyboard', onShow);
+    window.addEventListener('native.hidekeyboard', onHide);
+
+    var scrollCtrl;
+
+    function onShow(e) {
+      //for testing
+      var keyboardHeight = e.keyboardHeight || e.detail.keyboardHeight;
+      element.css('bottom', keyboardHeight);
+      scrollCtrl = element.controller('$ionicScroll');
+      if ( scrollCtrl ) {
+        scrollCtrl.scrollView.__container.style.bottom = keyboardHeight + keyboardAttachGetClientHeight(element[0]) + "px";
+      }
+    };
+
+    function onHide() {
+      element.css('bottom', '');
+      if ( scrollCtrl ) { 
+        scrollCtrl.scrollView.__container.style.bottom = '';
+      }
+    };
+
+    scope.$on('$destroy', function() {
+      window.removeEventListener('native.showkeyboard', onShow);
+      window.removeEventListener('native.hidekeyboard', onHide);
+    });
+  };
+})
+
+function keyboardAttachGetClientHeight(element) { return element.clientHeight }
 
 /**
 * @ngdoc directive

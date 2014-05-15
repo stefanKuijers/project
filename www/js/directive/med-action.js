@@ -22,7 +22,6 @@ angular.module('project.directive.med_action', ['project.service.phonestorage', 
       return {
          link: function($scope, $elem, $attrs) {
             $scope.med_index = 0;
-            console.log($scope.$parent);
             $scope.med_list_length = $scope.badge_value = $scope.$parent.med_list.length;
             $scope.current_med = $scope.$parent.med_list[$scope.med_index];
 
@@ -68,8 +67,6 @@ angular.module('project.directive.med_action', ['project.service.phonestorage', 
                   get_history_listener();
                   
                   var med_history = (result.rows.length > 0) ? angular.copy(result.rows.item(0)) : false;
-                  console.log("med_history:",med_history);
-
                   if (med_history)
                      Phonestorage.update_archive_user_action(med_history.id, $scope.current_med, status, now);
                   else
@@ -85,8 +82,7 @@ angular.module('project.directive.med_action', ['project.service.phonestorage', 
                if ($scope.badge_value > 0) $scope.badge_value--; 
                $scope.med_index++; 
                if ($scope.med_index >= $scope.med_list_length)
-                  console.log("SET all meds. close", $scope.$parent.popper, $scope.$parent, $scope),
-                  // $scope.$parent.popper.close(), // function close is not available for some reason... should i get a newer build?
+                  $scope.$parent.popper.close(),
                   $scope.med_index = 0;
 
                $scope.current_med = $scope.$parent.med_list[$scope.med_index];

@@ -173,24 +173,32 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             Private Functions
          */
          handle_notification_trigger: function(id, state, json) {
+            alert("NOTI TRIGGER ", JSON.stringify({id: id, state: state, json: json}));
             if (state === this.state.foreground)
                this.show_notification({id: id, state: state, json: json});
          },
 
          handle_notification_click: function(id, state, json) {
+            alert("NOTI CLICK ", JSON.stringify({id: id, state: state, json: json}));
             this.show_notification({id: id, state: state, json: json});
          },
 
          show_notification: function(notification_object) {
+            alert("@SHOE_NOTI " + JSON.stringify(notification_object));
+            alert("@SHOE_NOTI type" + typeof notification_object.json);
+            alert("@SHOE_NOTI value" + notification_object.json);
+
             var self = this;
 
             self.root_scope.taken_actions = {};
             if (typeof notification_object.json != 'undefined') { 
+               alert("NOTI SLUMBER ");
                var json = JSON.parse(notification_object.json);
 
                self.root_scope.med_list = [json.med];
                self.popup_popup("U heeft uw dosis " + json.med.trade_name + "  van " + json.med.time + " nog niet ingenomen. Wanneer wilt u het innemen?");
             } else {
+               alert("NOTI NORMAL ");
                var get_set_dosis_listener = this.root_scope.$on(Phonestorage.events.DOSIS_BY_TASK_ID_RETRIEVED, function(e, result) {
                   get_set_dosis_listener();
 
@@ -203,6 +211,7 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
 
          populate_med_list: function(notification_object, result) {
             this.root_scope.med_list = [];
+            var self = this;
             for (var i = 0; i < result.rows.length; i++) {
                this.root_scope.med_list[i]      = angular.copy( result.rows.item(i) );
                this.root_scope.med_list[i].task = notification_object.id;
@@ -211,21 +220,19 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                API.get_med_interactions(this.root_scope.med_list[i].id, this.root_scope);
             }
 
-            var med_interaction_listener = this.root_scope.$on(API.events.MED_INTERACTION, function(e, result) {
-               var med = Util.search_object_array_by(this.root_scope.med_list, {find_one: true, filters: {id: result.med.id}});
+            var med_interaction_listener = self.root_scope.$on(API.events.MED_INTERACTION, function(e, result) {
+               var med = Util.search_object_array_by(self.root_scope.med_list, {find_one: true, filters: {id: result.med.id}});
                if (med)
-                  this.root_scope.med_list[this.root_scope.med_list.indexOf(med)].interactions = result.med_interactions;
+                  self.root_scope.med_list[self.root_scope.med_list.indexOf(med)].interactions = result.med_interactions;
             });
          },
 
          popup_popup: function(message) {
-            // alert("popped up popup");
             var self = this;
             self.root_scope.message = message;
             self.root_scope.popper = $ionicPopup.show({
                templateUrl: 'view/dialog/med_reminder.html',
-               title: "Medicijn Innamemoment",
-               subTitle: self.root_scope.med_list[0].time,
+               title: "<span class='pop-title'>Medicijn Innamemoment</span><span class='pop-time'>" + self.root_scope.med_list[0].time + "</span>",
                scope: self.root_scope,
                buttons: [
                   { 
@@ -233,28 +240,30 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                      onTap: function(e) { return true; }
                   }
                ]
-            }).then(function(response) {
-                  self.handle_user_response(response, self.root_scope.taken_actions);
+            });
+            self.root_scope.popper.then(function() {
+                  self.handle_user_response(self.root_scope.taken_actions);
             });
          },
 
-         handle_user_response: function(response, actions) {
+         handle_user_response: function(actions) {
+            console.log(actions);
             // remove notification from notification center
 
-            switch(response.action) {
-               case this.user_response.dont_take_med :
-                  // Phonestorage.set_dose_history_state(Phonestorage.history_state.not_taken)
-               break;
+            // switch(response.action) {
+            //    case this.user_response.dont_take_med :
+            //       // Phonestorage.set_dose_history_state(Phonestorage.history_state.not_taken)
+            //    break;
 
-               case this.user_response.postpone :
-                  // add extra notification with an interval of 5 minutes or something (get interval from settings)
-                  // Phonestorage.set_dose_history_state(Phonestorage.history_state.postponed)
-               break;
+            //    case this.user_response.postpone :
+            //       // add extra notification with an interval of 5 minutes or something (get interval from settings)
+            //       // Phonestorage.set_dose_history_state(Phonestorage.history_state.postponed)
+            //    break;
 
-               case this.user_response.take_med :
-                  // Phonestorage.set_dose_history_state(Phonestorage.history_state.taken)
-               break;
-            }
+            //    case this.user_response.take_med :
+            //       // Phonestorage.set_dose_history_state(Phonestorage.history_state.taken)
+            //    break;
+            // }
          }
 
 

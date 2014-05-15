@@ -10,7 +10,6 @@ angular.module('project.controller.nav_control', [])
          $urlRouter.sync();
          setTimeout(function(){
             $scope.data.show_home_button = $state.is('med-info'); 
-            console.log($scope.data);
             if ($state.current.name) $state.reload();
          }, 400);
       });

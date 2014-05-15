@@ -113,11 +113,24 @@ button.back-home {
 }
 
 h3.popup-title {
+   text-align: left;
    font-size: 30px;
+   padding: 0 10px;
 }
 
 h5.popup-sub-title {
    font-size: 24px;
+}
+
+.pop-title {
+   float:left;
+}
+.pop-time {
+   float: right;
+}
+
+.popup-body {
+   clear:both;
 }
 
 a.item::after {
@@ -170,7 +183,6 @@ a.item::after {
    text-overflow: clip;
    white-space: normal;
 }
-
 
 /* view specific */
 /**/
@@ -241,6 +253,10 @@ a.item::after {
    position:absolute;
    left: 0px;
    top:-2px;
+}
+
+.interaction-item.item-icon-left {
+   padding-left: 65px;
 }
 
 .med-list .time-container {
@@ -530,6 +546,37 @@ div[pj-number-picker] button {
    border-bottom: none;
 }
 
+[pj-med-action] {
+   position: relative;
+   margin: 35px 0 15px 0;
+}
+
+[pj-med-action] .badge {
+   position:         absolute;
+   right:            9px;
+   top:              9px;
+   width:            30px;
+   height:           30px;
+   border-radius:    15px;
+   background-color: #c90000;
+   color:            white;
+   font-size:        20pt;
+   padding-top:      7px;
+   text-align:       center;
+   z-index:          10;
+}
+
+[pj-med-action] .col {
+   flex: none;
+   width: 30%;
+   margin-right: 5%
+}
+
+
+[pj-med-action] .col.last {
+   margin-right:0;
+}
+
 /* new medicin */
 .new-med-container {
    padding: 10%;
@@ -616,7 +663,9 @@ div[pj-number-picker] button {
 
 
 @media screen and (orientation:portrait) {
-   
+   .med-column-divider {
+      display:none;
+   }
 }
 
 @media screen and (orientation:landscape) {

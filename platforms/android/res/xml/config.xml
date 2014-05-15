@@ -4,6 +4,9 @@
     <feature name="App">
         <param name="android-package" value="org.apache.cordova.App" />
     </feature>
+    <feature name="ScanditSDK">
+        <param name="android-package" value="com.mirasense.scanditsdk.plugin.ScanditSDK" />
+    </feature>
     <feature name="Device">
         <param name="android-package" value="org.apache.cordova.device.Device" />
     </feature>
@@ -15,9 +18,6 @@
     </feature>
     <feature name="SoftKeyboard">
         <param name="android-package" value="org.apache.cordova.plugin.softkeyboard.SoftKeyboard" />
-    </feature>
-    <feature name="ScanditSDK">
-        <param name="android-package" value="com.mirasense.scanditsdk.plugin.ScanditSDK" />
     </feature>
     <name>Project App</name>
     <description>

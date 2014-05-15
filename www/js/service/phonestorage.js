@@ -266,13 +266,17 @@ angular.module('project.service.phonestorage', [])
                      "SELECT " +
                         "Dosis.reminder_task_id AS tasks, " +
                         "Dosis.time, " +
+                        "Dosis.amount, " +
                         "Dosis.med_id as id, " +
                         "Icon.id as icon, " +
-                        "Medicin.trade_name " +
+                        "Medicin.dosis_amount, " +
+                        "Medicin.trade_name, " +
+                        "Unit.unit " +
                      "FROM " +
                         "Dosis " +
                      "JOIN Medicin ON Dosis.med_id = Medicin.id " +
                      "JOIN Icon ON Medicin.Icon_id = Icon.id " +
+                     "JOIN Unit ON Medicin.Unit_id = Unit.id " +
                      "WHERE " +
                         "Dosis.reminder_task_id LIKE '%" + id + "%'" +
                      ";" , 
