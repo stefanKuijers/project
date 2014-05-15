@@ -173,30 +173,21 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             Private Functions
          */
          handle_notification_trigger: function(id, state, json) {
-            alert("TRIGGER: " + JSON.stringify({id: id, state: state, json:json}));
             if (state === this.state.foreground)
                this.show_notification({id: id, state: state, json: json});
          },
 
          handle_notification_click: function(id, state, json) {
-            alert("CLICK: " + JSON.stringify({id: id, state: state, json:json}));
             this.show_notification({id: id, state: state, json: json});
          },
 
          show_notification: function(notification_object) {
-            console.log("show_notification: " + JSON.stringify(notification_object));
-            console.log("show_notification json: " + notification_object.json);
-            console.log("show_notification json: " + typeof notification_object.json);
             var self = this;
 
             self.root_scope.taken_actions = {};
-            if (notification_object.json != "") {
-               console.log("json in popup so its a slumber");
-               console.log(JSON.parse(notification_object.json)); // object
-               console.log(JSON.parse(notification_object.json).med); // object
-               console.log(self.root_scope.med_list); // object                                                      // pass
-               console.log(JSON.stringify(self.root_scope.med_list)); // JSON array     
-               var json = JSON.parse(notification_object.json);                            // pass
+            if (typeof notification_object.json != 'undefined') { 
+               var json = JSON.parse(notification_object.json);
+
                self.root_scope.med_list = [json.med];
                self.popup_popup("U heeft uw dosis " + json.med.trade_name + "  van " + json.med.time + " nog niet ingenomen. Wanneer wilt u het innemen?");
             } else {

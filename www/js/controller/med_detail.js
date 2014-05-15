@@ -138,7 +138,7 @@ angular.module(
          $scope.times.splice($scope.times.indexOf(dose), 1);
       }
 
-      // Notification.handle_notification_click(1895220149, 'foreground');
+      Notification.handle_notification_click(1895220149, 'foreground');
       // Notification.show_notification({
       //    id: 1878284728,
       //    state: 'foreground',
