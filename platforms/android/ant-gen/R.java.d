@@ -1,8 +1,16 @@
 C:\dev\project\platforms\android\ant-gen\com\ionicframework\starter\R.java \
  : C:\dev\project\platforms\android\res\drawable\icon.png \
 C:\dev\project\platforms\android\res\drawable-hdpi\icon.png \
+C:\dev\project\platforms\android\res\drawable-land-hdpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-land-ldpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-land-mdpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-land-xhdpi\splash.png.png \
 C:\dev\project\platforms\android\res\drawable-ldpi\icon.png \
 C:\dev\project\platforms\android\res\drawable-mdpi\icon.png \
+C:\dev\project\platforms\android\res\drawable-port-hdpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-port-ldpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-port-mdpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-port-xhdpi\splash.png.png \
 C:\dev\project\platforms\android\res\drawable-xhdpi\icon.png \
 C:\dev\project\platforms\android\res\raw\beep.wav \
 C:\dev\project\platforms\android\res\raw\flashlight_turn_off_icon.png \

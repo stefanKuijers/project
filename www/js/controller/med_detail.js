@@ -120,7 +120,6 @@ angular.module(
             time: Date.today().setTimeToNow().toString('HH:mm')
          };
          $scope.times.push(new_dose);
-            
 
          var listenForInsert = $scope.$on(Phonestorage.events.DOSE_INSERTED, function(e, result) {
             listenForInsert(); // unbind listener
@@ -138,7 +137,7 @@ angular.module(
          $scope.times.splice($scope.times.indexOf(dose), 1);
       }
 
-      Notification.handle_notification_click(1895220149, 'foreground');
+      // Notification.handle_notification_click(1895220149, 'foreground');
       // Notification.show_notification({
       //    id: 1878284728,
       //    state: 'foreground',

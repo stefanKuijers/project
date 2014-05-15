@@ -24,13 +24,14 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
          },
          config: {
             default_notification_settings: {
-               slumber_title: "Niet Vergeten",       // The title of the message
-               title:         "Medicijnen innemen",  // The title of the message
-               repeat:        "daily",               // Either 'secondly', 'minutely', 'hourly', 'daily', 'weekly', 'monthly' or 'yearly'
-               sound:         String,                // A sound to be played
-               json:          String,                // Data to be passed through the notification
-               autoCancel:    false,                 // Setting this flag and the notification is automatically canceled when the user clicks it
-               ongoing:       false                  // Prevent clearing of notification (Android only)
+               slumber_title: "Niet Vergeten",           // The title of the message
+               title:         "Medicijnen innemen",      // The title of the message
+               repeat:        "daily",                   // Either 'secondly', 'minutely', 'hourly', 'daily', 'weekly', 'monthly' or 'yearly'
+               sound:         String,                    // A sound to be played
+               json:          String,                    // Data to be passed through the notification
+               autoCancel:    false,                     // Setting this flag and the notification is automatically canceled when the user clicks it
+               ongoing:       false,                     // Prevent clearing of notification (Android only)
+               icon:          "file://img/noti_icon.png" // set the icon to the app icon
             }
          },
 
@@ -52,6 +53,8 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                self.handle_notification_click(id, state, json);
             };
 
+            //window.plugin.notification.local.add({ icon: 'ic_launcher' }); // set app icon as notification
+            //window.plugin.notification.local.add({ icon: 'file://img/logo.png' });
             root_scope.$emit(this.events.INITIALIZED);
          },
 
@@ -86,7 +89,7 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                   task_id: task_id,
                   date: date,
                   interval: interval,
-                  message: ""
+                  message: "Het is tijd om uw medicijnen in te nemen"
                }
             }
 
@@ -116,19 +119,19 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             window.plugin.notification.local.add({
                id:         reminder.task_id,                                     // STRING. Id from the dosis table.
                date:       reminder.date,                                        // From the dosis table
-               message:    reminder.message + reminder.task_id,                  // Names of the medicin that need to be taken at this time
+               message:    reminder.message,                                     // Names of the medicin that need to be taken at this time
                title:      self.config.default_notification_settings.title,      // The title of the message
                repeat:     reminder.interval,                                    // Get the interval from the dosis table
                badge:      reminder.med_count,                                   // Amount of meds to be taken at this reminder. Get from dosis table
                autoCancel: self.config.default_notification_settings.autoCancel, // Setting this flag and the notification is automatically canceled when the user clicks it
-               ongoing:    self.config.default_notification_settings.ongoing     // Prevent clearing of notification (Android only)
+               ongoing:    self.config.default_notification_settings.ongoing,    // Prevent clearing of notification (Android only)
+               icon:       self.config.default_notification_settings.icon        // icon
             });
          },
 
          set_slumber_notification: function(reminder) {
             if (!Util.on_mobile_device) { Util.log("Not on mobile device. Could not add notification."); return; }
-            Util.log("Set slumber notification", JSON.stringify(reminder));
-
+            
             var self = this;
             window.plugin.notification.local.add({
                id:         reminder.task_id,                                        // STRING. Id from the dosis table.
@@ -137,19 +140,9 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                message:    reminder.message,                                        // Names of the medicin that need to be taken at this time
                json:       reminder.json, 
                autoCancel: self.config.default_notification_settings.autoCancel,    // Setting this flag and the notification is automatically canceled when the user clicks it
-               ongoing:    self.config.default_notification_settings.ongoing        // Prevent clearing of notification (Android only)
+               ongoing:    self.config.default_notification_settings.ongoing,       // Prevent clearing of notification (Android only)
+               icon:       self.config.default_notification_settings.icon           // icon
             });
-
-            Util.log("Slumber notification set", JSON.stringify({
-               id:         reminder.task_id,                                        // STRING. Id from the dosis table.
-               date:       reminder.date,                                           // From the dosis table
-               title:      self.config.default_notification_settings.slumber_title, // The title of the message
-               message:    reminder.message,                                        // Names of the medicin that need to be taken at this time
-               json:       reminder.json, 
-               autoCancel: self.config.default_notification_settings.autoCancel,    // Setting this flag and the notification is automatically canceled when the user clicks it
-               ongoing:    self.config.default_notification_settings.ongoing        // Prevent clearing of notification (Android only)
-            }));
-
          },
 
          cancel: function(id) {
@@ -173,32 +166,24 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             Private Functions
          */
          handle_notification_trigger: function(id, state, json) {
-            alert("NOTI TRIGGER ", JSON.stringify({id: id, state: state, json: json}));
             if (state === this.state.foreground)
                this.show_notification({id: id, state: state, json: json});
          },
 
          handle_notification_click: function(id, state, json) {
-            alert("NOTI CLICK ", JSON.stringify({id: id, state: state, json: json}));
             this.show_notification({id: id, state: state, json: json});
          },
 
          show_notification: function(notification_object) {
-            alert("@SHOE_NOTI " + JSON.stringify(notification_object));
-            alert("@SHOE_NOTI type" + typeof notification_object.json);
-            alert("@SHOE_NOTI value" + notification_object.json);
-
             var self = this;
 
             self.root_scope.taken_actions = {};
-            if (typeof notification_object.json != 'undefined') { 
-               alert("NOTI SLUMBER ");
+            if (typeof notification_object.json != 'undefined' && notification_object.json.length > 0) { 
                var json = JSON.parse(notification_object.json);
 
                self.root_scope.med_list = [json.med];
                self.popup_popup("U heeft uw dosis " + json.med.trade_name + "  van " + json.med.time + " nog niet ingenomen. Wanneer wilt u het innemen?");
             } else {
-               alert("NOTI NORMAL ");
                var get_set_dosis_listener = this.root_scope.$on(Phonestorage.events.DOSIS_BY_TASK_ID_RETRIEVED, function(e, result) {
                   get_set_dosis_listener();
 
@@ -233,40 +218,9 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             self.root_scope.popper = $ionicPopup.show({
                templateUrl: 'view/dialog/med_reminder.html',
                title: "<span class='pop-title'>Medicijn Innamemoment</span><span class='pop-time'>" + self.root_scope.med_list[0].time + "</span>",
-               scope: self.root_scope,
-               buttons: [
-                  { 
-                     text: 'Klaar', 
-                     onTap: function(e) { return true; }
-                  }
-               ]
+               scope: self.root_scope
             });
-            self.root_scope.popper.then(function() {
-                  self.handle_user_response(self.root_scope.taken_actions);
-            });
-         },
-
-         handle_user_response: function(actions) {
-            console.log(actions);
-            // remove notification from notification center
-
-            // switch(response.action) {
-            //    case this.user_response.dont_take_med :
-            //       // Phonestorage.set_dose_history_state(Phonestorage.history_state.not_taken)
-            //    break;
-
-            //    case this.user_response.postpone :
-            //       // add extra notification with an interval of 5 minutes or something (get interval from settings)
-            //       // Phonestorage.set_dose_history_state(Phonestorage.history_state.postponed)
-            //    break;
-
-            //    case this.user_response.take_med :
-            //       // Phonestorage.set_dose_history_state(Phonestorage.history_state.taken)
-            //    break;
-            // }
          }
-
-
       }
    }])
 ;

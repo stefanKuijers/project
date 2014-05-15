@@ -288,18 +288,6 @@ angular.module('project.service.phonestorage', [])
             );
          },
          get_single_med_history: function(history_obj, now, event_scope) {
-            var query = "SELECT * " +
-                     "FROM " +
-                        "History " +
-                     // "JOIN Medicin ON Dosis.med_id = Medicin.id " +
-                     // "JOIN Icon ON Medicin.Icon_id = Icon.id " +
-                     "WHERE " +
-                        "History.med_name = '" + history_obj.trade_name + "' AND " +
-                        "History.time_scheduled = '" + history_obj.time + "' AND " +
-                        "History.date = DATE('" + now.toString('yyyy-MM-d') + "') " +
-                     ";" ;
-
-            console.log(history_obj, query);
             var self = this;
             this.connection.transaction(
                function(tx) {

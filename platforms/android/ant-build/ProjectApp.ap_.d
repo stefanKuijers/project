@@ -1,8 +1,16 @@
 C:\dev\project\platforms\android\ant-build\ProjectApp.ap_ \
  : C:\dev\project\platforms\android\res\drawable\icon.png \
 C:\dev\project\platforms\android\res\drawable-hdpi\icon.png \
+C:\dev\project\platforms\android\res\drawable-land-hdpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-land-ldpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-land-mdpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-land-xhdpi\splash.png.png \
 C:\dev\project\platforms\android\res\drawable-ldpi\icon.png \
 C:\dev\project\platforms\android\res\drawable-mdpi\icon.png \
+C:\dev\project\platforms\android\res\drawable-port-hdpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-port-ldpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-port-mdpi\splash.png.png \
+C:\dev\project\platforms\android\res\drawable-port-xhdpi\splash.png.png \
 C:\dev\project\platforms\android\res\drawable-xhdpi\icon.png \
 C:\dev\project\platforms\android\res\raw\beep.wav \
 C:\dev\project\platforms\android\res\raw\flashlight_turn_off_icon.png \
@@ -13,8 +21,16 @@ C:\dev\project\platforms\android\res\values\strings.xml \
 C:\dev\project\platforms\android\res\xml\config.xml \
 C:\dev\project\platforms\android\ant-build\res\drawable\icon.png \
 C:\dev\project\platforms\android\ant-build\res\drawable-hdpi\icon.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-land-hdpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-land-ldpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-land-mdpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-land-xhdpi\splash.png.png \
 C:\dev\project\platforms\android\ant-build\res\drawable-ldpi\icon.png \
 C:\dev\project\platforms\android\ant-build\res\drawable-mdpi\icon.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-port-hdpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-port-ldpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-port-mdpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-port-xhdpi\splash.png.png \
 C:\dev\project\platforms\android\ant-build\res\drawable-xhdpi\icon.png \
 C:\dev\project\platforms\android\ant-build\res\raw\flashlight_turn_off_icon.png \
 C:\dev\project\platforms\android\ant-build\res\raw\flashlight_turn_on_icon.png \
@@ -91,6 +107,7 @@ C:\dev\project\platforms\android\assets\www\img\ionic.png \
 C:\dev\project\platforms\android\assets\www\img\liquid.png \
 C:\dev\project\platforms\android\assets\www\img\liquid_L.png \
 C:\dev\project\platforms\android\assets\www\img\new_med_icon.png \
+C:\dev\project\platforms\android\assets\www\img\noti_icon.png \
 C:\dev\project\platforms\android\assets\www\img\placeholder.png \
 C:\dev\project\platforms\android\assets\www\img\tablet_1.png \
 C:\dev\project\platforms\android\assets\www\img\tablet_1_L.png \
@@ -198,6 +215,7 @@ C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.l
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.device \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.dialogs \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.plugin.softkeyboard \
+C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.splashscreen \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar \
 C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.local-notification\www \
 C:\dev\project\platforms\android\assets\www\plugins\de.appplant.cordova.plugin.local-notification\www\local-notification.js \
@@ -209,6 +227,8 @@ C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.dialogs\w
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.dialogs\www\android\notification.js \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.plugin.softkeyboard\www \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.plugin.softkeyboard\www\softkeyboard.js \
+C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.splashscreen\www \
+C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.splashscreen\www\splashscreen.js \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www \
 C:\dev\project\platforms\android\assets\www\plugins\org.apache.cordova.statusbar\www\statusbar.js \
 C:\dev\project\platforms\android\assets\www\view\dialog \

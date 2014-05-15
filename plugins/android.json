@@ -12,7 +12,8 @@
                 "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>": 1,
                 "<feature name=\"LocalNotification\"><param name=\"android-package\" value=\"de.appplant.cordova.plugin.localnotification.LocalNotification\" /></feature>": 1,
                 "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>": 1,
-                "<feature name=\"SoftKeyboard\"><param name=\"android-package\" value=\"org.apache.cordova.plugin.softkeyboard.SoftKeyboard\" /></feature>": 1
+                "<feature name=\"SoftKeyboard\"><param name=\"android-package\" value=\"org.apache.cordova.plugin.softkeyboard.SoftKeyboard\" /></feature>": 1,
+                "<feature name=\"SplashScreen\"><param name=\"android-package\" value=\"org.apache.cordova.splashscreen.SplashScreen\" /></feature>": 1
             }
         },
         "AndroidManifest.xml": {
@@ -47,6 +48,9 @@
             "PACKAGE_NAME": "com.ionicframework.starter"
         },
         "org.apache.cordova.statusbar": {
+            "PACKAGE_NAME": "com.ionicframework.starter"
+        },
+        "org.apache.cordova.splashscreen": {
             "PACKAGE_NAME": "com.ionicframework.starter"
         }
     },

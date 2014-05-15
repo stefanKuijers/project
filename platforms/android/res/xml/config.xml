@@ -19,7 +19,10 @@
     <feature name="SoftKeyboard">
         <param name="android-package" value="org.apache.cordova.plugin.softkeyboard.SoftKeyboard" />
     </feature>
-    <name>Project App</name>
+    <feature name="SplashScreen">
+        <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen" />
+    </feature>
+    <name>Medicijn Beheer</name>
     <description>
         App voor afstudeerproject
     </description>
@@ -33,6 +36,8 @@
     <preference name="UIWebViewBounce" value="false" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="KeyboardDisplayRequiresUserAction" value="false" />
+    <preference name="SplashScreen" value="splash" />
+    <preference name="SplashScreenDelay" value="10000" />
     <feature name="StatusBar">
         <param name="ios-package" onload="true" value="CDVStatusBar" />
     </feature>
