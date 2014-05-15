@@ -21,8 +21,16 @@ C:\dev\project\platforms\android\res\values\strings.xml \
 C:\dev\project\platforms\android\res\xml\config.xml \
 C:\dev\project\platforms\android\ant-build\res\drawable\icon.png \
 C:\dev\project\platforms\android\ant-build\res\drawable-hdpi\icon.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-land-hdpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-land-ldpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-land-mdpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-land-xhdpi\splash.png.png \
 C:\dev\project\platforms\android\ant-build\res\drawable-ldpi\icon.png \
 C:\dev\project\platforms\android\ant-build\res\drawable-mdpi\icon.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-port-hdpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-port-ldpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-port-mdpi\splash.png.png \
+C:\dev\project\platforms\android\ant-build\res\drawable-port-xhdpi\splash.png.png \
 C:\dev\project\platforms\android\ant-build\res\drawable-xhdpi\icon.png \
 C:\dev\project\platforms\android\ant-build\res\raw\flashlight_turn_off_icon.png \
 C:\dev\project\platforms\android\ant-build\res\raw\flashlight_turn_on_icon.png \

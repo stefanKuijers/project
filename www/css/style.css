@@ -666,6 +666,10 @@ div[pj-number-picker] button {
    .med-column-divider {
       display:none;
    }
+   
+   .scroll-controll.scroll-down {
+      bottom: 190px;
+   }
 }
 
 @media screen and (orientation:landscape) {
@@ -743,4 +747,5 @@ div[pj-number-picker] button {
       height:250px;
       height:100vh;
    }
+
 }

@@ -90,7 +90,7 @@ angular.module('project.directive.scoll_controll', [])
                $scope.offset = get_offset();
 
                $scope.scroll_up_el.css('top', $scope.offset.top);
-               $scope.scroll_down_el.css('bottom', $scope.offset.bottom);
+               //$scope.scroll_down_el.css('bottom', $scope.offset.bottom);
             }
 
             function get_offset() {

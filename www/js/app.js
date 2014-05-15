@@ -25,7 +25,7 @@ angular.module(
                   API.init($rootScope);
                   Persistencejs.init();
 
-                  navigator.splashscreen.hide();
+                  if (navigator.splashscreen) navigator.splashscreen.hide();
                }
             );
             Phonestorage.init($rootScope);
