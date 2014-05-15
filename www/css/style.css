@@ -666,8 +666,8 @@ div[pj-number-picker] button {
    .med-column-divider {
       display:none;
    }
-   
-   .scroll-controll.scroll-down {
+
+   .overzicht-view .scroll-controll.scroll-down {
       bottom: 190px;
    }
 }
