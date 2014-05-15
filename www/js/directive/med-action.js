@@ -16,7 +16,7 @@ angular.module('project.directive.med_action', ['project.service.phonestorage', 
             hours: 0,
             minutes: 10
          },
-         slumber_minutes: 5
+         slumber_minutes: 1
       }
 
       return {
@@ -85,7 +85,8 @@ angular.module('project.directive.med_action', ['project.service.phonestorage', 
                if ($scope.badge_value > 0) $scope.badge_value--; 
                $scope.med_index++; 
                if ($scope.med_index >= $scope.med_list_length)
-                  console.log("SET all meds"),
+                  console.log("SET all meds. close", $scope.$parent.popper),
+                  // $scope.$parent.popper.close(), // function close is not available for some reason... should i get a newer build?
                   $scope.med_index = 0;
 
                $scope.current_med = $scope.$parent.med_list[$scope.med_index];
