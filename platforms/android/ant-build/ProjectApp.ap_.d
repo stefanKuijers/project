@@ -131,6 +131,7 @@ C:\dev\project\platforms\android\assets\www\js\controller\settings.js \
 C:\dev\project\platforms\android\assets\www\js\directive\day-selector.js \
 C:\dev\project\platforms\android\assets\www\js\directive\dosis_time.js \
 C:\dev\project\platforms\android\assets\www\js\directive\float-column-divider.js \
+C:\dev\project\platforms\android\assets\www\js\directive\history-med.js \
 C:\dev\project\platforms\android\assets\www\js\directive\interval-picker.js \
 C:\dev\project\platforms\android\assets\www\js\directive\med-action.js \
 C:\dev\project\platforms\android\assets\www\js\directive\number-picker.js \
@@ -239,6 +240,7 @@ C:\dev\project\platforms\android\assets\www\view\new-med-type.html \
 C:\dev\project\platforms\android\assets\www\view\new-med.html \
 C:\dev\project\platforms\android\assets\www\view\overzicht.html \
 C:\dev\project\platforms\android\assets\www\view\settings.html \
+C:\dev\project\platforms\android\assets\www\view\dialog\med_history_detail.html \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_interaction.html \
 C:\dev\project\platforms\android\assets\www\view\dialog\med_reminder.html \
 C:\dev\project\platforms\android\assets\www\view\dialog\scan_explanation.html \

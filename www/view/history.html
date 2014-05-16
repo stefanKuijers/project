@@ -1,9 +1,91 @@
 <ion-view title="Geschiedenis" class="history-view has-padding">
-   <ion-content>
-      Er is nog geen medicijn geschiedenis van innamemomenten.
+   <ion-content class="scroll-container">
+      <div pj-history-day class="item" ng-repeat="day in med_history" ng-class="{'day-selected': day.selected==true}" >
+         <div class="history-date">{{day.date}}</div>
+         <div class="row history-row">
+            <div pj-history-med class="col" ng-repeat="med in day.meds" ng-class="{'med-selected': med.selected==true}" ng-click="popup()">
+               <div class="status-triangle status-{{med.status_class}}"></div>
+               <div class="med-icon med-icon-{{med.icon}}">
+                  <i class="med-icon-interaction icon ion-alert-circled" ng-if="med.interactions"></i>
+               </div>
+               <div class="med-info-footer">
+                  <div class="med-name">{{med.med_name}}</div>
+                  <div class="med-dosis">{{med.dosis}}</div>
+               </div>
+            </div>
+         </div>
+      </div>
    </ion-content>
-   <ion-footer-bar class="history-view bar-stable">
-      Medicijn naam van gelecteerd medicijn         
+   <ion-footer-bar class="bar-stable history-footer">
+      <div class="col">
+         <div class="med-status">
+            <div class="indicator status-on-time"></div>
+            <div class="indicator-label">Op tijd</div>
+         </div>
+      </div>
+      <div class="col">
+         <div class="med-status">
+            <div class="indicator status-to-late"></div>
+            <div class="indicator-label">Te laat</div>
+         </div>
+      </div>  
+      <div class="col">
+         <div class="med-status">
+            <div class="indicator status-not"></div>
+            <div class="indicator-label">Niet ingenomen</div>
+         </div>
+      </div>        
    </ion-footer-bar>
+   <!-- <div class="history-footer bar-stable">
+      <div class="med-status">
+         <div class="indicator status-{{selected.med.status}}"></div>
+         <div class="indicator-label">{{selected.med.status}}</div>
+      </div>
+      <div class="history-med-info">
+         <div class="pointer-wrapper"><div class="pointer"></div></div>
+         <div class="med-name">{{selected.med.med_name}}</div>
+         <div class="med-dosis">{{selected.med.dosis}}</div>
+      </div> 
+      <div class="history-details">
+         <div class="scheduled">Geplanned om: {{selected.med.time_scheduled}}</div>
+         <div class="taken">Ingenomen om: {{selected.med.time_taken}}</div>
+      </div>     
+   </div> -->
 </ion-view>
+
+<!-- <ion-view title="Geschiedenis" class="history-view has-padding">
+
+   <div class="header header-bar">
+      <h1 class="selected-day">{{selected.day.date}}</h1>  
+      <div class="button button-positive">laat statestieken zien</div>
+   </div>
+
+   <div class="pointer-wrapper"><div class="pointer"></div></div>
+
+   <ion-scroll direction="y" scrollbar-x="false" scrollbar-y="false" class="scroll-container">
+      <div class="history-table">
+         <div pj-history-day ng-repeat="day in med_history" ng-class="{'day-selected': day.selected==true}" >
+            <div class="item item-divider">{{day.date}}</div>
+            <div pj-history-med class="item" ng-repeat="med in day.meds" ng-class="{'med-selected': med.selected==true}">
+               {{med.med_name}}
+            </div>
+         </div>
+      </div>
+   </ion-scroll>
+   <div class="history-footer bar-stable">
+      <div class="med-status">
+         <div class="indicator status-{{selected.med.status}}"></div>
+         <div class="indicator-label">{{selected.med.status}}</div>
+      </div>
+      <div class="history-med-info">
+         <div class="pointer-wrapper"><div class="pointer"></div></div>
+         <div class="med-name">{{selected.med.med_name}}</div>
+         <div class="med-dosis">{{selected.med.dosis}}</div>
+      </div> 
+      <div class="history-details">
+         <div class="scheduled">Geplanned om: {{selected.med.time_scheduled}}</div>
+         <div class="taken">Ingenomen om: {{selected.med.time_taken}}</div>
+      </div>     
+   </div>
+</ion-view> -->
   

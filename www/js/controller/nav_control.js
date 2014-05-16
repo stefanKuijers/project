@@ -1,5 +1,7 @@
 angular.module('project.controller.nav_control', [])
    .controller('NavCtrl', ['$scope', '$ionicSideMenuDelegate', '$state', '$urlRouter', function($scope, $ionicSideMenuDelegate, $state, $urlRouter) {
+      $ionicSideMenuDelegate.canDragContent(false);
+
       $scope.showSettings = function() {
          $ionicSideMenuDelegate.toggleRight();
       };

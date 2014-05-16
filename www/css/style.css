@@ -657,11 +657,133 @@ div[pj-number-picker] button {
 }
 
 /* history */
+.history-view .scroll-container {
+   top: 50px;
+   bottom: 80px;
+}
+
+[pj-history-day] {
+   height:225px;
+   padding: 0;
+   margin-bottom: 10px;
+}
+
+[pj-history-day] .history-date {
+   background-color: #BDDCFF;
+   height:35px;
+   text-align: center;
+   font-size: 16pt;
+   font-weight: bold;
+   padding-top: 5px
+}
+
+[pj-history-day] .history-row {
+   height:190px;
+}
+
+[pj-history-med] {
+   border: 2px solid #053E80;
+   position:relative;
+   text-align: center;
+   margin:2px;
+}
+[pj-history-med] .med-info-footer {
+   color:white;
+   background-color: #053E80;
+   width:100%;
+   bottom:0;
+   left:0;
+   right:0;
+   padding: 5px 2px;
+   position:absolute;
+}
+[pj-history-med] .med-name {
+   width:100%;
+   text-overflow: ellipsis;
+   overflow: hidden;
+   white-space: nowrap;
+}
+
+[pj-history-med] .med-icon {
+   width: 100px;
+   height: 0;
+   padding-bottom: 100px;
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size: contain;
+   position: relative;
+   margin:5px auto;
+}
+
+[pj-history-med] .status-triangle {
+   position: absolute;
+   right: 0;
+   top:0;
+   width: 0; 
+   height: 0; 
+   border-left: 40px solid transparent;
+   border-right: 0px solid transparent;
+   border-top: 40px solid #BDDCFF;
+}
+
+.history-footer {
+   height: 80px;
+}
+
+.history-footer .med-status {
+   border: 2px solid #053E80;
+   width: 190px;
+   height: 44px;
+   padding: 8px 10px;
+   margin: 10px auto 0 auto;
+   position:relative;
+   color: black;
+   font-size: 15pt;
+   font-weight: bold;
+}
+
+.history-footer .med-status .indicator {
+   position:absolute;
+   right: 0;
+   top:0;
+   width: 0; 
+   height: 0; 
+   border-left: 40px solid transparent;
+   border-right: 0px solid transparent;
+   border-top: 40px solid #BDDCFF;
+   margin: 0 auto 5px auto;
+}
+
+.status-on-time { opacity: 0.7; border-top: 40px solid green !important; }
+.status-to-late { opacity: 0.7; border-top: 40px solid orange !important; }
+.status-not { opacity: 0.7; border-top: 40px solid red !important; }
+
+.popup-body .status-triangle {
+   position:absolute;
+   right: 0;
+   top:0;
+   width: 0; 
+   height: 0; 
+   border-left: 40px solid transparent;
+   border-right: 0px solid transparent;
+   border-top: 40px solid #BDDCFF;
+   margin: 0 auto 5px auto;
+}
+
+.popup-body .med-icon {
+   width: 100px;
+   height: 0;
+   padding-bottom: 100px;
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size: contain;
+   position: relative;
+   margin:5px auto;
+}
 
 
 
-
-
+/* ORIENTATION */
 @media screen and (orientation:portrait) {
    .med-column-divider {
       display:none;
@@ -746,6 +868,21 @@ div[pj-number-picker] button {
       background-color: #053E80;
       height:250px;
       height:100vh;
+   }
+
+
+   [pj-history-day] .history-date {
+      position:absolute;
+      width:10%;
+      left:0;
+      height:200px;
+   }
+
+   [pj-history-day] .history-row {
+      position:absolute;
+      left:10%;
+      height:200px;
+      width:90%;
    }
 
 }

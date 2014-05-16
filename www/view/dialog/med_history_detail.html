@@ -1,0 +1,22 @@
+<div class="status-triangle status-{{med.status_class}}"></div>
+<h2>{{med.med_name}} {{med.dosis}}</h2>               
+<div class="row">
+   <div class="col">
+      <div class="med-icon med-icon-{{med.icon}}">
+         <i class="med-icon-interaction icon ion-alert-circled" ng-if="med.interactions"></i>
+      </div>
+   </div>
+   <div class="col">
+      <div class="scheduled">
+         <div class="label">Geplanned om:</div>
+         <div class="value">{{med.time_scheduled}}</div>
+      </div>
+      <div class="taken" ng-if="med.time_taken">
+         <div class="label">Ingenomen om: </div>
+         <div class="value">{{med.time_taken}}</div>
+      </div>
+      <div class="taken" ng-if="!med.time_taken">
+         U heeft dit medicijn niet ingenomen
+      </div>
+   </div>
+</div>
