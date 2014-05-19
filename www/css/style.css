@@ -110,6 +110,7 @@ button.back-home {
 
 .popup {
    width: 500px;
+   background-color: white;
 }
 
 h3.popup-title {
@@ -816,6 +817,11 @@ div[pj-number-picker] button {
    margin-top: 10px;
    border: 1px solid #053E80;
 }
+
+.history-view .scroll-down {
+   bottom: 80px;
+}
+
 
 
 

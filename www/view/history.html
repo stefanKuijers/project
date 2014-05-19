@@ -1,5 +1,5 @@
 <ion-view title="Geschiedenis" class="history-view has-padding">
-   <ion-content class="scroll-container">
+   <ion-content pj-scroll-controll class="scroll-container">
       <div pj-history-day class="item" ng-repeat="day in med_history_array" ng-class="{'day-selected': day.selected==true}" >
          <div class="history-date">{{day.date}}</div>
          <div class="row history-row">
