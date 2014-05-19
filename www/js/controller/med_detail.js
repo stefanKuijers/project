@@ -8,10 +8,11 @@ angular.module(
       'project.directive.interval_picker',
       'project.directive.day_selector',
       'project.directive.column_divider',
+      'project.directive.note',
       'project.service.notification',
       'project.service.util'
    ])
-   .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', '$ionicScrollDelegate','Phonestorage', 'Notification', 'Util', 'API', function($scope, $stateParams, $filter, $ionicScrollDelegate, Phonestorage, Notification, Util, API) {
+   .controller('MedInfoCtrl', ['$scope', '$stateParams', '$filter', '$ionicScrollDelegate', '$ionicPopup', 'Phonestorage', 'Notification', 'Util', 'API', function($scope, $stateParams, $filter, $ionicScrollDelegate, $ionicPopup, Phonestorage, Notification, Util, API) {
       $scope.events = {
          DOSE_CHANGED: 'DOSE_CHANGED'
       }
@@ -26,7 +27,8 @@ angular.module(
          var get_med_listener = $scope.$on(Phonestorage.events.MED_RETRIEVED, function(e, result) {
             get_med_listener();
             if (result.rows.length === 0) window.location.hash = "/redirect";
-            $scope.med = result.rows.item(0);
+            $scope.med = angular.copy(result.rows.item(0));
+            $scope.med.editable = false;
 
             var med_interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
                med_interaction_listener();
@@ -138,9 +140,26 @@ angular.module(
          $scope.times.splice($scope.times.indexOf(dose), 1);
       }
 
-      setTimeout(function(){
-         
-         
+      $scope.edit_note = function() {
+         $ionicPopup.show({
+            content: '<div pj-note></div>',
+            title: "Bewerkt de notule",
+            scope: $scope,
+            buttons: [
+              {
+                text: 'klaar',
+                type: 'button-positive',
+                onTap: function(e) { return true; }
+              },
+            ]
+         }).then(function() {
+            if (typeof cordova !== 'undefined') {
+               cordova.plugins.SoftKeyboard.hide();
+            }
+         });
+      }
+
+      setTimeout(function() {
          // Notification.handle_notification_click(1062295304, 'foreground');
          // Notification.handle_notification_click(1436945700, 'foreground');
 

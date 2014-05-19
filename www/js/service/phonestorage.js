@@ -498,18 +498,6 @@ angular.module('project.service.phonestorage', [])
          },
          update_archive_user_action: function(id, med, status, now) {
             var self = this;
-            console.log("update", id, med, status, now);
-            console.log(
-                  "UPDATE " + self.settings.HISTORY_TABLE_NAME + " " +
-                           "SET " +
-                              "time_taken='" + now.toString('HH:mm')  + "', " +
-                              "date='" + now.toString("yyyy-MM-d")  + "', " +
-                              "status='" + status  + "', " +
-                              "interactions='" + JSON.stringify(med.interactions) + "' " + 
-                           "WHERE id=" + id + 
-                        ";"
-
-            );
             this.connection.transaction(
                function(tx) {
                   self.query(
@@ -519,6 +507,26 @@ angular.module('project.service.phonestorage', [])
                               "date='" + now.toString("yyyy-MM-d")  + "', " +
                               "status='" + status  + "', " +
                               "interactions='" + JSON.stringify(med.interactions) + "' " + 
+                           "WHERE id=" + id + 
+                        ";",
+                     tx
+                  );
+               }
+            );
+         },
+         save_med_note: function(id, note) {
+            var self = this;
+            console.log("UPDATE " + self.settings.MED_TABLE_NAME + " " +
+                           "SET " +
+                              "note='" + note  + "' " + 
+                           "WHERE id=" + id + 
+                        ";");
+            this.connection.transaction(
+               function(tx) {
+                  self.query(
+                     "UPDATE " + self.settings.MED_TABLE_NAME + " " +
+                           "SET " +
+                              "note='" + note  + "' " + 
                            "WHERE id=" + id + 
                         ";",
                      tx

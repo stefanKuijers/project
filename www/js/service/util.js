@@ -61,7 +61,13 @@ angular.module('project.service.util', [])
                }
             }
             return results.length > 0 ? results : false;       
+         },
+
+         sanitize_string: function(string) {
+            return string.replace(/\W+/g, " ");
          }
+
+
 
       }
    }])

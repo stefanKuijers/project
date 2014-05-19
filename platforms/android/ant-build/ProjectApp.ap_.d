@@ -134,6 +134,7 @@ C:\dev\project\platforms\android\assets\www\js\directive\float-column-divider.js
 C:\dev\project\platforms\android\assets\www\js\directive\history-med.js \
 C:\dev\project\platforms\android\assets\www\js\directive\interval-picker.js \
 C:\dev\project\platforms\android\assets\www\js\directive\med-action.js \
+C:\dev\project\platforms\android\assets\www\js\directive\note.js \
 C:\dev\project\platforms\android\assets\www\js\directive\number-picker.js \
 C:\dev\project\platforms\android\assets\www\js\directive\radio.js \
 C:\dev\project\platforms\android\assets\www\js\directive\scroll-controll.js \

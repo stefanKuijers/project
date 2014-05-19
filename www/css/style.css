@@ -64,7 +64,6 @@ input[type="search"],
    margin-top: 2px;
 }
 
-
 .settings-button-label {
    right: 45px;
 }
@@ -203,6 +202,11 @@ a.item::after {
 .right-med-column .item {
    text-overflow: clip;
    white-space: normal;
+}
+
+textarea {
+    resize: none;
+    height: 200px;
 }
 
 /* view specific */
