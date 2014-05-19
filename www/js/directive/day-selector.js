@@ -19,18 +19,22 @@ angular.module('project.directive.day_selector', [])
             var populate_choises = typeof $scope.$parent.dose.days !== 'object';
             $scope.days = $scope.$parent.dose.days || {};
             
-
+            $scope.watches = {};
             for (var i = 0; i < days.length; i++) {
                if (populate_choises)
                   $scope.days[days[i]] = false;
 
-               $scope.$watch('days.' + days[i], function(e,ee) {
+               $scope.watches['days.' + days[i]] = $scope.$watch('days.' + days[i], function(e,ee) {
                   $scope.$parent.set_new_value($scope.$parent.dose_keys.days, $scope.days);
                });
             }
 
 
             $scope.$parent.set_new_value($scope.$parent.dose_keys.days, $scope.days);
+
+            $scope.$on('$destroy', function() {
+               for (watch in $scope.watches) $scope.watches[watch]();
+            });
          } 
       }
    }])

@@ -8,7 +8,7 @@ angular.module('project.controller.nav_control', [])
 
       // showing the home-button in stead of back when on med detail
       $scope.data = { show_home_button: false };
-      $scope.$on('$locationChangeSuccess', function(evt, e) {
+      $scope.location_listener = $scope.$on('$locationChangeSuccess', function(evt, e) {
          $urlRouter.sync();
          setTimeout(function(){
             $scope.data.show_home_button = $state.is('med-info'); 
@@ -19,5 +19,9 @@ angular.module('project.controller.nav_control', [])
       $scope.go_home = function() {
          window.location.hash = "";
       }
+
+      $scope.$on('$destroy', function() {
+         $scope.location_listener();
+      });
    }])
 ;

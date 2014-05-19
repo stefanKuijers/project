@@ -3,6 +3,7 @@ angular.module('project.controller.history', ['project.service.phonestorage','pr
       $scope.med_history = {};
 
       var history_overview_listener = $scope.$on(Phonestorage.events.MED_HISTORY_OVERVIEW_RETRIEVED, function(e, result) {
+         history_overview_listener();
          var history_day = function(med_event, i) {
             return {
                index_date: index_date(med_event.date),
@@ -23,22 +24,8 @@ angular.module('project.controller.history', ['project.service.phonestorage','pr
             $scope.med_history_array.push($scope.med_history[med]);
          }
          $scope.med_history_array = $filter('orderBy')($scope.med_history_array, '-index_date', false);
-
-         var listener = $scope.$on(Phonestorage.events.INTERACTION_RETRTIEVED, function(e, result) {
-            if (result.rows.length > 0) {
-               for (var k = 0; k < result.rows.length; k++) { // for each result (interaction)
-                  for (var l = 0; l < $scope.med_history_array.length; l++) { // go through the med_history_array for meds
-                     assign_interactions($scope.med_history_array[l].meds, result.rows.item(k));
-                  }
-               }
-            }
-         });
-
-         for (i=0; i < $scope.med_history_array.length; i++) { // loop through all meds to check for interactions
-            for (var j=0; j < $scope.med_history_array[i].meds.length; j++) { 
-               Phonestorage.get_interactions_by_med($scope.med_history_array[i].meds[j].med_name, $scope);
-            }
-         }
+         $scope.$apply();
+            
       });
       Phonestorage.get_history_overview($scope); // triggers all above by getting all the meds from the history
 
@@ -53,9 +40,7 @@ angular.module('project.controller.history', ['project.service.phonestorage','pr
             med.status_class = "on-time";
 
          med.date = parse_date(med.date, 'dd-MMMM-yyyy');
-
-         if (med.interactions == null)
-            med.interactions = false;
+         med.interactions = (med.interactions == null || med.interactions.toLowerCase().match('null')) ? false : JSON.parse(med.interactions);
 
          return med;
       }
@@ -78,21 +63,6 @@ angular.module('project.controller.history', ['project.service.phonestorage','pr
 
       function index_date(date) {
         return Date.parse(date).toString('yyyy-MM-dd').replace('-', '').replace('-', '');
-      }
-
-      function assign_interactions(day_meds, result_item) {
-         var result_a = Util.search_object_array_by(day_meds, {find_one: true, filters: {med_name: result_item.first_med_name}});
-         if (result_a) assign_interaction(day_meds, day_meds.indexOf(result_a), result_item);
-
-         var result_b = Util.search_object_array_by(day_meds, {find_one: true, filters: {med_name: result_item.second_med_name}});
-         if (result_b) assign_interaction(day_meds, day_meds.indexOf(result_b), result_item);
-
-         if (result_a || result_b) console.log($scope.med_history_array), $scope.$apply();
-      }
-
-      function assign_interaction(day_meds, index, result_item) {
-         if (day_meds[index].interactions) day_meds[index].interactions[result_item.id] = result_item;
-         else day_meds[index].interactions = {}, day_meds[index].interactions[result_item.id] = result_item;
       }
    }])
 ;

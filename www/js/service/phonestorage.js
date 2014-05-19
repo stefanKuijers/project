@@ -125,9 +125,12 @@ angular.module('project.service.phonestorage', [])
             this.table_exists(this.settings.MED_TABLE_NAME);
 
             var self = this;
-            this.event_aggregater.$on(this.events.TABLE_DOES_NOT_EXIST , function(e, result) {
-               self.setup_storage();
-            });
+            if ( !this.event_aggregater.listen_for_rebuild) {
+               this.event_aggregater.listen_for_rebuild = this.event_aggregater.$on(this.events.TABLE_DOES_NOT_EXIST , function(e, result) {
+                  
+                  // self.setup_storage();
+               });
+            }
          },
 
          /**
@@ -409,36 +412,37 @@ angular.module('project.service.phonestorage', [])
          },
          archive_user_action: function(med, status, now) {
             console.log('archive', med, status, now);
+            var interactions = (med.interactions !== undefined) ? JSON.stringify(med.interactions) : "NULL"; 
             var self = this;
             console.log(
-               'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + ' ' +
-                  '(status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) ' + 
-               'VALUES (' +
-                  '"' + status + '", ' + 
-                  '"' + med.time + '", ' +
-                  '"' + now.toString("HH:mm") + '", ' +
-                  'DATE("'+ now.toString('yyyy-MM-d') +'"), '+
-                  '"' + med.trade_name +'", ' +
-                  '(SELECT name FROM Icon WHERE id=' + med.icon + '), ' +
-                  '"' + med.amount + ' x ' + med.dosis_amount + med.unit + '", ' +
-                  '"' + JSON.stringify(med.interactions) + '", ' +
-               ';'
-               );
+               "INSERT INTO " + self.settings.HISTORY_TABLE_NAME + " " +
+                  "(status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) " + 
+               "VALUES (" +
+                  "'" + status + "', " + 
+                  "'" + med.time + "', " +
+                  "'" + now.toString('HH:mm') + "', " +
+                  "DATE('"+ now.toString("yyyy-MM-d") +"'), "+
+                  "'" + med.trade_name +"', " +
+                  "(SELECT name FROM Icon WHERE id=" + med.icon + "), " +
+                  "'" + med.amount + " x " + med.dosis_amount + med.unit + "', " +
+                  "'" + interactions + "'" +
+               ");"
+            );
             this.connection.transaction(
                function(tx) {
                   self.query(
-                     'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + ' ' +
-                        '(status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) ' + 
-                     'VALUES (' +
-                        '"' + status + '", ' + 
-                        '"' + med.time + '", ' +
-                        '"' + now.toString("HH:mm") + '", ' +
-                        'DATE("'+ now.toString('yyyy-MM-d') +'"), '+
-                        '"' + med.trade_name +'", ' +
-                        '(SELECT name FROM Icon WHERE id=' + med.icon + '), ' +
-                        '"' + med.amount + ' x ' + med.dosis_amount + med.unit + '", ' +
-                        '"' + JSON.stringify(med.interactions) + '", ' +
-                     ';',
+                     "INSERT INTO " + self.settings.HISTORY_TABLE_NAME + " " +
+                        "(status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) " + 
+                     "VALUES (" +
+                        "'" + status + "', " + 
+                        "'" + med.time + "', " +
+                        "'" + now.toString('HH:mm') + "', " +
+                        "DATE('"+ now.toString("yyyy-MM-d") +"'), "+
+                        "'" + med.trade_name +"', " +
+                        "(SELECT name FROM Icon WHERE id=" + med.icon + "), " +
+                        "'" + med.amount + " x " + med.dosis_amount + med.unit + "', " +
+                        "'" + interactions + "'" +
+                     ");",
                      tx
                   );
                }
@@ -494,24 +498,33 @@ angular.module('project.service.phonestorage', [])
          },
          update_archive_user_action: function(id, med, status, now) {
             var self = this;
-            console.log('update', id, med, status, now);
-            // this.connection.transaction(
-            //    function(tx) {
-            //       self.query(
-            //          'UPDATE ' + self.settings.HISTORY_TABLE_NAME + ' ' +
-            //             'SET ' +
-            //                'med_name= "' + med.trade_name + '", ' +
-            //                'time_scheduled= "' + med.time  + '", ' +
-            //                'time_taken= "' + now.toString("HH:mm")  + '", ' +
-            //                'date= "' + now.toString('yyyy-MM-d')  + '", ' +
-            //                'status= "' + status  + '", ' +
-            //                'icon= ' + med.icon + ' ' +
-            //             'WHERE id=' + id + 
-            //          ';',
-            //          tx
-            //       );
-            //    }
-            // );
+            console.log("update", id, med, status, now);
+            console.log(
+                  "UPDATE " + self.settings.HISTORY_TABLE_NAME + " " +
+                           "SET " +
+                              "time_taken='" + now.toString('HH:mm')  + "', " +
+                              "date='" + now.toString("yyyy-MM-d")  + "', " +
+                              "status='" + status  + "', " +
+                              "interactions='" + JSON.stringify(med.interactions) + "' " + 
+                           "WHERE id=" + id + 
+                        ";"
+
+            );
+            this.connection.transaction(
+               function(tx) {
+                  self.query(
+                     "UPDATE " + self.settings.HISTORY_TABLE_NAME + " " +
+                           "SET " +
+                              "time_taken='" + now.toString('HH:mm')  + "', " +
+                              "date='" + now.toString("yyyy-MM-d")  + "', " +
+                              "status='" + status  + "', " +
+                              "interactions='" + JSON.stringify(med.interactions) + "' " + 
+                           "WHERE id=" + id + 
+                        ";",
+                     tx
+                  );
+               }
+            );
          },
 
 
@@ -575,6 +588,7 @@ angular.module('project.service.phonestorage', [])
 
 
          setup_storage: function() {
+            console.log("setup storage");
             this.setup_med_table(this);
             this.setup_settings_table(this, this.settings.SETTINGS_TABLE_NAME);
             this.setup_history_table(this);

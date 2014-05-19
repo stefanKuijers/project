@@ -25,13 +25,14 @@ angular.module(
       function get_med() {
          var get_med_listener = $scope.$on(Phonestorage.events.MED_RETRIEVED, function(e, result) {
             get_med_listener();
-
+            if (result.rows.length === 0) window.location.hash = "/redirect";
             $scope.med = result.rows.item(0);
 
             var med_interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
                med_interaction_listener();
 
                $scope.interactions = result.med_interactions;
+               $scope.med.interactions = result.med_interactions;
                $scope.$apply();
             });
             API.get_med_interactions($scope.med, $scope);
@@ -63,7 +64,7 @@ angular.module(
          $scope.times = $filter('orderBy')($scope.times, 'time', false);
       }
 
-      $scope.$on($scope.events.DOSE_CHANGED, function(e, update) {
+      $scope.dose_changed_listener = $scope.$on($scope.events.DOSE_CHANGED, function(e, update) {
          var prepared_dose = prepare_dose(update.dose);
 
          var update_dose_listener = $scope.$on(Phonestorage.events.DOSE_UPDATED, function(e, result) {
@@ -138,7 +139,11 @@ angular.module(
       }
 
       setTimeout(function(){
-         Notification.handle_notification_click(1895220149, 'foreground');
+         
+         
+         Notification.handle_notification_click(1062295304, 'foreground');
+         // Notification.handle_notification_click(1436945700, 'foreground');
+
          // Notification.show_notification({
          //    id: 1878284728,
          //    state: 'foreground',
@@ -146,6 +151,10 @@ angular.module(
          //    //json: '{"med":{"tasks":"["27552349"]","time":"11:14","id":"1","icon":"3","trade_name":"Hydrocloorthiazide","task":"27552349"},"date":"2014-05-15"}'
          // });
       }, 1000);
+
+      $scope.$on('$destroy', function() {
+         $scope.dose_changed_listener();
+      });
       
    }])
 ;

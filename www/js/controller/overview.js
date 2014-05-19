@@ -13,12 +13,13 @@ angular.module('project.controller.overview', ['project.service.phonestorage', '
          var get_overview_listener = $scope.$on(Phonestorage.events.MED_OVERVIEW_RETRIEVED, function(e, result) {
             get_overview_listener();
 
-            var listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
-               // listener(); // cant unlissen as it could be one or twenty callbacks.
-               var med = Util.search_object_array_by($scope.med_overview, {find_one: true, filters: {id: result.med.id}});
-               $scope.med_overview[$scope.med_overview.indexOf(med)].interactions = result.med_interactions;
-               $scope.$apply();
-            });
+            if (!$scope.interaction_listener) { // make sure 
+               $scope.interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
+                  var med = Util.search_object_array_by($scope.med_overview, {find_one: true, filters: {id: result.med.id}});
+                  $scope.med_overview[$scope.med_overview.indexOf(med)].interactions = result.med_interactions;
+                  $scope.$apply();
+               });
+            }
 
             for (var i = 0; i < result.rows.length; i++) {
                $scope.med_overview[i] = angular.copy(result.rows.item(i));

@@ -24,6 +24,7 @@ angular.module('project.directive.med_action', ['project.service.phonestorage', 
             $scope.med_index = 0;
             $scope.med_list_length = $scope.badge_value = $scope.$parent.med_list.length;
             $scope.current_med = $scope.$parent.med_list[$scope.med_index];
+            console.log($scope.current_med);
 
             $scope.actions = [
                {text: "niet", value: CONST.actions.dont_take},

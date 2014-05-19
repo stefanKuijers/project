@@ -16,9 +16,10 @@ angular.module(
                alert("Connection lost", e, result);
             });
             
-            $rootScope.$on(
+            var storage_ready_listener = $rootScope.$on(
                Phonestorage.events.STORAGE_INITIALIZED, 
                function() {
+                  storage_ready_listener();
                   $rootScope.$broadcast(Phonestorage.events.STORAGE_READY, "broadcast from root");
                   
                   Notification.init($rootScope);

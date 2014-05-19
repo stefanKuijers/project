@@ -196,19 +196,21 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
          populate_med_list: function(notification_object, result) {
             this.root_scope.med_list = [];
             var self = this;
+            if (!this.root_scope.med_interaction_listener) {
+               this.root_scope.med_interaction_listener = self.root_scope.$on(API.events.MED_INTERACTION, function(e, result) {
+                  var med = Util.search_object_array_by(self.root_scope.med_list, {find_one: true, filters: {id: result.med.id}});
+                  if (med)
+                     self.root_scope.med_list[self.root_scope.med_list.indexOf(med)].interactions = result.med_interactions;
+               });
+            }
             for (var i = 0; i < result.rows.length; i++) {
-               this.root_scope.med_list[i]      = angular.copy( result.rows.item(i) );
-               this.root_scope.med_list[i].task = notification_object.id;
+               this.root_scope.med_list[i]       = angular.copy( result.rows.item(i) );
+               this.root_scope.med_list[i].task  = notification_object.id;
                this.root_scope.med_list[i].tasks = JSON.parse(this.root_scope.med_list[i].tasks);
 
-               API.get_med_interactions(this.root_scope.med_list[i].id, this.root_scope);
+               API.get_med_interactions(this.root_scope.med_list[i], this.root_scope);
             }
 
-            var med_interaction_listener = self.root_scope.$on(API.events.MED_INTERACTION, function(e, result) {
-               var med = Util.search_object_array_by(self.root_scope.med_list, {find_one: true, filters: {id: result.med.id}});
-               if (med)
-                  self.root_scope.med_list[self.root_scope.med_list.indexOf(med)].interactions = result.med_interactions;
-            });
          },
 
          popup_popup: function(message) {

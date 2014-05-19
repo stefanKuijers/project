@@ -7,8 +7,9 @@ angular.module('project.controller.settings', ['project.service.phonestorage', '
             fetched_settings_listener();
 
             $scope.settings = settings;
+            $scope.watches = {};
             for (setting_key in settings) {
-               $scope.$watch('settings.' + setting_key, function(new_value) {
+               $scope.watches['settings_' + setting_key] = $scope.$watch('settings.' + setting_key, function(new_value) {
                   setting_key_exp = this.exp.split('.')[1];
                   
                   if (setting_key === 'screen_contrast' || setting_key === 'sound_volume') {
@@ -40,6 +41,10 @@ angular.module('project.controller.settings', ['project.service.phonestorage', '
             Persistencejs.set_default_settings($scope);
             $ionicSideMenuDelegate.toggleRight();
          }
+
+         $scope.$on('$destroy', function() {
+            for (watch in $scope.watches) $scope.watches[watch]();
+         });
 
       }
    ])

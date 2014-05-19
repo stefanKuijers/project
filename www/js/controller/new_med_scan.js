@@ -26,14 +26,14 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
       scan_success = function(scan_result) {
          var med_prescribed = window.localStorage.getItem("new_med_prescribed") == 'true'; // retrieve and typecast to boolean
          var safe_med_listener = $scope.$on(API.events.SAFE_MED_RETRIEVED, function(e, medicin) {
-            safe_med_listener();
+            safe_med_listener(), med_interaction_listener();
             medicin.prescribed = med_prescribed;
             
             $scope.add_med_to_storage(medicin);
          });
 
          var med_interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
-            med_interaction_listener();
+            med_interaction_listener(), safe_med_listener();
 
             $scope.interactions = result.med_interactions;
             $scope.med = result.med;
@@ -93,37 +93,39 @@ angular.module('project.controller.new_med_scan', ['project.service.api', 'proje
                window.location.hash = "";
          });
       }
-            
-      $scope.$on(Phonestorage.events.USER_DATA_RETRIEVED, function(e, result) {
-         $scope.user_data = {};
-         for (var i = 0; i < result.rows.length; i++) {
-            $scope.user_data[result.rows.item(i).key] = result.rows.item(i).value;
-         }
+           
+      if (!$scope.user_data_listener) {
+         $scope.user_data_listener = $scope.$on(Phonestorage.events.USER_DATA_RETRIEVED, function(e, result) {         
+            $scope.user_data = {};
+            for (var i = 0; i < result.rows.length; i++) {
+               $scope.user_data[result.rows.item(i).key] = result.rows.item(i).value;
+            }
 
-         $scope.user_data.hide_scan_explanation = $scope.user_data.show_scan_explanation != 'true';
-         $scope.$watch('user_data.hide_scan_explanation', function(new_value, old_value) {
-            if (new_value !== old_value)
-               Phonestorage.update_user_data('show_scan_explanation', !new_value);
-         });
-
-         if ($scope.user_data.show_scan_explanation == 'true')
-            $ionicPopup.show({
-               templateUrl: 'view/dialog/scan_explanation.html',
-               title: "Uitleg Medicijn Scannen",
-               scope: $scope,
-               buttons: [
-                 { 
-                    text: 'Begrepen', 
-                    type: 'button-positive',
-                    onTap: function(e) { return 'proceed'; } 
-                 }
-               ]
-            }).then(function(res) {
-               scan();
+            $scope.user_data.hide_scan_explanation = $scope.user_data.show_scan_explanation != 'true';
+            $scope.$watch('user_data.hide_scan_explanation', function(new_value, old_value) {
+               if (new_value !== old_value)
+                  Phonestorage.update_user_data('show_scan_explanation', !new_value);
             });
-         else 
-            scan();
-      });
+
+            if ($scope.user_data.show_scan_explanation == 'true')
+               $ionicPopup.show({
+                  templateUrl: 'view/dialog/scan_explanation.html',
+                  title: "Uitleg Medicijn Scannen",
+                  scope: $scope,
+                  buttons: [
+                    { 
+                       text: 'Begrepen', 
+                       type: 'button-positive',
+                       onTap: function(e) { return 'proceed'; } 
+                    }
+                  ]
+               }).then(function(res) {
+                  scan();
+               });
+            else 
+               scan();
+         });
+      }
       Phonestorage.get_user_data($scope);
 
 
