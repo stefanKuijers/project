@@ -51,9 +51,17 @@ input[type="search"],
    left: 40px;
 }
 
-button.back-home {
+.button.back-home {
    position:relative;
    z-index:10;
+}
+
+.back-button-label {
+   top: -3px;
+}
+
+.back-button {
+   margin-top: 2px;
 }
 
 
@@ -122,6 +130,9 @@ h3.popup-title {
 
 h5.popup-sub-title {
    font-size: 24px;
+   text-align: left;
+   padding-left: 10px;
+   color: white;
 }
 
 .pop-title, .pop-time {

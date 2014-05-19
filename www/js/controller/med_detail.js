@@ -141,7 +141,7 @@ angular.module(
       setTimeout(function(){
          
          
-         Notification.handle_notification_click(1062295304, 'foreground');
+         // Notification.handle_notification_click(1062295304, 'foreground');
          // Notification.handle_notification_click(1436945700, 'foreground');
 
          // Notification.show_notification({

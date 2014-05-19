@@ -53,11 +53,11 @@
          <ion-side-menu-content drag-content="false" ng-controller="NavCtrl">
 
             <ion-nav-bar class="nav-title-slide-ios7">
-               <button ng-if="data.show_home_button" class="button-icon button-clear back-home icon ion-chevron-left" ng-click="go_home()">
-               <div class="back-button-label back-home">terug</div>
-               </button>
-               <ion-nav-back-button ng-if="!data.show_home_button" class="button-icon icon button-clear ion-chevron-left">
-                  <div class="back-button-label">terug</div>
+               <div                 ng-if="data.show_home_button"  class="button-icon icon button-clear ion-chevron-left back-button button" ng-click="go_home()">
+                  <div class="back-button-label ">terug</div>
+               </div>
+               <ion-nav-back-button ng-if="!data.show_home_button" class="button-icon icon button-clear ion-chevron-left back-button">
+                  <div class="back-button-label back-home-label">terug</div>
                </ion-nav-back-button>
             </ion-nav-bar>
 

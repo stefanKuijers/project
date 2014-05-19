@@ -26,7 +26,6 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             default_notification_settings: {
                slumber_title: "Niet Vergeten",           // The title of the message
                title:         "Medicijnen innemen",      // The title of the message
-               repeat:        "daily",                   // Either 'secondly', 'minutely', 'hourly', 'daily', 'weekly', 'monthly' or 'yearly'
                sound:         String,                    // A sound to be played
                json:          String,                    // Data to be passed through the notification
                autoCancel:    false,                     // Setting this flag and the notification is automatically canceled when the user clicks it
@@ -42,7 +41,6 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             this.initialized = true;
             this.root_scope  = root_scope;
             this.available   = Util.on_mobile_device;
-            console.log("notification init");
 
             if (!Util.on_mobile_device) { Util.log("Not on mobile device"); return; }
             var self = this;
@@ -53,6 +51,9 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             window.plugin.notification.local.onclick = function (id, state, json) {
                self.handle_notification_click(id, state, json);
             };
+
+            window.plugin.notification.local.setDefaults({ icon: "file://img/noti_icon.png" });
+            window.plugin.notification.local.setDefaults({ smallIcon: "file://img/noti_icon.png" });
 
             root_scope.$emit(this.events.INITIALIZED);
          },
@@ -124,7 +125,8 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                badge:      reminder.med_count,                                   // Amount of meds to be taken at this reminder. Get from dosis table
                autoCancel: self.config.default_notification_settings.autoCancel, // Setting this flag and the notification is automatically canceled when the user clicks it
                ongoing:    self.config.default_notification_settings.ongoing,    // Prevent clearing of notification (Android only)
-               icon:       self.config.default_notification_settings.icon        // icon
+               icon:       self.config.default_notification_settings.icon,       // icon
+               smallIcon:  self.config.default_notification_settings.icon        // icon
             });
          },
 
@@ -140,7 +142,8 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                json:       reminder.json, 
                autoCancel: self.config.default_notification_settings.autoCancel,    // Setting this flag and the notification is automatically canceled when the user clicks it
                ongoing:    self.config.default_notification_settings.ongoing,       // Prevent clearing of notification (Android only)
-               icon:       self.config.default_notification_settings.icon           // icon
+               icon:       self.config.default_notification_settings.icon,          // icon
+               smallIcon:  self.config.default_notification_settings.icon           // icon            });
             });
          },
 
