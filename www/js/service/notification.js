@@ -42,6 +42,7 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             this.initialized = true;
             this.root_scope  = root_scope;
             this.available   = Util.on_mobile_device;
+            console.log("notification init");
 
             if (!Util.on_mobile_device) { Util.log("Not on mobile device"); return; }
             var self = this;
@@ -53,8 +54,6 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                self.handle_notification_click(id, state, json);
             };
 
-            //window.plugin.notification.local.add({ icon: 'ic_launcher' }); // set app icon as notification
-            //window.plugin.notification.local.add({ icon: 'file://img/logo.png' });
             root_scope.$emit(this.events.INITIALIZED);
          },
 
@@ -217,7 +216,7 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
             self.root_scope.message = message;
             self.root_scope.popper = $ionicPopup.show({
                templateUrl: 'view/dialog/med_reminder.html',
-               title: "<span class='pop-title'>Medicijn Innamemoment</span><span class='pop-time'>" + self.root_scope.med_list[0].time + "</span>",
+               title: "<span class='pop-title'>Medicijn Innamemoment</span><span class='pop-time'>" + self.root_scope.med_list[0].time + "</span><span class='floater'>&nbsp;</span>",
                scope: self.root_scope
             });
          }

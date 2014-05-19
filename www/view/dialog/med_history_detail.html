@@ -19,4 +19,21 @@
          U heeft dit medicijn niet ingenomen
       </div>
    </div>
+
+</div>
+<div ng-if="med.interactions">Het gebruik van dit medicijn is niet veilig verlopen. Lees de medicijn-interactie(s) en raadpleeg uw arts.</div>
+<div class="history_interaction_item" ng-if="med.interactions" ng-repeat="interaction in med.interactions">
+   <div class="row">
+      <div class="col">
+         <p>{{interaction.description}}</p>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col">
+         <strong>{{interaction.first_med_name}}</strong>
+      </div>
+      <div class="col">
+         <strong>{{interaction.second_med_name}}</strong>
+      </div>
+   </div>
 </div>

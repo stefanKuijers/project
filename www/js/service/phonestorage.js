@@ -114,7 +114,8 @@ angular.module('project.service.phonestorage', [])
             USER_DATA_RETRIEVED:                "USER_DATA_RETRIEVED",
             DOSIS_BY_TASK_ID_RETRIEVED:         "DOSIS_BY_TASK_ID_RETRIEVED",
             SINGLE_MED_HISTORY_EVENT_RETRIEVED: "SINGLE_MED_HISTORY_EVENT_RETRIEVED",
-            MED_HISTORY_OVERVIEW_RETRIEVED:     "MED_HISTORY_OVERVIEW_RETRIEVED"
+            MED_HISTORY_OVERVIEW_RETRIEVED:     "MED_HISTORY_OVERVIEW_RETRIEVED",
+            INTERACTION_RETRTIEVED:             "INTERACTION_RETRTIEVED"
          },
 
          init: function(event_scope) {
@@ -293,23 +294,7 @@ angular.module('project.service.phonestorage', [])
             this.connection.transaction(
                function(tx) {
                   self.query(
-                     // "SELECT " +
-                     //    "History.status, " +
-                     //    "History.time_scheduled, " +
-                     //    "History.time_taken, " +
-                     //    "History.date, " +
-                     //    "History.med_name, " +
-                     //    "History.dosis, " +
-                     //    "History.interactions, " +
-                     //    "Icon.name AS icon " +
-                     // "FROM " +
-                     //    "History " +
-                     // "JOIN Icon ON History.icon = Icon.id " +
-                     // ";" , 
-                     "SELECT * " +
-                     "FROM " +
-                        "History " +
-                     ";" , 
+                     "SELECT * FROM History;" , 
                      tx, 
                      self.events.MED_HISTORY_OVERVIEW_RETRIEVED, 
                      event_scope
@@ -325,8 +310,6 @@ angular.module('project.service.phonestorage', [])
                      "SELECT * " +
                      "FROM " +
                         "History " +
-                     // "JOIN Medicin ON Dosis.med_id = Medicin.id " +
-                     // "JOIN Icon ON Medicin.Icon_id = Icon.id " +
                      "WHERE " +
                         "History.med_name = '" + history_obj.trade_name + "' AND " +
                         "History.time_scheduled = '" + history_obj.time + "' AND " +
@@ -334,6 +317,29 @@ angular.module('project.service.phonestorage', [])
                      ";" , 
                      tx, 
                      self.events.SINGLE_MED_HISTORY_EVENT_RETRIEVED, 
+                     event_scope
+                  );
+               }
+            );
+         },
+         get_interactions_by_med: function(med_name, event_scope) {
+            var self = this;
+            this.connection.transaction(
+               function(tx) {
+                  self.query(
+                     'SELECT ' +
+                        'Interaction.id, ' +
+                        'Interaction.description, ' +
+                        'Med1.trade_name AS first_med_name, ' +
+                        'Med2.trade_name AS second_med_name, ' +
+                        'Interaction_Status.status ' +
+                     'FROM Interaction ' + 
+                     'JOIN Medicin AS Med1 ON Interaction.Primary_med_id = Med1.id ' +
+                     'JOIN Medicin AS Med2 ON Interaction.Secondary_med_id = Med2.id ' +
+                     'JOIN Interaction_Status  ON Interaction.Interaction_Status_id = Interaction_Status.id ' +
+                     'WHERE Med1.trade_name="' + med_name + '" OR Med2.trade_name="' + med_name + '";', 
+                     tx, 
+                     self.events.INTERACTION_RETRTIEVED, 
                      event_scope
                   );
                }
@@ -402,13 +408,36 @@ angular.module('project.service.phonestorage', [])
             );
          },
          archive_user_action: function(med, status, now) {
+            console.log('archive', med, status, now);
             var self = this;
+            console.log(
+               'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + ' ' +
+                  '(status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) ' + 
+               'VALUES (' +
+                  '"' + status + '", ' + 
+                  '"' + med.time + '", ' +
+                  '"' + now.toString("HH:mm") + '", ' +
+                  'DATE("'+ now.toString('yyyy-MM-d') +'"), '+
+                  '"' + med.trade_name +'", ' +
+                  '(SELECT name FROM Icon WHERE id=' + med.icon + '), ' +
+                  '"' + med.amount + ' x ' + med.dosis_amount + med.unit + '", ' +
+                  '"' + JSON.stringify(med.interactions) + '", ' +
+               ';'
+               );
             this.connection.transaction(
                function(tx) {
                   self.query(
                      'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + ' ' +
-                        '(med_name, time_scheduled, time_taken, date, status, icon) ' + 
-                     'VALUES ("' + med.trade_name +'", "' + med.time + '", "' + now.toString("HH:mm") + '", DATE("'+ now.toString('yyyy-MM-d') +'"), "' + status + '", ' + med.icon + ')' +
+                        '(status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) ' + 
+                     'VALUES (' +
+                        '"' + status + '", ' + 
+                        '"' + med.time + '", ' +
+                        '"' + now.toString("HH:mm") + '", ' +
+                        'DATE("'+ now.toString('yyyy-MM-d') +'"), '+
+                        '"' + med.trade_name +'", ' +
+                        '(SELECT name FROM Icon WHERE id=' + med.icon + '), ' +
+                        '"' + med.amount + ' x ' + med.dosis_amount + med.unit + '", ' +
+                        '"' + JSON.stringify(med.interactions) + '", ' +
                      ';',
                      tx
                   );
@@ -465,23 +494,24 @@ angular.module('project.service.phonestorage', [])
          },
          update_archive_user_action: function(id, med, status, now) {
             var self = this;
-            this.connection.transaction(
-               function(tx) {
-                  self.query(
-                     'UPDATE ' + self.settings.HISTORY_TABLE_NAME + ' ' +
-                        'SET ' +
-                           'med_name= "' + med.trade_name + '", ' +
-                           'time_scheduled= "' + med.time  + '", ' +
-                           'time_taken= "' + now.toString("HH:mm")  + '", ' +
-                           'date= "' + now.toString('yyyy-MM-d')  + '", ' +
-                           'status= "' + status  + '", ' +
-                           'icon= ' + med.icon + ' ' +
-                        'WHERE id=' + id + 
-                     ';',
-                     tx
-                  );
-               }
-            );
+            console.log('update', id, med, status, now);
+            // this.connection.transaction(
+            //    function(tx) {
+            //       self.query(
+            //          'UPDATE ' + self.settings.HISTORY_TABLE_NAME + ' ' +
+            //             'SET ' +
+            //                'med_name= "' + med.trade_name + '", ' +
+            //                'time_scheduled= "' + med.time  + '", ' +
+            //                'time_taken= "' + now.toString("HH:mm")  + '", ' +
+            //                'date= "' + now.toString('yyyy-MM-d')  + '", ' +
+            //                'status= "' + status  + '", ' +
+            //                'icon= ' + med.icon + ' ' +
+            //             'WHERE id=' + id + 
+            //          ';',
+            //          tx
+            //       );
+            //    }
+            // );
          },
 
 
@@ -720,7 +750,7 @@ angular.module('project.service.phonestorage', [])
                         'time_taken TIME, ' +
                         'date DATE, ' +
                         'dosis VARCHAR(50), ' +
-                        'interactions BOOL, ' +
+                        'interactions VARCHAR(100), ' +
                         'med_name VARCHAR(50),' +
                         'icon VARCHAR(10)' +
                      ')'
@@ -728,20 +758,50 @@ angular.module('project.service.phonestorage', [])
                   tx.executeSql(
                      'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + 
                      ' (status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) ' + 
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-01"), "Ibuprofen", "tablet_1", "2 x 120mg", 0 UNION ALL ' +
-                     'SELECT -1, "08:00", NULL, DATE("2014-05-01"), "Paracetamol", "tablet_2", "2 x 60mg", 0 UNION ALL ' +
-                     'SELECT 0, "10:00", "10:00", DATE("2014-05-01"), "Nurofeen", "tablet_2", "1 x 100mg", 1 UNION ALL ' +
-                     'SELECT 0, "13:00", "13:00", DATE("2014-05-01"), "Hydrochloorthiazide", "liquid", "50ml", 0 UNION ALL ' +
-                     'SELECT 1, "06:00", "06:05", DATE("2014-05-02"), "Ibuprofen", "tablet_2", "2 x 120mg", 1 UNION ALL ' +
-                     'SELECT 0, "08:00", "08:00", DATE("2014-05-02"), "Paracetamol", "tablet_2", "2 x 60mg", 0 UNION ALL ' +
-                     'SELECT 0, "13:00", "13:00", DATE("2014-05-02"), "Hydrochloorthiazide", "tablet_1", "50ml", 0 UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-03"), "Ibuprofen", "tablet_2", "2 x 120mg", 0 UNION ALL ' +
-                     'SELECT 1, "08:00", "08:10", DATE("2014-05-03"), "Paracetamol", "liquid", "2 x 60mg", 0 UNION ALL ' +
-                     'SELECT 1, "13:00", "13:30", DATE("2014-05-03"), "Hydrochloorthiazide", "tablet_1", "50ml", 0 UNION ALL ' +
-                     'SELECT -1, "06:00", NULL, DATE("2014-05-04"), "Ibuprofen", "tablet_2", "2 x 120mg", 0 UNION ALL ' +
-                     'SELECT -1, "08:00", NULL, DATE("2014-05-04"), "Paracetamol", "liquid", "2 x 60mg", 1 UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-05"), "Ibuprofen", "tablet_1", "2 x 120mg", 0 UNION ALL ' +
-                     'SELECT 1, "09:00", "09:20", DATE("2014-05-05"), "Ibuprofen", "tablet_2", "2 x 120mg", 0;'
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-01"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT -1, "08:00", NULL, DATE("2014-05-01"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "10:00", "10:00", DATE("2014-05-01"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
+                     'SELECT 0, "13:00", "13:00", DATE("2014-05-01"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
+                     'SELECT 1, "06:00", "06:05", DATE("2014-05-02"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 0, "08:00", "08:00", DATE("2014-05-02"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "13:00", "13:00", DATE("2014-05-02"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-03"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 1, "08:00", "08:10", DATE("2014-05-03"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 1, "13:00", "13:30", DATE("2014-05-03"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                     'SELECT -1, "06:00", NULL, DATE("2014-05-04"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT -1, "08:00", NULL, DATE("2014-05-04"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-05"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-06"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT -1, "08:00", NULL, DATE("2014-05-06"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "10:00", "10:00", DATE("2014-05-06"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
+                     'SELECT 0, "13:00", "13:00", DATE("2014-05-06"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
+                     'SELECT 1, "06:00", "06:05", DATE("2014-05-07"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 0, "08:00", "08:00", DATE("2014-05-07"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "13:00", "13:00", DATE("2014-05-07"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-08"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 1, "08:00", "08:10", DATE("2014-05-08"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 1, "13:00", "13:30", DATE("2014-05-08"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                     'SELECT -1, "06:00", NULL, DATE("2014-05-09"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT -1, "08:00", NULL, DATE("2014-05-09"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-11"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT -1, "08:00", NULL, DATE("2014-05-11"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "10:00", "10:00", DATE("2014-05-11"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
+                     'SELECT 0, "13:00", "13:00", DATE("2014-05-11"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
+                     'SELECT 1, "06:00", "06:05", DATE("2014-05-12"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 0, "08:00", "08:00", DATE("2014-05-12"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "13:00", "13:00", DATE("2014-05-12"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-13"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 1, "08:00", "08:10", DATE("2014-05-13"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 1, "13:00", "13:30", DATE("2014-05-13"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                     'SELECT -1, "06:00", NULL, DATE("2014-05-14"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT -1, "08:00", NULL, DATE("2014-05-14"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                     'SELECT 0, "06:00", "06:00", DATE("2014-05-15"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                     'SELECT 1, "09:00", "09:20", DATE("2014-05-15"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL;'
                   );
                   
                }, 

@@ -122,11 +122,19 @@ h5.popup-sub-title {
    font-size: 24px;
 }
 
+.pop-title, .pop-time {
+   color: white;
+}
+
 .pop-title {
    float:left;
 }
 .pop-time {
    float: right;
+}
+
+.floater {
+   display: block;
 }
 
 .popup-body {
@@ -674,7 +682,8 @@ div[pj-number-picker] button {
    text-align: center;
    font-size: 16pt;
    font-weight: bold;
-   padding-top: 5px
+   padding-top: 5px;
+   white-space: normal;
 }
 
 [pj-history-day] .history-row {
@@ -754,9 +763,9 @@ div[pj-number-picker] button {
    margin: 0 auto 5px auto;
 }
 
-.status-on-time { opacity: 0.7; border-top: 40px solid green !important; }
-.status-to-late { opacity: 0.7; border-top: 40px solid orange !important; }
-.status-not { opacity: 0.7; border-top: 40px solid red !important; }
+.status-on-time { opacity: 1; border-top: 40px solid green !important; }
+.status-to-late { opacity: 1; border-top: 40px solid orange !important; }
+.status-not { opacity: 1; border-top: 40px solid #c90000 !important; }
 
 .popup-body .status-triangle {
    position:absolute;
@@ -780,6 +789,35 @@ div[pj-number-picker] button {
    position: relative;
    margin:5px auto;
 }
+
+.popup-head {
+   background-color: #053E80;
+}
+
+.popup-head .dark-blue-title {
+   color:white;
+}
+
+.scheduled .label,
+.taken .label {
+   float: left;
+}
+
+.scheduled .value,
+.taken .value {
+   float: right;
+}
+
+.taken {
+   clear: both;
+}
+
+.history_interaction_item {
+   margin-top: 10px;
+   border: 1px solid #053E80;
+}
+
+
 
 
 
@@ -870,12 +908,19 @@ div[pj-number-picker] button {
       height:100vh;
    }
 
+   [pj-history-day] {
+      height: 202px;
+   }
+
 
    [pj-history-day] .history-date {
       position:absolute;
       width:10%;
       left:0;
       height:200px;
+      line-height: 40pt;
+      font-size: 18pt;
+      padding: 10px;
    }
 
    [pj-history-day] .history-row {
@@ -884,5 +929,7 @@ div[pj-number-picker] button {
       height:200px;
       width:90%;
    }
+
+
 
 }
