@@ -24,15 +24,15 @@ angular.module(
          $scope.$on(Phonestorage.events.STORAGE_READY, get_med);
 
       function get_med() {
-         var get_med_listener = $scope.$on(Phonestorage.events.MED_RETRIEVED, function(e, result) {
-            get_med_listener();
+
+         $scope.get_med_listener = $scope.$on(Phonestorage.events.MED_RETRIEVED, function(e, result) {
+            $scope.get_med_listener();
             if (result.rows.length === 0) window.location.hash = "/redirect";
             $scope.med = angular.copy(result.rows.item(0));
             $scope.med.editable = false;
 
-            var med_interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
-               med_interaction_listener();
-
+            $scope.med_interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
+               setTimeout( function() { $scope.med_interaction_listener(); }, 4000);
                $scope.interactions = result.med_interactions;
                $scope.med.interactions = result.med_interactions;
                $scope.$apply();
@@ -41,8 +41,8 @@ angular.module(
 
          });
 
-         var get_dosis_listener = $scope.$on(Phonestorage.events.MED_TIMES_RETRIEVED, function(e, result) {
-            get_dosis_listener();
+         $scope.get_dosis_listener = $scope.$on(Phonestorage.events.MED_TIMES_RETRIEVED, function(e, result) {
+            $scope.get_dosis_listener();
 
             $scope.times = [];
             for (var i = 0; i < result.rows.length; i++) {

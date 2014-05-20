@@ -11,7 +11,7 @@ angular.module('project.service.api', ['project.service.phonestorage'])
                   description: "Dit medicijn behoort tot de medicijngroep van vochtafdrijvende middelen.",
                   trade_name: "Ibuprofen 400mg",
                   note: "Een notule bij dit medicijn",
-                  Icon_id: 4,
+                  Icon_id: 2,
                   Unit_id: 3,
                   dosis_amount: 400,
                   when_to_use: "Dit medicijn werkt vochtafdrijvend. Te gebruiken bij: hartfalen, leverziekte, nierziekte, longoedeem, hoge bloeddruk of voorkoming van nierstenen. Dit medicijn zorgt ervoor dat u extra vochtafdrijft.",

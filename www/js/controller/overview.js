@@ -15,9 +15,13 @@ angular.module('project.controller.overview', ['project.service.phonestorage', '
 
             if (!$scope.interaction_listener) { // make sure 
                $scope.interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
-                  var med = Util.search_object_array_by($scope.med_overview, {find_one: true, filters: {id: result.med.id}});
-                  $scope.med_overview[$scope.med_overview.indexOf(med)].interactions = result.med_interactions;
-                  $scope.$apply();
+                  setTimeout( function() {if ($scope.interaction_listener) $scope.interaction_listener(); $scope.interaction_listener = false}, 1000);
+                  var meds = Util.search_object_array_by($scope.med_overview, {find_one: false, filters: {id: result.med.id}});
+                  console.log(meds);
+                  for (med in meds) {
+                     $scope.med_overview[$scope.med_overview.indexOf(meds[med])].interactions = result.med_interactions;
+                     $scope.$apply();
+                  }
                });
             }
 

@@ -233,6 +233,7 @@ a.item::after {
    border: none;
    height: 100px;
    padding: 0;
+   border-bottom: 2px solid rgb(90,90,90);
    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
    box-sizing: border-box;         /* Opera/IE 8+ */
@@ -438,6 +439,7 @@ a.item::after {
 
 .dosis.item.add-item .button {
    padding: 0 10px;
+   line-height: 30pt
 }
 
 .item.header-item {
@@ -998,6 +1000,7 @@ div[pj-number-picker] button {
       width:70%;
       margin: 0 15%;
       font-size: 34px;
+      line-height: 29pt
    }
 
    .new-med-container {
