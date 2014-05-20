@@ -118,8 +118,9 @@ angular.module('project.service.phonestorage', [])
             INTERACTION_RETRTIEVED:             "INTERACTION_RETRTIEVED"
          },
 
-         init: function(event_scope) {
+         init: function(event_scope, populate_storage) {
             this.event_aggregater = event_scope;
+            this.populate_storage = populate_storage;
             this.connection = this.connect();
 
             this.table_exists(this.settings.MED_TABLE_NAME);
@@ -349,9 +350,7 @@ angular.module('project.service.phonestorage', [])
             );
          },
 
-         get_reminders: function() {},
-         get_history: function() {},
-         get_conditions: function() {},
+         get_conditions: function() {}, // not implemented
 
          /* ADD */
          add_medicin: function(med, event_scope) {
@@ -450,7 +449,6 @@ angular.module('project.service.phonestorage', [])
          },
 
          /* UPDATE */
-         update_medicin: function(attribute, value) {},
          update_setting: function(attribute, value) {
             var self = this;
             this.connection.transaction(
@@ -516,11 +514,6 @@ angular.module('project.service.phonestorage', [])
          },
          save_med_note: function(id, note) {
             var self = this;
-            console.log("UPDATE " + self.settings.MED_TABLE_NAME + " " +
-                           "SET " +
-                              "note='" + note  + "' " + 
-                           "WHERE id=" + id + 
-                        ";");
             this.connection.transaction(
                function(tx) {
                   self.query(
@@ -600,9 +593,8 @@ angular.module('project.service.phonestorage', [])
             this.setup_med_table(this);
             this.setup_settings_table(this, this.settings.SETTINGS_TABLE_NAME);
             this.setup_history_table(this);
-            this.setup_reminder_table(this);
-            this.setup_user_condition_table(this);
             this.setup_user_data_table(this, this.settings.USER_DATA_TABLE_NAME)
+            this.setup_user_condition_table(this);
          },
 
          setup_med_table: function(scope) {
@@ -627,12 +619,14 @@ angular.module('project.service.phonestorage', [])
                         'Secondary_med_id INT REFERENCES ' + self.settings.MED_TABLE_NAME + '(id)' +
                      ')'
                   );
-                  tx.executeSql(
-                     'INSERT INTO ' + self.settings.INTERACTION_TABLE_NAME + 
-                     ' (description, Interaction_Status_id, Primary_med_id, Secondary_med_id) ' + 
-                     'SELECT "Deze twee medicijnen hebben een gevaarlijke wisselwerking.", 2, 4, 2 UNION ALL ' +
-                     'SELECT "Deze medicijnen verslechteren elkaars werking.", 0, 1, 3 ;'
-                  );
+                  if (self.populate_storage) {
+                     tx.executeSql(
+                        'INSERT INTO ' + self.settings.INTERACTION_TABLE_NAME + 
+                        ' (description, Interaction_Status_id, Primary_med_id, Secondary_med_id) ' + 
+                        'SELECT "Deze twee medicijnen hebben een gevaarlijke wisselwerking.", 2, 4, 2 UNION ALL ' +
+                        'SELECT "Deze medicijnen verslechteren elkaars werking.", 0, 1, 3 ;'
+                     );
+                  }
 
                   tx.executeSql('DROP TABLE IF EXISTS ' + self.settings.DOSIS_TABLE_NAME);
                   tx.executeSql(
@@ -647,33 +641,36 @@ angular.module('project.service.phonestorage', [])
                         'special_interval VARCHAR(50)' +
                      ')'
                   );
-                  tx.executeSql(
-                     'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
-                     ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
-                     'SELECT 2, "06:00", 1, "null", 0, 0 UNION ALL ' +
-                     'SELECT 1, "08:00", 1, "null", 0, 0 UNION ALL ' +
-                     'SELECT 3, "08:00", 1, "null", 0, 2 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, "null", 0, 0 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, "null", 0, 1 UNION ALL ' +
-                     'SELECT 2, "13:00", 1, "null", 0, 2 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, "null", 0, 3 UNION ALL ' +
-                     'SELECT 1, "16:00", 1, "null", 0, 3 UNION ALL ' +
-                     'SELECT 1, "18:30", 1, "null", 0, 2 UNION ALL ' +
-                     'SELECT 1, "18:30", 1, "null", 0, 0;'
-                  );
-                  tx.executeSql(
-                     'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
-                     ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
-                     'SELECT 1, "08:00", 1, "null", 0, 2 UNION ALL ' +
-                     'SELECT 1, "13:00", 1, "null", 0, 0 UNION ALL ' +
-                     'SELECT 2, "22:00", 1, "null", 0, 1;'
-                  );
-                  tx.executeSql(
-                     'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
-                     ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id, special_interval) ' + 
-                     'SELECT 2, "08:00", 1, "null", 1, 1, \'{"monday":false,"tuesday":false,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\' UNION ALL ' +
-                     'SELECT 2, "22:00", 1, "null", 1, 1, \'{"monday":true,"tuesday":true,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\';'
-                  );
+
+                  if (self.populate_storage) {
+                     tx.executeSql(
+                        'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
+                        ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
+                        'SELECT 2, "06:00", 1, "null", 0, 0 UNION ALL ' +
+                        'SELECT 1, "08:00", 1, "null", 0, 0 UNION ALL ' +
+                        'SELECT 3, "08:00", 1, "null", 0, 2 UNION ALL ' +
+                        'SELECT 1, "13:00", 1, "null", 0, 0 UNION ALL ' +
+                        'SELECT 1, "13:00", 1, "null", 0, 1 UNION ALL ' +
+                        'SELECT 2, "13:00", 1, "null", 0, 2 UNION ALL ' +
+                        'SELECT 1, "13:00", 1, "null", 0, 3 UNION ALL ' +
+                        'SELECT 1, "16:00", 1, "null", 0, 3 UNION ALL ' +
+                        'SELECT 1, "18:30", 1, "null", 0, 2 UNION ALL ' +
+                        'SELECT 1, "18:30", 1, "null", 0, 0;'
+                     );
+                     tx.executeSql(
+                        'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
+                        ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id) ' + 
+                        'SELECT 1, "08:00", 1, "null", 0, 2 UNION ALL ' +
+                        'SELECT 1, "13:00", 1, "null", 0, 0 UNION ALL ' +
+                        'SELECT 2, "22:00", 1, "null", 0, 1;'
+                     );
+                     tx.executeSql(
+                        'INSERT INTO ' + self.settings.DOSIS_TABLE_NAME + 
+                        ' (amount, time, reoccurence, reminder_task_id, Interval_Unit_id, Med_id, special_interval) ' + 
+                        'SELECT 2, "08:00", 1, "null", 1, 1, \'{"monday":false,"tuesday":false,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\' UNION ALL ' +
+                        'SELECT 2, "22:00", 1, "null", 1, 1, \'{"monday":true,"tuesday":true,"wednesday":false,"thursday":false,"friday":true,"saturday":false,"sunday":true}\';'
+                     );
+                  }
 
                   // Create the med table
                   tx.executeSql('DROP TABLE IF EXISTS ' + self.settings.MED_TABLE_NAME);
@@ -684,9 +681,7 @@ angular.module('project.service.phonestorage', [])
                         'description VARCHAR(1000), ' +
                         'trade_name VARCHAR(100), ' +
                         'note VARCHAR(4000), ' +
-                        // 'icon ENUM("tablet_1", "tablet_2", "tablet_3", "liquid", "powder", "injection"), ' +
                         'dosis_amount INT, ' +
-                        // 'dosis_unit ENUM("ml", "cl", "dl", "mg", "g"), ' +
                         'when_to_use VARCHAR(1000), ' +
                         'when_not_to_use VARCHAR(1000), ' +
                         'how_to_use VARCHAR(1000), ' +
@@ -695,12 +690,13 @@ angular.module('project.service.phonestorage', [])
                         'Active_Ingredient_id INT REFERENCES ' + self.settings.ACTIVE_INGREDIENT_TABLE_NAME + '(id)' +
                      ')'
                   );
-
-                  var med; 
-                  var query_pre_fix = 'INSERT INTO ' + self.settings.MED_TABLE_NAME + ' (prescribed, description, trade_name, note, dosis_amount, when_to_use, when_not_to_use, how_to_use, Icon_id, Unit_id, Active_Ingredient_id) VALUES ';
-                  for (med_i in self.default_values.meds) {
-                     med = self.default_values.meds[med_i];
-                     tx.executeSql(query_pre_fix + '("' + med.prescribed + '", "' + med.description + '", "' + med.trade_name + '", "' + med.note + '", ' + med.dosis_amount + ', "' + med.when_to_use + '", "' + med.when_not_to_use + '", "' + med.how_to_use + '", ' + med.Icon_id + ', ' + med.Unit_id + ', "' + med.active_ingredient + '")');
+                  if (self.populate_storage) {
+                     var med; 
+                     var query_pre_fix = 'INSERT INTO ' + self.settings.MED_TABLE_NAME + ' (prescribed, description, trade_name, note, dosis_amount, when_to_use, when_not_to_use, how_to_use, Icon_id, Unit_id, Active_Ingredient_id) VALUES ';
+                     for (med_i in self.default_values.meds) {
+                        med = self.default_values.meds[med_i];
+                        tx.executeSql(query_pre_fix + '("' + med.prescribed + '", "' + med.description + '", "' + med.trade_name + '", "' + med.note + '", ' + med.dosis_amount + ', "' + med.when_to_use + '", "' + med.when_not_to_use + '", "' + med.how_to_use + '", ' + med.Icon_id + ', ' + med.Unit_id + ', "' + med.active_ingredient + '")');
+                     }
                   }
                }, 
                this.query_failed
@@ -777,62 +773,59 @@ angular.module('project.service.phonestorage', [])
                         'icon VARCHAR(10)' +
                      ')'
                   );
-                  tx.executeSql(
-                     'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + 
-                     ' (status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) ' + 
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-01"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT -1, "08:00", NULL, DATE("2014-05-01"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "10:00", "10:00", DATE("2014-05-01"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
-                     'SELECT 0, "13:00", "13:00", DATE("2014-05-01"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
-                     'SELECT 1, "06:00", "06:05", DATE("2014-05-02"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 0, "08:00", "08:00", DATE("2014-05-02"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "13:00", "13:00", DATE("2014-05-02"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-03"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 1, "08:00", "08:10", DATE("2014-05-03"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 1, "13:00", "13:30", DATE("2014-05-03"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
-                     'SELECT -1, "06:00", NULL, DATE("2014-05-04"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT -1, "08:00", NULL, DATE("2014-05-04"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-05"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                  if (self.populate_storage) {
+                     tx.executeSql(
+                        'INSERT INTO ' + self.settings.HISTORY_TABLE_NAME + 
+                        ' (status, time_scheduled, time_taken, date, med_name, icon, dosis, interactions) ' + 
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-01"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT -1, "08:00", NULL, DATE("2014-05-01"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "10:00", "10:00", DATE("2014-05-01"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
+                        'SELECT 0, "13:00", "13:00", DATE("2014-05-01"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
+                        'SELECT 1, "06:00", "06:05", DATE("2014-05-02"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 0, "08:00", "08:00", DATE("2014-05-02"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "13:00", "13:00", DATE("2014-05-02"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-03"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 1, "08:00", "08:10", DATE("2014-05-03"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 1, "13:00", "13:30", DATE("2014-05-03"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                        'SELECT -1, "06:00", NULL, DATE("2014-05-04"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT -1, "08:00", NULL, DATE("2014-05-04"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-05"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
 
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-06"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT -1, "08:00", NULL, DATE("2014-05-06"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "10:00", "10:00", DATE("2014-05-06"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
-                     'SELECT 0, "13:00", "13:00", DATE("2014-05-06"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
-                     'SELECT 1, "06:00", "06:05", DATE("2014-05-07"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 0, "08:00", "08:00", DATE("2014-05-07"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "13:00", "13:00", DATE("2014-05-07"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-08"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 1, "08:00", "08:10", DATE("2014-05-08"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 1, "13:00", "13:30", DATE("2014-05-08"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
-                     'SELECT -1, "06:00", NULL, DATE("2014-05-09"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT -1, "08:00", NULL, DATE("2014-05-09"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-06"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT -1, "08:00", NULL, DATE("2014-05-06"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "10:00", "10:00", DATE("2014-05-06"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
+                        'SELECT 0, "13:00", "13:00", DATE("2014-05-06"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
+                        'SELECT 1, "06:00", "06:05", DATE("2014-05-07"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 0, "08:00", "08:00", DATE("2014-05-07"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "13:00", "13:00", DATE("2014-05-07"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-08"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 1, "08:00", "08:10", DATE("2014-05-08"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 1, "13:00", "13:30", DATE("2014-05-08"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                        'SELECT -1, "06:00", NULL, DATE("2014-05-09"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT -1, "08:00", NULL, DATE("2014-05-09"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-10"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
 
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-11"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT -1, "08:00", NULL, DATE("2014-05-11"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "10:00", "10:00", DATE("2014-05-11"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
-                     'SELECT 0, "13:00", "13:00", DATE("2014-05-11"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
-                     'SELECT 1, "06:00", "06:05", DATE("2014-05-12"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 0, "08:00", "08:00", DATE("2014-05-12"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "13:00", "13:00", DATE("2014-05-12"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-13"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 1, "08:00", "08:10", DATE("2014-05-13"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 1, "13:00", "13:30", DATE("2014-05-13"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
-                     'SELECT -1, "06:00", NULL, DATE("2014-05-14"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT -1, "08:00", NULL, DATE("2014-05-14"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
-                     'SELECT 0, "06:00", "06:00", DATE("2014-05-15"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
-                     'SELECT 1, "09:00", "09:20", DATE("2014-05-15"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL;'
-                  );
-                  
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-11"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT -1, "08:00", NULL, DATE("2014-05-11"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "10:00", "10:00", DATE("2014-05-11"), "Nurofeen", "tablet_2", "1 x 100mg", NULL UNION ALL ' +
+                        'SELECT 0, "13:00", "13:00", DATE("2014-05-11"), "Hydrochloorthiazide", "liquid", "50ml", NULL UNION ALL ' +
+                        'SELECT 1, "06:00", "06:05", DATE("2014-05-12"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 0, "08:00", "08:00", DATE("2014-05-12"), "Paracetamol", "tablet_2", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "13:00", "13:00", DATE("2014-05-12"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-13"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 1, "08:00", "08:10", DATE("2014-05-13"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 1, "13:00", "13:30", DATE("2014-05-13"), "Hydrochloorthiazide", "tablet_1", "50ml", NULL UNION ALL ' +
+                        'SELECT -1, "06:00", NULL, DATE("2014-05-14"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT -1, "08:00", NULL, DATE("2014-05-14"), "Paracetamol", "liquid", "2 x 60mg", NULL UNION ALL ' +
+                        'SELECT 0, "06:00", "06:00", DATE("2014-05-15"), "Ibuprofen", "tablet_1", "2 x 120mg", NULL UNION ALL ' +
+                        'SELECT 1, "09:00", "09:20", DATE("2014-05-15"), "Ibuprofen", "tablet_2", "2 x 120mg", NULL;'
+                     );
+                  }
                }, 
                this.query_failed
             );
-         },
-
-         setup_reminder_table: function(scope) {
-            // setup table and inject default data
          },
 
          setup_user_condition_table: function() {

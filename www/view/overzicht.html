@@ -1,6 +1,6 @@
 <ion-view title="overzicht">
    <ion-content class="has-header overzicht-view">
-      <div pj-scroll-controll parent-level="2" class="med-list scroll has-header has-footer">
+      <div ng-if="med_overview.length > 0" pj-scroll-controll parent-level="2" class="med-list scroll has-header has-footer">
          <a class="item med-item" ng-class="{'time-header': med.time_header==true}" ng-repeat="med in med_overview" type="item-text-wrap" href="#/medicijn-detail/{{med.id}}">
             <div class="time-container time-col">
                <span ng-if="med.time_header" class="time">
@@ -25,6 +25,10 @@
             </div>
          </a>
       </div>
+      <div ng-if="med_overview.length === 0" class="how-to how-to-settings">
+         <i class="icon ion-chevron-up"></i>
+         <span>Hier kunt u instellingen aanpassen</span>
+      </div>
    </ion-content>
 
    <ion-footer-bar class="bar-stable overzicht-footer">
@@ -33,12 +37,20 @@
             <div class="new-med-icon"></div>
             <span class="button-label">Nieuw Medicijn</span>
          </a>
+         <div ng-if="med_overview.length === 0" class="how-to how-to-add">
+            <i class="icon ion-chevron-down"></i>
+            <span>Hier kunt u medicijnen toevoegen</span>
+         </div>
       </div>
       <div class="col">
          <a class="button button-clear button-block" href="#/geschiedenis">  
             <div class="history-icon"></div>
             <span class="button-label">Geschiedenis</span>
          </a>
+         <div ng-if="med_overview.length === 0" class="how-to how-to-history">
+            <i class="icon ion-chevron-down"></i>
+            <span>Hier kunt u zien wanneer u wat heeft ingenomen</span>
+         </div>
       </div>         
    </ion-footer-bar>
    

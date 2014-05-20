@@ -239,7 +239,8 @@ a.item::after {
 }
 
 .med-list .item.time-header {
-   border-top: 1px solid rgb(90,90,90);
+   margin:0;
+   border-bottom: 1px solid rgb(90,90,90);
 }
 
 .info-col {
@@ -467,6 +468,47 @@ a.item::after {
 
 .note-item .button {
    margin-top: 20px;
+}
+
+.how-to {
+   position:absolute;
+}
+
+.how-to span {
+   font-size: 22pt;
+   line-height: 23pt;
+   display: block;
+   text-align: center;
+}
+
+.how-to i {
+   font-size: 50pt;
+   position: absolute;
+}
+
+.how-to.how-to-history,
+.how-to.how-to-add {
+   width: 50%;
+   top: -145px;
+}
+
+.how-to.how-to-add { left: 0%; }
+.how-to.how-to-add span, .how-to.how-to-history span { margin-bottom: 50px;}
+.how-to.how-to-add i { top: 85px; left: 41%;}
+.how-to.how-to-history { left: 50%; }
+.how-to.how-to-history i { top: 85px; left: 41%;}
+
+.how-to.how-to-settings {
+   right: 0;
+   width: 200px;
+   color: #444;
+}
+
+.how-to.how-to-settings span {
+   margin-top: 70px;
+}
+.how-to.how-to-settings i {
+   right: 65px;
 }
 
 /* DIRECTIVES */
@@ -855,6 +897,14 @@ div[pj-number-picker] button {
    bottom: 80px;
 }
 
+.history-explanation {
+   font-size: 22pt;
+   text-align: center;
+   width: 75%;
+   margin: auto;
+   padding-top: 20%; 
+}
+
 
 
 
@@ -869,9 +919,36 @@ div[pj-number-picker] button {
    .overzicht-view .scroll-controll.scroll-down {
       bottom: 190px;
    }
+
 }
 
 @media screen and (orientation:landscape) {
+
+   .how-to.how-to-history,
+   .how-to.how-to-add {
+      top: auto !important;
+      left: 100%;
+      width: 400px;
+   }
+
+   .how-to.how-to-history span,
+   .how-to.how-to-add span {
+      text-align: left;
+      margin-left: 60px;
+      margin-top: 3px;
+   }
+
+   .how-to.how-to-history i,
+   .how-to.how-to-add i {
+      left: 10px;
+      top: auto;
+      bottom: auto;
+   }
+
+   .how-to .ion-chevron-down:before {
+      content: "\f124";
+   }
+
    ion-content.overzicht-view {
       height:auto;
       left:25%;
