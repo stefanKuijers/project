@@ -40,7 +40,7 @@ angular.module('project.controller.history', ['project.service.phonestorage','pr
             med.status_class = "on-time";
 
          med.date = parse_date(med.date, 'dd-MMMM-yyyy');
-         med.interactions = (med.interactions == null || med.interactions.toLowerCase().match('null')) ? false : JSON.parse(med.interactions);
+         med.interactions = (med.interactions == null || med.interactions.match(/null/i) || med.interactions == 'undefined') ? false : JSON.parse(med.interactions);
 
          return med;
       }

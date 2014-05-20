@@ -62,6 +62,7 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
          // 1: now all doses are parsed to reminder objects and after that filtered. Shoud first filter and than parse.
          // 2: Check documentation of the notification plugin. Probably I don't have to check or the ID is already set. It will probably overwrite the notification
          add: function(dose, caller_scope) {
+            var now = Date.today().setTimeToNow();
             parse_date = function(time, day) {
                var parts = time.split(":");
                var hours = parseInt(parts[0], 10);
@@ -72,13 +73,22 @@ angular.module('project.service.notification', ['project.service.phonestorage', 
                if (day) {
                   switch (day) {
                      case "monday"   : if (!date.is().monday())    date.next().monday(); break;
-                     case "tuesday"  : if (!date.is().monday())    date.next().tuesday(); break;
+                     case "tuesday"  : if (!date.is().tuesday())   date.next().tuesday(); break;
                      case "wednesday": if (!date.is().wednesday()) date.next().wednesday(); break;
                      case "thursday" : if (!date.is().thursday())  date.next().thursday(); break;
                      case "friday"   : if (!date.is().friday())    date.next().friday(); break;
                      case "saturday" : if (!date.is().saturday())  date.next().saturday(); break;
                      case "sunday"   : if (!date.is().sunday())    date.next().sunday(); break;
                   }
+               }
+               if (now.isAfter(date)) {
+                  if (date.is().monday())    date.next().monday(); 
+                  if (date.is().tuesday())   date.next().tuesday(); 
+                  if (date.is().wednesday()) date.next().wednesday();
+                  if (date.is().thursday())  date.next().thursday(); 
+                  if (date.is().friday())    date.next().friday(); 
+                  if (date.is().saturday())  date.next().saturday(); 
+                  if (date.is().sunday())    date.next().sunday(); 
                }
 
                return date;

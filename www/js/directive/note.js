@@ -29,7 +29,7 @@ angular.module('project.directive.note', ['project.service.phonestorage', 'proje
                el_input.trigger('click');
 
                if (typeof cordova !== 'undefined') {
-                  $elem.parent().parent().css('top', '145px');
+                  $elem.parent().parent().css('top', '110px');
                   cordova.plugins.SoftKeyboard.show();
                }
                el_input.val(value);
