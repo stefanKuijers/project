@@ -33,6 +33,7 @@ input[type="search"],
 .settings-button-label,
 .button {
    font-size: 14.5pt;
+   line-height: 18pt;
 }
 
 .bar-header .title {
@@ -458,6 +459,10 @@ a.item::after {
    float: right;
 }
 
+.note-item {
+   margin-bottom: 20px;
+}
+
 .note-item .button {
    margin-top: 20px;
 }
@@ -517,7 +522,7 @@ div[pj-time-picker] .col-minute {
 div[pj-time-picker] .col-seperator { 
    flex: none; width:6%;
    text-align: center;
-   padding-top: 84px;
+   padding-top: 74px;
    font-weight:bold;
 }
 
@@ -526,6 +531,7 @@ div[pj-time-picker] .minute_holder,
 div[pj-time-picker] .col-seperator,
 div[pj-time-picker] button {
    font-size: 28pt;
+   line-height: 36pt;
 }
 
 /* number-picker */
@@ -539,6 +545,7 @@ div[pj-number-picker] .number_holder,
 div[pj-number-picker] .minute_holder,
 div[pj-number-picker] button {
    font-size: 28pt;
+   line-height: 36pt;
 }
 
 /* scroll-controll */
@@ -831,6 +838,10 @@ div[pj-number-picker] button {
 
 .taken {
    clear: both;
+}
+
+.taken.msg {
+   padding-top: 15px;
 }
 
 .history_interaction_item {

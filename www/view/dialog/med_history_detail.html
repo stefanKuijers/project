@@ -11,12 +11,15 @@
          <div class="label">Geplanned om:</div>
          <div class="value">{{med.time_scheduled}}</div>
       </div>
-      <div class="taken" ng-if="med.time_taken">
+      <div class="taken msg" ng-if="med.status == -2">
+         U heeft dit medicijn nog niet ingenomen. De herrinering gaat zo af.
+      </div>
+      <div class="taken msg" ng-if="med.status == -1">
+         U heeft dit medicijn niet ingenomen
+      </div>
+      <div class="taken" ng-if="med.status == 0 || med.status == 1">
          <div class="label">Ingenomen om: </div>
          <div class="value">{{med.time_taken}}</div>
-      </div>
-      <div class="taken" ng-if="!med.time_taken">
-         U heeft dit medicijn niet ingenomen
       </div>
    </div>
 

@@ -32,7 +32,7 @@ angular.module('project.controller.history', ['project.service.phonestorage','pr
       function parse_med(med_event) {
          var med = angular.copy(med_event);
 
-         if (med.status === -1)
+         if (med.status === -1 || med.status === -2)
             med.status_class = "not";
          else if (med.status === 1)
             med.status_class = "to-late";
