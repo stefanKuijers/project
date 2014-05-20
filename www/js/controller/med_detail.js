@@ -29,6 +29,7 @@ angular.module(
             $scope.get_med_listener();
             if (result.rows.length === 0) window.location.hash = "/redirect";
             $scope.med = angular.copy(result.rows.item(0));
+            $scope.med.trade_name = $scope.med.trade_name.replace('400mg', '').replace('200mg', '');
             $scope.med.editable = false;
 
             $scope.med_interaction_listener = $scope.$on(API.events.MED_INTERACTION, function(e, result) {
